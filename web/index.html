@@ -12,7 +12,7 @@
 <script type="text/javascript" src="/raptor-web-static/js/Sprite.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/PositionChanger.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Camera.js"></script>
-<script type="text/javascript" src="/raptor-web-static/js/Character.js"></script>
+<script type="text/javascript" src="/raptor-web-static/js/Actor.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Player.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Game.js"></script>
 <title>Raptor: Call of the Shadows</title>
@@ -23,23 +23,32 @@
 			<div id="main-scene">
 				<div id="building1" class="building"></div>
 				<div id="building1" class="building"></div>
-				<div id="player"></div>
 				<div id="enemy1" class="enemy"></div>
 				<div id="enemy1" class="enemy"></div>
 			</div>
+            <div id="player"></div>
 			<div id="hud">
-				<div id="armor-hud" class="gauge-hud progress-bar"></div>
-				<div id="health-hud" class="gauge-hud progress-bar"></div>
-				<div id="upper-huds">
-					<div id="shields" class="counter-hud"></div>
-					<div id="money" class="money"></div>
-					<div id="sec-weapon">
-						<div id="sec-weapon-laser"></div>
-					</div>
+				<div id="armor-hud" class="gauge-hud progress-bar">
+				    <div id="armor-hud-indic" class="gauge-hud-indic progress-bar-indic"></div>
 				</div>
-				<div id="downer-huds">
-					<div id="bombs" class="counter-hud"></div>
-					<div id="boss-health" class="health-bar progress-bar"></div>
+				<div id="health-hud" class="gauge-hud progress-bar">
+                    <div id="health-hud-indic" class="gauge-hud-indic progress-bar-indic"></div>
+                </div>
+                <div id="inner-huds">
+					<div id="upper-huds">
+						<div id="shields" class="counter-hud">
+						   <div id="shields-indic"></div>
+						</div>
+						<div id="money" class="money"></div>
+						<div id="sec-weapon">
+						</div>
+					</div>
+					<div id="downer-huds">
+						<div id="bombs" class="counter-hud">
+						   <div id="bombs-indic"></div>
+						</div>
+						<div id="boss-health" class="health-bar progress-bar"></div>
+					</div>
 				</div>
 			</div>
 		</div>

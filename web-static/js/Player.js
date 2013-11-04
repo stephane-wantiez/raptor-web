@@ -1,8 +1,13 @@
 var Player = function(parent)
 {
-	Character.call(this, parent, "player");
+	Actor.call(this, parent, "player");
 
 	var self = this;
+	
+	this.width = Player.WIDTH;
+	this.height = Player.HEIGHT;
+	this.radius = Player.HEIGHT;
+	this.state = Actor.State.ACTIVE;
 	
 	this.health = 100;
 	this.armor = 0;
@@ -18,12 +23,12 @@ var Player = function(parent)
 	this.secWeaponChanged = true;
 	this.nbBombsChanged = true;
 	
-	this.$health    = $("#health-hud");
-	this.$armor     = $("#armor-hud");
-	this.$shields   = $("#shields");
+	this.$health    = $("#health-hud-indic");
+	this.$armor     = $("#armor-hud-indic");
+	this.$shields   = $("#shields-indic");
 	this.$money     = $("#money");
 	this.$secWeapon = $("#sec-weapon");
-	this.$bombs     = $("#bombs");
+	this.$bombs     = $("#bombs-indic");
     
 	this.mouseEnabled = true;
 	
@@ -49,7 +54,7 @@ var Player = function(parent)
 	this.setSprite("move");
 	
 	this.secWeaponsList = {
-		"laser" : "../img/laser-weapon.png"	
+		"missiles" : "/raptor-web-static/img/icon_missiles.png"	
 	};
 
 	this.keyList = {};
@@ -66,14 +71,16 @@ Player.WIDTH = 65;
 Player.HEIGHT = 65;
 Player.INIT_X = Camera.SCREEN_WIDTH / 2;
 Player.INIT_Y = Camera.SCREEN_HEIGHT - 100;
-Player.MIN_X = 0 ;
-Player.MAX_X = Camera.SCREEN_WIDTH - Player.WIDTH ;
+Player.MIN_X = 20 ;
+Player.MAX_X = Camera.SCREEN_WIDTH - Player.WIDTH - 20 ;
 Player.MIN_Y = 50 ;
-Player.MAX_Y = Camera.SCREEN_HEIGHT - Player.HEIGHT ;
+Player.MAX_Y = Camera.SCREEN_HEIGHT - Player.HEIGHT - 30 ;
 Player.SPEED_X = 3000;
 Player.SPEED_Y = 2000;
-Player.ARMOR_ICON_WIDTH = 16;
-Player.BOMB_ICON_WIDTH = 16;
+Player.MAX_NB_SHIELDS = 10;
+Player.SHIELDS_PERCENT_FACTOR = 100 / Player.MAX_NB_SHIELDS ;
+Player.MAX_NB_BOMBS = 3;
+Player.BOMBS_PERCENT_FACTOR = 100 / Player.MAX_NB_BOMBS ;
 Player.NB_MONEY_DIGITS = 8;
 Player.MOVE_UP_KEY     = 38 ; // up arrow
 Player.MOVE_DOWN_KEY   = 40 ; // down arrow
@@ -82,7 +89,7 @@ Player.MOVE_RIGHT_KEY  = 39 ; // right arrow
 Player.MOVE_ATTACK_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
 
-Player.prototype = new Character();
+Player.prototype = new Actor();
 
 Player.prototype.setMouseEnabled = function(value)
 {
@@ -113,6 +120,8 @@ Player.prototype.setArmor = function(value)
 
 Player.prototype.setNbShields = function(value)
 {	
+	value = $.clampValue(value,0,Player.MAX_NB_SHIELDS);
+	
 	if (this.nbShields != value)
 	{
 		this.nbShields = value;
@@ -142,6 +151,8 @@ Player.prototype.setSecWeapon = function(value)
 
 Player.prototype.setNbBombs = function(value)
 {	
+	value = $.clampValue(value,0,Player.MAX_NB_BOMBS);
+	
 	if (this.nbBombs != value)
 	{
 		this.nbBombs = value;
@@ -153,25 +164,25 @@ Player.prototype.updateHud = function()
 {
 	if (this.healthChanged)
 	{
-		this.$health.css("width", this.health + "%");
+		this.$health.css("height", this.health + "%");
 		this.healthChanged = false;
 	}
 	
 	if (this.armorChanged)
 	{
-		this.$armor.css("width", this.armor + "%");
+		this.$armor.css("height", this.armor + "%");
 		this.armorChanged = false;
 	}
 	
 	if (this.nbShieldsChanged)
 	{
-		this.$shields.css("width", (Player.ARMOR_ICON_WIDTH * this.nbShields) + "px" );
+		this.$shields.css("width", (Player.SHIELDS_PERCENT_FACTOR * this.nbShields) + "%" );
 		this.nbShieldsChanged = false;
 	}
 	
 	if (this.nbBombsChanged)
 	{
-		this.$bombs.css("width", (Player.BOMB_ICON_WIDTH * this.nbBombs) + "px" );
+		this.$bombs.css("width", (Player.BOMBS_PERCENT_FACTOR * this.nbBombs) + "%" );
 		this.nbBombsChanged = false;
 	}
 	
@@ -186,7 +197,7 @@ Player.prototype.updateHud = function()
 		if ((this.secWeapon != "") && (this.secWeaponsList[this.secWeapon] != ""))
 		{
 			this.$secWeapon.show();
-			this.$health.css( "background-image", "url(" + this.secWeaponsList[this.secWeapon] + ")");
+			this.$secWeapon.css( "background-image", "url(" + this.secWeaponsList[this.secWeapon] + ")");
 		}
 		else
 		{
@@ -209,7 +220,7 @@ Player.prototype.updateState = function(deltaTimeSec)
 		move.x = $.clampValue(( this.mouseX - this.x ) * 50, -this.speed.x, this.speed.x) * deltaTimeSec ;
 		move.y = $.clampValue(( this.mouseY - this.y ) * 50, -this.speed.y, this.speed.y) * deltaTimeSec ;
 
-		console.log("Mouse moved: mouseX=" + this.mouseX + " , mouseY=" + this.mouseY + " - x=" + this.x + " , y=" + this.y + " -> move.x=" + move.x + " , move.y=" + move.y);
+		//console.log("Mouse moved: mouseX=" + this.mouseX + " , mouseY=" + this.mouseY + " - x=" + this.x + " , y=" + this.y + " -> move.x=" + move.x + " , move.y=" + move.y);
 		
 		isAttacking = this.mouseClicked;
 	}
@@ -228,7 +239,7 @@ Player.prototype.updateState = function(deltaTimeSec)
 
     if (isMoving)
     {
-	    console.log("Move: " + move.x + " , " + move.y + " - Delta: " + deltaTimeSec);
+	    //console.log("Move: " + move.x + " , " + move.y + " - Delta: " + deltaTimeSec);
     	this.move(move.x, move.y);
     }
         

@@ -18,6 +18,11 @@ PositionChanger.prototype.firePositionChange = function()
     }
 };
 
+PositionChanger.prototype.getPosition = function()
+{
+	return { x: this.x, y: this.y };
+};
+
 PositionChanger.prototype.setPosition = function(x, y)
 {
     this.x = parseInt(x);

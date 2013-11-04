@@ -1,3 +1,106 @@
-#hud{
+#hud div {
 	z-index: 5;
+}
+
+#inner-huds{
+	position: absolute;
+	top:0%;
+	left: 3%;
+	width: 94%;
+	height: 100%;
+}
+
+#upper-huds{
+    position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 50px;
+    /*border: white solid 1px;*/
+}
+#downer-huds{
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    width: 100%;
+    height: 30px;
+    /*border: yellow solid 1px;*/
+    margin-top: -30px;
+}
+
+#shields{
+    position: absolute;
+    left: 2%;
+    top: 5px;
+    width: 200px;
+    height: 20px;
+    /*border: green solid 1px;*/
+}
+#shields-indic{
+    width: 40%;
+    height: 100%;
+    background-image: url(../img/icon_shield.png);
+    background-position: left center;
+    /*border: cyan solid 1px;*/
+}
+
+#bombs{
+    position: absolute;
+    left: 2%;
+    bottom: 5px;
+    width: 72px;
+    height: 22px;
+    /*border: green solid 1px;*/
+}
+#bombs-indic{
+    width: 40%;
+    height: 100%;
+    background-image: url(../img/icon_bomb.png);
+    background-position: left center;
+    /*border: cyan solid 1px;*/
+}
+
+.gauge-hud{
+    position: absolute;
+    top: 0px;
+    width: 2%;
+    height: 100%;
+    background-color: black;
+}
+.gauge-hud-indic{
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    background-image: url(../img/icon_gauge.gif);
+    background-position: center bottom;
+    border: black solid 1px;
+}
+#armor-hud{
+	position:absolute;
+	left:0%;
+}
+#health-hud{
+    position:absolute;
+    left:98%;
+}
+
+#money{
+    position: absolute;
+    left: 50%;
+    width: 200px;
+    margin-left: -100px;
+    text-align: center;
+    font-family: 5metrik_bold;
+    font-size: 25px;
+    color: #DF821A;
+    /*border: red solid 1px;*/
+}
+
+#sec-weapon{
+	position:absolute;
+	left: 95%;
+	top: 5px;
+	width: 32px;
+	height: 32px;
+    /*border: grey solid 1px;*/
 }

@@ -100,6 +100,16 @@ $.clampValue = function(value, min, max)
 	return value;
 };
 
+$.getDistanceBetweenPointsSquared = function(point1,point2)
+{
+	return Math.abs (( point2.x - point1.x ) * ( point2.x - point1.x ) - ( point2.y - point1.y ) * ( point2.y - point1.y ));
+};
+
+$.getDistanceBetweenPoints = function(point1,point2)
+{
+	return Math.sqrt($.getDistanceBetweenPointsSquared(point1,point2));
+};
+
 $.expandValueDigits = function(value,nbDigits) // ex: 1234 on 8 digits -> return "00001234"
 {
 	var valueStr = "";
@@ -119,6 +129,11 @@ $.expandValueDigits = function(value,nbDigits) // ex: 1234 on 8 digits -> return
 };
 
 // UNIT TESTS
+
+testValue = $.getDistanceBetweenPointsSquared({x:1,y:1},{x:2,y:1});
+if (testValue != 1) console.error("$.getDistanceBetweenPointsSquared is WRONG: " + testValue);
+testValue = $.getDistanceBetweenPointsSquared({x:1,y:1},{x:1,y:3});
+if (testValue != 4) console.error("$.getDistanceBetweenPointsSquared is WRONG: " + testValue);
 
 testValue = $.expandValueDigits(1234,8);
 if (testValue != "00001234") console.error("$.expandValueDigits is WRONG: " + testValue);

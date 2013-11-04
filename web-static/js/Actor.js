@@ -1,4 +1,4 @@
-var Character = function(parent,id)
+var Actor = function(parent,id)
 {
 	if(!$.isDefined(parent)) return;	
 	this.parent = parent;
@@ -12,11 +12,21 @@ var Character = function(parent,id)
 	this.maxX = Infinity;
 	this.minY = 0;
 	this.maxY = Infinity;
+	
+	this.width = 0;
+	this.height = 0;
+	
+	this.radius = 1;
+	this.areCollisionsChecked = true;
+	
+	this.state = Actor.State.INACTIVE;
 };
 
-Character.prototype = new PositionChanger("character");
+Actor.State = { INACTIVE : 0, ACTIVE : 1, DEAD : 2 };
 
-Character.prototype.setSprite = function(anim, onComplete)
+Actor.prototype = new PositionChanger("Actor");
+
+Actor.prototype.setSprite = function(anim, onComplete)
 {
 	this.lastAnimId = anim;
 	var spriteId = anim;
@@ -42,7 +52,7 @@ Character.prototype.setSprite = function(anim, onComplete)
 	}
 };
 
-Character.prototype.moveTo = function(x, y)
+Actor.prototype.moveTo = function(x, y)
 {
 	if ((this.x == x) && (this.y == y)) return;
 	
@@ -69,7 +79,28 @@ Character.prototype.moveTo = function(x, y)
 	});
 };
 
-Character.prototype.move = function(x, y)
+Actor.prototype.move = function(x, y)
 {
 	this.moveTo(this.x + x, this.y + y);
+};
+
+Actor.prototype.getPositionInScene = function()
+{
+	return this.getPosition();
+};
+
+Actor.prototype.getCenterInScene = function()
+{
+	var centerInScene = this.getPositionInScene();
+	centerInScene.x += this.width  / 2 ;
+	centerInScene.y += this.height / 2 ;
+	return centerInScene;
+};
+
+Actor.prototype.isCollidingWith = function(otherActor)
+{
+	var actorCenterPos = this.getCenterInScene();
+	var otherCenterPos = otherActor.getCenterInScene();
+	var distSquared = $.getDistanceBetweenPointsSquared(actorCenterPos,otherCenterPos);
+	return distSquared <= ( this.radius * this.radius );
 };
