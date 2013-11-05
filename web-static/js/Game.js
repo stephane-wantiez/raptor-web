@@ -8,11 +8,20 @@ var Game = function()
 	this.elapsedGameTimeSinceStartup = 0;
 	this.paused = false;
 	
-	$screen = $("#screen");
 	$scene = $("#game");
 
 	player = new Player($scene);
-	camera = new Camera($scene);
+	scene = new Scene(player);
+	player.setScene(scene);
+	
+	// test values
+	player.setArmor(50);
+	player.setHealth(80);
+	player.setMoney(123450);
+	player.setNbBombs(2);
+	player.setNbShields(3);
+	player.setSecWeapon("missiles");
+	
 	
 	requestAnimFrame(
 		function loop() {
@@ -34,7 +43,7 @@ Game.prototype.mainLoop = function()
 	this.elapsedGameTimeSinceStartup += deltaTimeMs;
 	var deltaTimeSec = deltaTimeMs / 1000;
 
-	camera.update(deltaTimeSec);
+	scene.update(deltaTimeSec);
 	player.update(deltaTimeSec);
 };
 

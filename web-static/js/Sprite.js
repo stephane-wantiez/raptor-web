@@ -31,6 +31,7 @@ var Sprite = function(parent, id, url, width, height, colCount, rowCount, frameR
 	this.parent.append(this.$elm);
 	this.hide();
 	this.onAnimationComplete = false;
+	this.completed = false;
 	
 	this.$img = $("<img>").css({
 		position: "absolute",
@@ -101,6 +102,7 @@ Sprite.prototype.play = function(onComplete){
 Sprite.prototype.resetAnim = function(){
 	this.stop();
 	this.currentFrame = 0;
+	this.completed = false;
 	this.refreshDisplay();
 };
 Sprite.prototype.stop = function(){
@@ -125,6 +127,7 @@ Sprite.prototype.nextFrame = function(frames){
 	if(this.currentFrame == this.frameCount - 1 && !this.loop && this.onAnimationComplete){
 		this.onAnimationComplete(this);
 		this.onAnimationComplete = false;
+		this.completed = true;
 	}
 };
 Sprite.prototype.refreshDisplay = function(){

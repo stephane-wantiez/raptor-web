@@ -10,8 +10,9 @@
 <script	src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/utils.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Sprite.js"></script>
+<script type="text/javascript" src="/raptor-web-static/js/ActorsContainer.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/PositionChanger.js"></script>
-<script type="text/javascript" src="/raptor-web-static/js/Camera.js"></script>
+<script type="text/javascript" src="/raptor-web-static/js/Scene.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Actor.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Player.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Game.js"></script>
@@ -20,11 +21,13 @@
 <body>
 	<div id="screen">
 		<div id="game">
-			<div id="main-scene">
-				<div id="building1" class="building"></div>
-				<div id="building1" class="building"></div>
-				<div id="enemy1" class="enemy"></div>
-				<div id="enemy1" class="enemy"></div>
+		    <div id="scene-view">
+				<div id="scene">
+					<div id="building1" class="building"></div>
+					<div id="building1" class="building"></div>
+					<div id="enemy1" class="enemy"></div>
+					<div id="enemy1" class="enemy"></div>
+				</div>
 			</div>
             <div id="player"></div>
 			<div id="hud">

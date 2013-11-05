@@ -7,6 +7,10 @@ var Actor = function(parent,id)
 
 	this.spriteList = {};
 	this.currentSprite = false;
+	this.nextSprite = "";	
+	this.lastAnimId = "";
+	this.idleSpriteName = "";
+	this.deadSpriteName = "";
 	
 	this.minX = 0;
 	this.maxX = Infinity;
@@ -16,10 +20,16 @@ var Actor = function(parent,id)
 	this.width = 0;
 	this.height = 0;
 	
+	this.childActors = new ActorsContainer();
+	
+	this.isVisible = false;
+	
 	this.radius = 1;
 	this.areCollisionsChecked = true;
 	
 	this.state = Actor.State.INACTIVE;
+	
+	this.deathTime = 0;
 };
 
 Actor.State = { INACTIVE : 0, ACTIVE : 1, DEAD : 2 };
@@ -33,7 +43,7 @@ Actor.prototype.setSprite = function(anim, onComplete)
 	
 	if(this.currentSprite != this.spriteList[spriteId])
 	{
-		if(!this.currentSprite || this.currentSprite.loop || this.currentSprite.currentFrame == this.currentSprite.frameCount - 1)
+		if(!this.currentSprite || this.currentSprite.loop || this.currentSprite.completed)
 		{
 			if(this.currentSprite)
 			{
@@ -49,6 +59,24 @@ Actor.prototype.setSprite = function(anim, onComplete)
 		{
             this.nextSprite = anim;
         }
+	}
+};
+
+Actor.prototype.checkSprite = function()
+{
+	if (this.state == Actor.State.ACTIVE)
+	{
+		if (!this.currentSprite || this.currentSprite.completed)
+		{
+			if (this.nextSprite != "")
+			{
+				this.setSprite(this.nextSprite);
+			}
+			else if (this.idleSpriteName != "")
+			{
+				this.setSprite(this.idleSpriteName);
+			}
+		}
 	}
 };
 
@@ -97,10 +125,99 @@ Actor.prototype.getCenterInScene = function()
 	return centerInScene;
 };
 
+Actor.prototype.isBeforeX = function(x)
+{
+	return this.x + this.width < x;
+};
+
+Actor.prototype.isAfterX = function(x)
+{
+	return x < this.x ;
+};
+
+Actor.prototype.isBeforeY = function(x)
+{
+	return this.y + this.height < y;
+};
+
+Actor.prototype.isAfterY = function(x)
+{
+	return y < this.y ;
+};
+
+Actor.prototype.isLifetimeOver = function()
+{
+	return ( this.deathTime != 0 ) && ( this.deathTime <= Date.now() );
+};
+
 Actor.prototype.isCollidingWith = function(otherActor)
 {
+	if (!      this.areCollisionsChecked) return false;
+	if (!otherActor.areCollisionsChecked) return false;
+	
+	if (      this.state == Actor.State.DEAD) return false;
+	if (otherActor.state == Actor.State.DEAD) return false;
+	
 	var actorCenterPos = this.getCenterInScene();
 	var otherCenterPos = otherActor.getCenterInScene();
 	var distSquared = $.getDistanceBetweenPointsSquared(actorCenterPos,otherCenterPos);
-	return distSquared <= ( this.radius * this.radius );
+	var minDist = this.radius + otherActor.radius;
+	var minDistSquared = minDist * minDist;
+	
+	return distSquared <= minDistSquared;
+};
+
+Actor.prototype.checkCollisionWith = function(otherActor)
+{
+	if (this.isCollidingWith(otherActor))
+	{
+		this.handleCollisionWith(otherActor);
+		otherActor.handleCollisionWith(this);
+	};
+		
+	for (var childActor in this.childActors.list)
+	{
+		childActor.checkCollisionWith(otherActor);
+	}
+		
+	for (var otherChildActor in otherActor.childActors.list)
+	{
+		this.checkCollisionWith(otherChildActor);
+	}
+};
+
+Actor.prototype.handleCollisionWith = function(otherActor)
+{};
+
+Actor.prototype.update = function(deltaTimeSec)
+{
+	this.childActors.clean();
+	this.childActors.update(deltaTimeSec);
+	
+	if (this.isLifetimeOver())
+	{
+		this.kill();
+	}
+	else
+	{
+		this.checkSprite();
+	}
+};
+
+Actor.prototype.kill = function()
+{
+	var self = this;
+	var setToDead = function(value)
+	{
+		self.state = Actor.State.DEAD;
+	};
+	
+	if ( this.isVisible && (this.deadSpriteName != ""))
+	{
+		this.setSprite(this.deadSpriteName, setToDead);
+	}
+	else
+	{
+		setToDead(null);
+	}
 };

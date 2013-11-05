@@ -24,4 +24,5 @@ PositionChanger -> Actor -> FlyingActor -> FlyingEnemy -> classes of each type o
                          -> Building
 Sprite
 Camera
+Scene
 Game

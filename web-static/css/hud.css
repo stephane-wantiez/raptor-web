@@ -65,6 +65,7 @@
     top: 0px;
     width: 2%;
     height: 100%;
+    border: black solid 1px;
     background-color: black;
 }
 .gauge-hud-indic{
@@ -73,7 +74,6 @@
     bottom: 0px;
     background-image: url(../img/icon_gauge.gif);
     background-position: center bottom;
-    border: black solid 1px;
 }
 #armor-hud{
 	position:absolute;

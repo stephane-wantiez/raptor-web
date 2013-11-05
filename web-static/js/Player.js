@@ -30,6 +30,7 @@ var Player = function(parent)
 	this.$secWeapon = $("#sec-weapon");
 	this.$bombs     = $("#bombs-indic");
     
+	this.controlsEnabled = true;
 	this.mouseEnabled = true;
 	
     $(document).keyup(function(e){ self.onKeyUp(e.which);});
@@ -51,7 +52,9 @@ var Player = function(parent)
 	this.spriteList = {
 		"move": new Sprite(this.$elm, "move", "/raptor-web-static/img/sprites_player.png", 3*Player.WIDTH, Player.HEIGHT, 3, 1, 20, true)
 	};
+	
 	this.setSprite("move");
+	this.idleSpriteName = "move";
 	
 	this.secWeaponsList = {
 		"missiles" : "/raptor-web-static/img/icon_missiles.png"	
@@ -64,17 +67,19 @@ var Player = function(parent)
 	this.mouseMoved = false;
 	this.mouseClicked = false;
 	
+	this.ammosShootTime = [];
+	
 	this.setPosition(Player.INIT_X,Player.INIT_Y);
 };
 
 Player.WIDTH = 65;
 Player.HEIGHT = 65;
-Player.INIT_X = Camera.SCREEN_WIDTH / 2;
-Player.INIT_Y = Camera.SCREEN_HEIGHT - 100;
+Player.INIT_X = Scene.SCREEN_WIDTH / 2;
+Player.INIT_Y = Scene.SCREEN_HEIGHT - 100;
 Player.MIN_X = 20 ;
-Player.MAX_X = Camera.SCREEN_WIDTH - Player.WIDTH - 20 ;
+Player.MAX_X = Scene.SCREEN_WIDTH - Player.WIDTH - 20 ;
 Player.MIN_Y = 50 ;
-Player.MAX_Y = Camera.SCREEN_HEIGHT - Player.HEIGHT - 30 ;
+Player.MAX_Y = Scene.SCREEN_HEIGHT - Player.HEIGHT - 30 ;
 Player.SPEED_X = 3000;
 Player.SPEED_Y = 2000;
 Player.MAX_NB_SHIELDS = 10;
@@ -90,6 +95,18 @@ Player.MOVE_ATTACK_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
 
 Player.prototype = new Actor();
+
+Player.prototype.setScene = function(scene)
+{
+	this.scene = scene;
+};
+
+Player.prototype.getPositionInScene = function()
+{
+	var pos = this.getPosition();
+	pos.y += scene.getCameraPosition();
+	return pos;
+};
 
 Player.prototype.setMouseEnabled = function(value)
 {
@@ -160,6 +177,12 @@ Player.prototype.setNbBombs = function(value)
 	}
 };
 
+Player.prototype.shootAmmo = function(ammoType,ammoActor)
+{
+	this.childActors.add(ammoActor);
+	this.ammosShootTime[ammoType] = Date.now();
+};
+
 Player.prototype.updateHud = function()
 {
 	if (this.healthChanged)
@@ -215,7 +238,7 @@ Player.prototype.updateState = function(deltaTimeSec)
 	var move = {x: 0, y: 0};
 	var isAttacking = false;
 	
-	if (this.mouseEnabled)
+	if (this.controlsEnabled && this.mouseEnabled)
 	{	
 		move.x = $.clampValue(( this.mouseX - this.x ) * 50, -this.speed.x, this.speed.x) * deltaTimeSec ;
 		move.y = $.clampValue(( this.mouseY - this.y ) * 50, -this.speed.y, this.speed.y) * deltaTimeSec ;
@@ -224,7 +247,7 @@ Player.prototype.updateState = function(deltaTimeSec)
 		
 		isAttacking = this.mouseClicked;
 	}
-	else
+	else if (this.controlsEnabled)
 	{
 	    if (this.isKeyDown(Player.MOVE_LEFT_KEY )) move.x = -this.speed.x * deltaTimeSec ;
 	    if (this.isKeyDown(Player.MOVE_RIGHT_KEY)) move.x =  this.speed.x * deltaTimeSec ;
@@ -251,12 +274,17 @@ Player.prototype.updateState = function(deltaTimeSec)
 
 Player.prototype.update = function(deltaTimeSec)
 {	
+	Actor.prototype.update.call(this,deltaTimeSec);
+	
 	if (!game.paused)
 	{
 		this.updateState(deltaTimeSec);
 	}
 	
 	this.updateHud();
+	
+	//var pos = this.getPositionInScene();
+	//console.log("Player position in scene: " + pos.x + "," + pos.y );
 };
 
 Player.prototype.isKeyDown = function(k)
