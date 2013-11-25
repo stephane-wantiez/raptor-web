@@ -11,25 +11,52 @@ var Scene = function(player)
 
 Scene.prototype.checkCollisionsBetweenActorsAnd = function(actor)
 {
-	for (var otherActor in this.actors.list)
+	for (var otherActorId in this.actors.list)
 	{
+		var otherActor = this.actors.list[otherActorId];
 		actor.checkCollisionWith(otherActor);
 	}
 };
 
+Scene.prototype.isActorOutOfXLimits = function(actor)
+{
+	return actor.isBeforeX(Scene.MIN_X) || actor.isAfterX(Scene.MAX_X);
+};
+
 Scene.prototype.checkActorPosition = function(actor)
 {
-	if (actor.isBeforeX(Scene.MIN_X) || actor.isAfterX(Scene.MAX_X) || actor.isAfterY(Scene.MAX_CAMERA_Y))
+	if (this.isActorOutOfXLimits(actor))
 	{
-		// actor is out of limits
-		actor.kill();
+		actor.remove();
+	}
+	else
+	{
+		var actorIsVisibleInY = this.isActorVisibleInY(actor);
+		
+		if (actor.state == Actor.State.INACTIVE)
+		{
+			if (actorIsVisibleInY)
+			{
+				//console.log("Inactive actor becomes visible, activation");
+				actor.activate();
+			}
+		}
+		else if (actor.state == Actor.State.ACTIVE)
+		{
+			if (!actorIsVisibleInY)
+			{
+				//console.log("Active actor becomes invisible, removal");
+				actor.remove();
+			}
+		}
 	}
 };
 
 Scene.prototype.checkActorsPosition = function()
 {
-	for (var actor in this.actors.list)
+	for (var actorId in this.actors.list)
 	{
+		var actor = this.actors.list[actorId];
 		this.checkActorPosition(actor);
 	}
 };
@@ -41,12 +68,12 @@ Scene.prototype.getCameraPosition = function()
 
 Scene.prototype.updateCameraPosition = function(deltaTimeSec)
 {
-	this.cameraY -= this.speedY * deltaTimeSec;
+	this.cameraY += this.speedY * deltaTimeSec;
 	this.cameraY = $.clampValue(this.cameraY,Scene.MIN_CAMERA_Y,Scene.MAX_CAMERA_Y);
-	this.shitSceneForCamera();
+	this.shiftSceneForCamera();
 };
 
-Scene.prototype.shitSceneForCamera = function()
+Scene.prototype.shiftSceneForCamera = function()
 {
 	this.$scene.css("top",-this.cameraY+"px");
 };
@@ -61,6 +88,11 @@ Scene.prototype.getMaxVisibleY = function()
 	return this.cameraY + Scene.SCREEN_HEIGHT + Scene.VISIBILITY_OFFSET;
 };
 
+Scene.prototype.isActorVisibleInY = function(actor)
+{
+	return !actor.isBeforeY(this.getMinVisibleY()) && !actor.isAfterY(this.getMaxVisibleY());
+};
+
 Scene.prototype.update = function(deltaTimeSec)
 {
 	this.actors.clean();
@@ -71,13 +103,18 @@ Scene.prototype.update = function(deltaTimeSec)
 	this.checkActorsPosition();
 	
 	//console.log("Camera Y: " + this.cameraY);
+	//console.log("Nb actors in scene: " + this.actors.size());
 };
 
-Scene.CAMERA_SPEED = 40;
+Scene.CAMERA_SPEED = -40;
 Scene.SCREEN_WIDTH = 800;
 Scene.SCREEN_HEIGHT = 600;
 Scene.SCENE_WIDTH = 800;
 Scene.SCENE_HEIGHT = 6000;
+Scene.MIN_X = 0;
+Scene.MAX_X = Scene.SCENE_WIDTH;
+Scene.MIN_Y = 0;
+Scene.MAX_Y = Scene.SCENE_HEIGHT;
 Scene.MIN_CAMERA_Y = 0;
 Scene.MAX_CAMERA_Y = Scene.SCENE_HEIGHT - Scene.SCREEN_HEIGHT;
 Scene.VISIBILITY_OFFSET = 100;

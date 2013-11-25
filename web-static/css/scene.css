@@ -27,3 +27,8 @@
     position: absolute;
 	z-index: 3;
 }
+
+.bullet{
+    position: absolute;
+    z-index: 3;	
+}

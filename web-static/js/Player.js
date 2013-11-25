@@ -16,6 +16,11 @@ var Player = function(parent)
 	this.secWeapon = "";
 	this.nbBombs = 0;
 	
+	this.weaponCreateAmmo = function(){ return new Bullet(self.parent); };
+	this.weaponShootDelayMs = Bullet.SHOOT_WAIT_TIME_MSEC;
+	this.nextAllowedWeaponAttack = 0;
+	this.useAttackPosition1 = true;
+	
 	this.healthChanged = true;
 	this.armorChanged = true;
 	this.nbShieldsChanged = true;
@@ -50,7 +55,7 @@ var Player = function(parent)
 	};
 
 	this.spriteList = {
-		"move": new Sprite(this.$elm, "move", "/raptor-web-static/img/sprites_player.png", 3*Player.WIDTH, Player.HEIGHT, 3, 1, 20, true)
+		"move": new Sprite(this.$elm, "move", "/raptor-web-static/img/sprites_player.png", Player.NB_MOVE_SPRITES*Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true)
 	};
 	
 	this.setSprite("move");
@@ -67,13 +72,16 @@ var Player = function(parent)
 	this.mouseMoved = false;
 	this.mouseClicked = false;
 	
-	this.ammosShootTime = [];
-	
 	this.setPosition(Player.INIT_X,Player.INIT_Y);
 };
 
 Player.WIDTH = 65;
 Player.HEIGHT = 65;
+Player.NB_MOVE_SPRITES = 3;
+Player.SHOOT_REL_POSITION_1_X = 10;
+Player.SHOOT_REL_POSITION_2_X = Player.WIDTH - 10;
+Player.SHOOT_REL_POSITION_1_Y = -10;
+Player.SHOOT_REL_POSITION_2_Y = -10;
 Player.INIT_X = Scene.SCREEN_WIDTH / 2;
 Player.INIT_Y = Scene.SCREEN_HEIGHT - 100;
 Player.MIN_X = 20 ;
@@ -95,11 +103,6 @@ Player.MOVE_ATTACK_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
 
 Player.prototype = new Actor();
-
-Player.prototype.setScene = function(scene)
-{
-	this.scene = scene;
-};
 
 Player.prototype.getPositionInScene = function()
 {
@@ -175,12 +178,6 @@ Player.prototype.setNbBombs = function(value)
 		this.nbBombs = value;
 		this.nbBombsChanged = true;
 	}
-};
-
-Player.prototype.shootAmmo = function(ammoType,ammoActor)
-{
-	this.childActors.add(ammoActor);
-	this.ammosShootTime[ammoType] = Date.now();
 };
 
 Player.prototype.updateHud = function()
@@ -269,7 +266,36 @@ Player.prototype.updateState = function(deltaTimeSec)
 	//this.setSprite(isAttacking?"attack":(isMoving?"move":"idle"));
     this.setSprite("move");
     
-    if (isAttacking) console.log("Attacking");
+    if (isAttacking)
+    {
+    	this.attack();
+    }
+};
+
+Player.prototype.getAttackPosition = function()
+{
+	var posInScene = this.getPositionInScene();
+	var attackPosX = posInScene.x + ( this.useAttackPosition1 ? Player.SHOOT_REL_POSITION_1_X : Player.SHOOT_REL_POSITION_2_X );
+	var attackPosY = posInScene.y + ( this.useAttackPosition1 ? Player.SHOOT_REL_POSITION_1_Y : Player.SHOOT_REL_POSITION_2_Y );
+	this.useAttackPosition1 = ! this.useAttackPosition1;
+	return { x : attackPosX, y : attackPosY };
+};
+
+Player.prototype.attack = function()
+{
+	//console.log("Attack command");
+	if (this.nextAllowedWeaponAttack < game.elapsedGameTimeSinceStartup)
+	{
+		//console.log("Can attack!");
+		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
+		//var projectile = this.weaponCreateAmmo();
+		var projectile = new Bullet(this.scene.$scene);
+		var attackPos = this.getAttackPosition();
+		projectile.setPosition(attackPos.x,attackPos.y);
+		projectile.speedY += this.scene.speedY;
+		this.scene.actors.add(projectile);
+	}
+	
 };
 
 Player.prototype.update = function(deltaTimeSec)

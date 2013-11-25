@@ -1,9 +1,20 @@
-var Actor = function(parent,id)
+var Actor = function(parent,id,className)
 {
 	if(!$.isDefined(parent)) return;	
 	this.parent = parent;
 	
-	this.$elm = $("#"+id);
+	this.id = id;
+	
+	this.$elm = $("#"+this.id);
+	
+	if(this.$elm.length == 0)
+	{
+		this.$elm = $("<div>");
+		this.$elm.attr("id",this.id);
+		this.parent.append(this.$elm);
+	};
+	
+	if($.isDefined(className)) this.$elm.addClass(className); 
 
 	this.spriteList = {};
 	this.currentSprite = false;
@@ -12,15 +23,13 @@ var Actor = function(parent,id)
 	this.idleSpriteName = "";
 	this.deadSpriteName = "";
 	
-	this.minX = 0;
+	this.minX = -Infinity;
 	this.maxX = Infinity;
-	this.minY = 0;
+	this.minY = -Infinity;
 	this.maxY = Infinity;
 	
 	this.width = 0;
 	this.height = 0;
-	
-	this.childActors = new ActorsContainer();
 	
 	this.isVisible = false;
 	
@@ -35,6 +44,11 @@ var Actor = function(parent,id)
 Actor.State = { INACTIVE : 0, ACTIVE : 1, DEAD : 2 };
 
 Actor.prototype = new PositionChanger("Actor");
+
+Actor.prototype.setScene = function(scene)
+{
+	this.scene = scene;
+};
 
 Actor.prototype.setSprite = function(anim, onComplete)
 {
@@ -135,12 +149,12 @@ Actor.prototype.isAfterX = function(x)
 	return x < this.x ;
 };
 
-Actor.prototype.isBeforeY = function(x)
+Actor.prototype.isBeforeY = function(y)
 {
 	return this.y + this.height < y;
 };
 
-Actor.prototype.isAfterY = function(x)
+Actor.prototype.isAfterY = function(y)
 {
 	return y < this.y ;
 };
@@ -148,6 +162,14 @@ Actor.prototype.isAfterY = function(x)
 Actor.prototype.isLifetimeOver = function()
 {
 	return ( this.deathTime != 0 ) && ( this.deathTime <= Date.now() );
+};
+
+Actor.prototype.checkLifetime = function()
+{
+	if ((this.state == Actor.State.ACTIVE) && this.isLifetimeOver())
+	{
+		this.remove();
+	}
 };
 
 Actor.prototype.isCollidingWith = function(otherActor)
@@ -174,50 +196,46 @@ Actor.prototype.checkCollisionWith = function(otherActor)
 		this.handleCollisionWith(otherActor);
 		otherActor.handleCollisionWith(this);
 	};
-		
-	for (var childActor in this.childActors.list)
-	{
-		childActor.checkCollisionWith(otherActor);
-	}
-		
-	for (var otherChildActor in otherActor.childActors.list)
-	{
-		this.checkCollisionWith(otherChildActor);
-	}
 };
 
 Actor.prototype.handleCollisionWith = function(otherActor)
 {};
 
 Actor.prototype.update = function(deltaTimeSec)
-{
-	this.childActors.clean();
-	this.childActors.update(deltaTimeSec);
-	
-	if (this.isLifetimeOver())
+{	
+	if (this.state == Actor.State.ACTIVE)
 	{
-		this.kill();
-	}
-	else
-	{
+		this.checkLifetime();
 		this.checkSprite();
 	}
 };
 
+Actor.prototype.activate = function()
+{
+	//console.log("Activating actor");
+	this.state = Actor.State.ACTIVE;
+};
+
 Actor.prototype.kill = function()
 {
+	//console.log("Killing actor");
 	var self = this;
-	var setToDead = function(value)
-	{
-		self.state = Actor.State.DEAD;
-	};
+	var doRemove = function(value){ self.remove(); };
 	
 	if ( this.isVisible && (this.deadSpriteName != ""))
 	{
-		this.setSprite(this.deadSpriteName, setToDead);
+		this.setSprite(this.deadSpriteName, doRemove);
 	}
 	else
 	{
-		setToDead(null);
+		doRemove(null);
 	}
+};
+
+Actor.prototype.remove = function()
+{
+	//console.log("Removing actor");
+	this.state = Actor.State.DEAD;
+	this.isVisible = false;
+	this.$elm.remove();
 };

@@ -1,6 +1,6 @@
 var ActorsContainer = function()
 {
-	this.list = [];
+	this.list = {};
 };
 
 ActorsContainer.prototype.add = function(actor)
@@ -8,31 +8,36 @@ ActorsContainer.prototype.add = function(actor)
 	this.list[actor.id] = actor;
 };
 
-ActorsContainer.prototype.remove = function(actor)
+ActorsContainer.prototype.remove = function(actorId)
 {
-	this.list.splice(actor.id,1);
+	delete this.list[actorId];
 };
 
 ActorsContainer.prototype.clean = function()
 {
 	var actorsToRemove = [];
-	for (var actor in this.list)
+	for (var actorId in this.list)
 	{
-		if (actor.state == Actor.State.DEAD)
+		if (this.list[actorId].state == Actor.State.DEAD)
 		{
-			actorsToRemove.push(actor);
+			actorsToRemove.push(actorId);
 		}
 	}
-	for (var actorToRemove in actorsToRemove)
+	for (var actorToRemoveId in actorsToRemove)
 	{
-		this.remove(actorToRemove);
+		this.remove(actorsToRemove[actorToRemoveId]);
 	}
 };
 
 ActorsContainer.prototype.update = function(deltaTimeSec)
 {
-	for (var actor in this.list)
+	for (var actorId in this.list)
 	{
-		actor.update(deltaTimeSec);
+		this.list[actorId].update(deltaTimeSec);
 	}
+};
+
+ActorsContainer.prototype.size = function()
+{
+	return Object.keys(this.list).length;
 };
