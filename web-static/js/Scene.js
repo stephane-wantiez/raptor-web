@@ -2,11 +2,9 @@ var Scene = function(player)
 {
 	this.player = player;
 	this.actors = new ActorsContainer();
-	this.$scene = $("#scene");
 	this.speedY = Scene.CAMERA_SPEED;	
-	this.cameraY = Scene.MAX_CAMERA_Y;
-	
-	//this.backgroundImage = "/raptor-web-static/img/background-ocean.png";
+	this.cameraY = Scene.MAX_CAMERA_Y;	
+	this.backgroundImage = assetManager.getImage("background");
 };
 
 Scene.prototype.checkCollisionsBetweenActorsAnd = function(actor)
@@ -70,12 +68,6 @@ Scene.prototype.updateCameraPosition = function(deltaTimeSec)
 {
 	this.cameraY += this.speedY * deltaTimeSec;
 	this.cameraY = $.clampValue(this.cameraY,Scene.MIN_CAMERA_Y,Scene.MAX_CAMERA_Y);
-	this.shiftSceneForCamera();
-};
-
-Scene.prototype.shiftSceneForCamera = function()
-{
-	this.$scene.css("top",-this.cameraY+"px");
 };
 
 Scene.prototype.getMinVisibleY = function()
@@ -104,6 +96,18 @@ Scene.prototype.update = function(deltaTimeSec)
 	
 	//console.log("Camera Y: " + this.cameraY);
 	//console.log("Nb actors in scene: " + this.actors.size());
+};
+
+Scene.prototype.render = function(g)
+{
+	g.save();
+	
+	// go to the origin of the scene, and draw the scene actors from there
+    g.translate(0,-this.cameraY);
+    g.drawImage(this.backgroundImage,0,0);
+    this.actors.render(g);
+    
+    g.restore();
 };
 
 Scene.CAMERA_SPEED = -40;

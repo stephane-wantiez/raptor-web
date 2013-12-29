@@ -1,6 +1,6 @@
-var MovingActor = function(parent,id,className)
+var MovingActor = function(id,width,height)
 {
-	Actor.call(this, parent, id, className);
+	Actor.call(this,id,width,height);
 	this.speedX = 0;
 	this.speedY = 0;
 };

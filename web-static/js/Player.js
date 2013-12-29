@@ -1,13 +1,11 @@
-var Player = function(parent)
+var Player = function()
 {
-	Actor.call(this, parent, "player");
+	Actor.call(this, "player", Player.WIDTH, Player.HEIGHT);
 
 	var self = this;
 	
-	this.width = Player.WIDTH;
-	this.height = Player.HEIGHT;
-	this.radius = Player.HEIGHT;
 	this.state = Actor.State.ACTIVE;
+	this.isVisible = true;
 	
 	this.health = 100;
 	this.armor = 0;
@@ -53,10 +51,12 @@ var Player = function(parent)
 		x: Player.SPEED_X,
 		y: Player.SPEED_Y
 	};
+	
+	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES*Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true);
 
-	this.spriteList = {
+	/*this.spriteList = {
 		"move": new Sprite(this.$elm, "move", "/raptor-web-static/img/sprites_player.png", Player.NB_MOVE_SPRITES*Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true)
-	};
+	};*/
 	
 	this.setSprite("move");
 	this.idleSpriteName = "move";
@@ -78,16 +78,16 @@ var Player = function(parent)
 Player.WIDTH = 65;
 Player.HEIGHT = 65;
 Player.NB_MOVE_SPRITES = 3;
-Player.SHOOT_REL_POSITION_1_X = 10;
-Player.SHOOT_REL_POSITION_2_X = Player.WIDTH - 10;
+Player.SHOOT_REL_POSITION_1_X = -20;
+Player.SHOOT_REL_POSITION_2_X =  20;
 Player.SHOOT_REL_POSITION_1_Y = -10;
 Player.SHOOT_REL_POSITION_2_Y = -10;
 Player.INIT_X = Scene.SCREEN_WIDTH / 2;
 Player.INIT_Y = Scene.SCREEN_HEIGHT - 100;
-Player.MIN_X = 20 ;
-Player.MAX_X = Scene.SCREEN_WIDTH - Player.WIDTH - 20 ;
-Player.MIN_Y = 50 ;
-Player.MAX_Y = Scene.SCREEN_HEIGHT - Player.HEIGHT - 30 ;
+Player.MIN_X = Player.WIDTH/2 + 20 ;
+Player.MAX_X = Scene.SCREEN_WIDTH - Player.WIDTH/2 - 20 ;
+Player.MIN_Y = Player.WIDTH/2 + 50 ;
+Player.MAX_Y = Scene.SCREEN_HEIGHT - Player.HEIGHT/2 - 30 ;
 Player.SPEED_X = 3000;
 Player.SPEED_Y = 2000;
 Player.MAX_NB_SHIELDS = 10;
@@ -311,6 +311,7 @@ Player.prototype.update = function(deltaTimeSec)
 	
 	//var pos = this.getPositionInScene();
 	//console.log("Player position in scene: " + pos.x + "," + pos.y );
+	//console.log("Player position: " + this.x + "," + this.y );
 };
 
 Player.prototype.isKeyDown = function(k)
@@ -330,8 +331,8 @@ Player.prototype.onKeyUp = function(k)
 
 Player.prototype.onMouseMove = function(x,y)
 {
-	this.mouseX = x - this.parent.offset().left ;
-	this.mouseY = y - this.parent.offset().top  ;
+	this.mouseX = x - game.graphics.$canvas.offset().left ;
+	this.mouseY = y - game.graphics.$canvas.offset().top  ;
 };
 
 Player.prototype.onMouseDown = function(button)

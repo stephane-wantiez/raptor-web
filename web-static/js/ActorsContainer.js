@@ -37,6 +37,14 @@ ActorsContainer.prototype.update = function(deltaTimeSec)
 	}
 };
 
+ActorsContainer.prototype.render = function(g)
+{
+	for (var actorId in this.list)
+	{
+		this.list[actorId].render(g);
+	}
+};
+
 ActorsContainer.prototype.size = function()
 {
 	return Object.keys(this.list).length;

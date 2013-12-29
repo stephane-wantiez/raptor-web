@@ -9,6 +9,7 @@
 <script	src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script	src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/utils.js"></script>
+<script type="text/javascript" src="/raptor-web-static/js/AssetManager.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/Sprite.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/ActorsContainer.js"></script>
 <script type="text/javascript" src="/raptor-web-static/js/PositionChanger.js"></script>
@@ -23,15 +24,7 @@
 <body>
 	<div id="screen">
 		<div id="game">
-		    <div id="scene-view">
-				<div id="scene">
-					<div id="building1" class="building"></div>
-					<div id="building1" class="building"></div>
-					<div id="enemy1" class="enemy"></div>
-					<div id="enemy1" class="enemy"></div>
-				</div>
-			</div>
-            <div id="player"></div>
+            <canvas id="scene-view" width="800" height="600"></canvas>
 			<div id="hud">
 				<div id="armor-hud" class="gauge-hud progress-bar">
 				    <div id="armor-hud-indic" class="gauge-hud-indic progress-bar-indic"></div>

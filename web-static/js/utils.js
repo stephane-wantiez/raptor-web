@@ -112,6 +112,25 @@ $.clampValue = function(value, min, max)
 	return value;
 };
 
+$.meanValue = function(a,b)
+{
+	var minVal = Math.min(a,b);
+	var maxVal = Math.max(a,b);
+	return minVal + (maxVal-minVal)/2;
+};
+
+$.tween = function(from, to, startTime, duration, easing)
+{
+    var now = Date.now();
+    if (now - startTime < duration)
+    {
+        var normValue = (now - startTime) / duration;
+        if (typeof(easing) != "undefined") normValue = $.clampValue(easing(normValue),0,1);
+        return from + (to-from) * normValue;
+    }
+    return to;
+};
+
 $.getDistanceBetweenPointsSquared = function(point1,point2)
 {
 	return Math.abs (( point2.x - point1.x ) * ( point2.x - point1.x ) - ( point2.y - point1.y ) * ( point2.y - point1.y ));
@@ -138,6 +157,71 @@ $.expandValueDigits = function(value,nbDigits) // ex: 1234 on 8 digits -> return
 	if ( value >= divider ) return "" + (divider-1) ; // ex: 1234 > 1000 -> return "999"
 	
 	return valueStr;
+};
+
+$.EASE_FACTOR = 3.5;
+$.EASE_FACTOR_EXP = 4;
+
+$.easeInCustom = function(timeNorm)
+{
+    return Math.pow(timeNorm,$.EASE_FACTOR);
+};
+
+$.easeOutCustom = function(timeNorm)
+{
+    return Math.pow(timeNorm,1/$.EASE_FACTOR);
+};
+
+$.easeInExpCustom = function(timeNorm)
+{
+    return Math.pow(timeNorm,$.EASE_FACTOR_EXP);
+};
+
+$.easeOutExpoCustom = function(timeNorm)
+{
+    return Math.pow(timeNorm,1/$.EASE_FACTOR_EXP);
+};
+
+$.easeInSinCustom = function(timeNorm)
+{
+    return Math.sin(-Math.PI/2+timeNorm*Math.PI/2)+1;
+};
+
+$.easeOutSinCustom = function(timeNorm)
+{
+    return Math.sin(timeNorm*Math.PI/2);
+};
+
+$.easeInOutSinCustom = function(timeNorm)
+{
+    return (1 + Math.sin(-Math.PI/2+timeNorm*Math.PI)) / 2;
+};
+
+$.showEase = function(g,rect,ease)
+{
+    g.save();
+    
+    g.translate(rect.x,rect.y);
+    
+    g.fillStyle = "black";
+    g.fillRect(0,0,rect.width,rect.height);
+    
+    g.fillStyle = "red";
+    
+    var nbPoints = 50;
+    
+    for(var i = 0 ; i <= nbPoints ; ++i)
+    {
+        var vx = i / nbPoints;
+        var px = vx * rect.width;
+        
+        var vy = ease(vx);
+        var py = vy * rect.height;
+        
+        g.fillRect(px,rect.height-py,1,1);
+    }
+    
+    g.restore();
 };
 
 // UNIT TESTS

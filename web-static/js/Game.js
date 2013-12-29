@@ -6,11 +6,18 @@ var Game = function()
 	this.currentFrameTimeMs = this.timeAtStartupMs;
 	this.elapsedTimeSinceStartupMs = 0;
 	this.elapsedGameTimeSinceStartup = 0;
+	this.timeSinceLoadingEnd = 0;
 	this.paused = false;
 	
-	$scene = $("#game");
+    var $sceneView = $("#scene-view");
+    var sceneView = $sceneView.get(0);
+    this.graphics = sceneView.getContext("2d");
+    this.graphics.$canvas = $sceneView;
+    this.graphics.canvas = sceneView;
+	
+	this.initAssets();
 
-	player = new Player($scene);
+	player = new Player();
 	scene = new Scene(player);
 	player.setScene(scene);
 	
@@ -20,8 +27,7 @@ var Game = function()
 	player.setMoney(123450);
 	player.setNbBombs(2);
 	player.setNbShields(3);
-	player.setSecWeapon("missiles");
-	
+	player.setSecWeapon("missiles");	
 	
 	requestAnimFrame(
 		function loop() {
@@ -29,6 +35,21 @@ var Game = function()
 			requestAnimFrame(loop);
 		}					
 	);
+};
+
+Game.prototype.initAssets = function()
+{
+    var assetsPath = "/raptor-web-static/";
+    var imagesPath = assetsPath + "img/";
+    
+    var imageList = {
+        "background"  : imagesPath + "background-ocean.png",
+        "player-move" : imagesPath +   "sprites_player.png",
+        "bullet"      : imagesPath +    "sprite_bullet.bmp"
+    };
+    var soundList = {};
+    
+    assetManager.startLoading(imageList,soundList);
 };
 
 Game.prototype.mainLoop = function()
@@ -42,9 +63,42 @@ Game.prototype.mainLoop = function()
 	deltaTimeMs = this.paused ? 0 : deltaTimeMs;
 	this.elapsedGameTimeSinceStartup += deltaTimeMs;
 	var deltaTimeSec = deltaTimeMs / 1000;
+    
+    this.graphics.drawTimeMillis = currentTimeMs;    
+    this.graphics.clearRect(0,0,this.graphics.canvas.width,this.graphics.canvas.height);
+    
+    var doneLoading = assetManager.isDoneLoading();
+    var alphaLoad = 1;
+    
+    if(doneLoading)
+    {
+        if (this.timeSinceLoadingEnd == 0) this.timeSinceLoadingEnd = currentTimeMs;
+        alphaLoad = $.tween(1,0,this.timeSinceLoadingEnd,1000,$.easeOutExpoCustom);
+	
+        this.gameRender(this.graphics);
+        this.gameUpdate(deltaTimeSec);
+    }
+    if(!doneLoading || alphaLoad > 0)
+    {
+        assetManager.setRenderAlpha(alphaLoad);
+        assetManager.renderLoadingProgress(this.graphics);
+    }
+};
 
+Game.prototype.gameUpdate = function(deltaTimeSec)
+{
 	scene.update(deltaTimeSec);
 	player.update(deltaTimeSec);
+};
+
+Game.prototype.gameRender = function(g)
+{
+	g.save();
+	
+	scene.render(g);
+	player.render(g);
+	
+	g.restore();
 };
 
 $(document).ready(function()

@@ -1,8 +1,7 @@
-var PositionChanger = function(className)
+var PositionChanger = function()
 {	
 	this.x = 0;
 	this.y = 0;
-	this.$elm = $("<div>").addClass(className);
 	this.positionListenerList = [];
 };
 
@@ -27,6 +26,5 @@ PositionChanger.prototype.setPosition = function(x, y)
 {
     this.x = parseInt(x);
     this.y = parseInt(y);
-	this.$elm.css({left:this.x+"px",top:this.y+"px"});
     this.firePositionChange();
 };

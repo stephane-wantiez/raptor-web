@@ -1,20 +1,6 @@
-var Actor = function(parent,id,className)
+var Actor = function(id,width,height)
 {
-	if(!$.isDefined(parent)) return;	
-	this.parent = parent;
-	
 	this.id = id;
-	
-	this.$elm = $("#"+this.id);
-	
-	if(this.$elm.length == 0)
-	{
-		this.$elm = $("<div>");
-		this.$elm.attr("id",this.id);
-		this.parent.append(this.$elm);
-	};
-	
-	if($.isDefined(className)) this.$elm.addClass(className); 
 
 	this.spriteList = {};
 	this.currentSprite = false;
@@ -28,12 +14,15 @@ var Actor = function(parent,id,className)
 	this.minY = -Infinity;
 	this.maxY = Infinity;
 	
-	this.width = 0;
-	this.height = 0;
+	this.width = width;
+	this.height = height;
+	
+	this.centerX = parseInt(width/2);
+	this.centerY = parseInt(height/2);
 	
 	this.isVisible = false;
 	
-	this.radius = 1;
+	this.radius = $.meanValue(this.centerX,this.centerY);
 	this.areCollisionsChecked = true;
 	
 	this.state = Actor.State.INACTIVE;
@@ -48,6 +37,17 @@ Actor.prototype = new PositionChanger("Actor");
 Actor.prototype.setScene = function(scene)
 {
 	this.scene = scene;
+};
+
+Actor.prototype.createSprite = function(id,img,width,height,colCount,rowCount,frameRate,loop)
+{
+    this.spriteList[id] = new Sprite(id,img,width,height,colCount,rowCount,frameRate,loop);
+};
+
+Actor.prototype.createSpriteWithUrl = function(id,url,width,height,colCount,rowCount,frameRate,loop)
+{
+	var img = assetManager.getImage(url);
+    this.createSprite(id,img,width,height,colCount,rowCount,frameRate,loop);
 };
 
 Actor.prototype.setSprite = function(anim, onComplete)
@@ -210,6 +210,19 @@ Actor.prototype.update = function(deltaTimeSec)
 	}
 };
 
+Actor.prototype.render = function(g)
+{
+    if(this.isVisible && this.currentSprite)
+    {
+        g.save();
+        g.translate(this.x,this.y);
+        
+        this.currentSprite.render(g);
+        
+        g.restore();
+    }
+};
+
 Actor.prototype.activate = function()
 {
 	//console.log("Activating actor");
@@ -237,5 +250,4 @@ Actor.prototype.remove = function()
 	//console.log("Removing actor");
 	this.state = Actor.State.DEAD;
 	this.isVisible = false;
-	this.$elm.remove();
 };
