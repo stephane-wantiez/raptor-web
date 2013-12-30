@@ -17,27 +17,19 @@ var Actor = function(id,width,height)
 	this.width = width;
 	this.height = height;
 	
-	this.centerX = parseInt(width/2);
-	this.centerY = parseInt(height/2);
-	
 	this.isVisible = false;
 	
-	this.radius = $.meanValue(this.centerX,this.centerY);
+	this.radius = $.meanValue(width/2,height/2);
 	this.areCollisionsChecked = true;
 	
 	this.state = Actor.State.INACTIVE;
-	
+	this.health = 100;
 	this.deathTime = 0;
 };
 
 Actor.State = { INACTIVE : 0, ACTIVE : 1, DEAD : 2 };
 
 Actor.prototype = new PositionChanger("Actor");
-
-Actor.prototype.setScene = function(scene)
-{
-	this.scene = scene;
-};
 
 Actor.prototype.createSprite = function(id,img,width,height,colCount,rowCount,frameRate,loop)
 {
@@ -131,14 +123,6 @@ Actor.prototype.getPositionInScene = function()
 	return this.getPosition();
 };
 
-Actor.prototype.getCenterInScene = function()
-{
-	var centerInScene = this.getPositionInScene();
-	centerInScene.x += this.width  / 2 ;
-	centerInScene.y += this.height / 2 ;
-	return centerInScene;
-};
-
 Actor.prototype.isBeforeX = function(x)
 {
 	return this.x + this.width < x;
@@ -172,6 +156,21 @@ Actor.prototype.checkLifetime = function()
 	}
 };
 
+Actor.prototype.setHealth = function(value)
+{
+	this.health = value;
+};
+
+Actor.prototype.damage = function(damage)
+{
+	this.setHealth(this.health-damage);
+	
+	if (this.health <= 0)
+	{
+		this.kill();
+	}
+};
+
 Actor.prototype.isCollidingWith = function(otherActor)
 {
 	if (!      this.areCollisionsChecked) return false;
@@ -180,11 +179,13 @@ Actor.prototype.isCollidingWith = function(otherActor)
 	if (      this.state == Actor.State.DEAD) return false;
 	if (otherActor.state == Actor.State.DEAD) return false;
 	
-	var actorCenterPos = this.getCenterInScene();
-	var otherCenterPos = otherActor.getCenterInScene();
-	var distSquared = $.getDistanceBetweenPointsSquared(actorCenterPos,otherCenterPos);
+	var actorPos = this.getPositionInScene();
+	var otherPos = otherActor.getPositionInScene();
+	var distSquared = $.getDistanceBetweenPointsSquared(actorPos,otherPos);
 	var minDist = this.radius + otherActor.radius;
 	var minDistSquared = minDist * minDist;
+	
+	console.log("Checking collision between actor " + this.id + " and " + otherActor.id + " - distSquared=" + distSquared + " - minDistSquared=" + minDistSquared + " - radius= " + this.radius + " & " + otherActor.radius);
 	
 	return distSquared <= minDistSquared;
 };
@@ -193,6 +194,7 @@ Actor.prototype.checkCollisionWith = function(otherActor)
 {
 	if (this.isCollidingWith(otherActor))
 	{
+		console.log("Actor " + this.id + " is colliding with actor " + otherActor.id);
 		this.handleCollisionWith(otherActor);
 		otherActor.handleCollisionWith(this);
 	};
@@ -219,6 +221,9 @@ Actor.prototype.render = function(g)
         
         this.currentSprite.render(g);
         
+        /*g.fillStyle = "white";
+        g.fillRect(0,0,3,3);*/
+        
         g.restore();
     }
 };
@@ -227,6 +232,7 @@ Actor.prototype.activate = function()
 {
 	//console.log("Activating actor");
 	this.state = Actor.State.ACTIVE;
+	this.isVisible = true;
 };
 
 Actor.prototype.kill = function()

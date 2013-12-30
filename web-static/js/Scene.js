@@ -1,10 +1,30 @@
-var Scene = function(player)
+var Scene = function()
 {
-	this.player = player;
 	this.actors = new ActorsContainer();
+	this.playerActors = new ActorsContainer();
 	this.speedY = Scene.CAMERA_SPEED;	
 	this.cameraY = Scene.MAX_CAMERA_Y;	
 	this.backgroundImage = assetManager.getImage("background");
+	
+	this.generateEnemies();
+};
+
+Scene.prototype.generateEnemies = function()
+{
+	this.actors.add(new FlyingEnemy1("enemy01",200,200));
+	this.actors.add(new FlyingEnemy2("enemy02",300,400));
+	this.actors.add(new FlyingEnemy3("enemy03",200,700));
+	this.actors.add(new FlyingEnemy1("enemy04",250,700));
+	this.actors.add(new FlyingEnemy2("enemy05",300,700));
+	this.actors.add(new FlyingEnemy3("enemy06",100,1000));
+	this.actors.add(new FlyingEnemy2("enemy07",500,1400));
+	this.actors.add(new FlyingEnemy1("enemy08",600,1700));
+	this.actors.add(new FlyingEnemy2("enemy09",200,2000));
+	this.actors.add(new FlyingEnemy3("enemy10",600,2000));
+	this.actors.add(new FlyingEnemy1("enemy11",400,4000));
+	this.actors.add(new FlyingEnemy1("enemy12",200,4500));
+	this.actors.add(new FlyingEnemy2("enemy13",400,5000));
+	this.actors.add(new FlyingEnemy3("enemy14",300,5200));
 };
 
 Scene.prototype.checkCollisionsBetweenActorsAnd = function(actor)
@@ -12,7 +32,25 @@ Scene.prototype.checkCollisionsBetweenActorsAnd = function(actor)
 	for (var otherActorId in this.actors.list)
 	{
 		var otherActor = this.actors.list[otherActorId];
-		actor.checkCollisionWith(otherActor);
+		if (otherActor.state == Actor.State.ACTIVE)
+		{
+			//console.log("Checking collision between actor " + actor.id + " and actor " + otherActor.id);
+			actor.checkCollisionWith(otherActor);
+		}
+	}
+};
+
+Scene.prototype.checkActorsCollision = function()
+{
+	this.checkCollisionsBetweenActorsAnd(player);
+	
+	for (var playerActorId in this.playerActors.list)
+	{
+		var playerActor = this.playerActors.list[playerActorId];
+		if (playerActor.state == Actor.State.ACTIVE)
+		{
+			this.checkCollisionsBetweenActorsAnd(playerActor);
+		}
 	}
 };
 
@@ -35,7 +73,7 @@ Scene.prototype.checkActorPosition = function(actor)
 		{
 			if (actorIsVisibleInY)
 			{
-				//console.log("Inactive actor becomes visible, activation");
+				console.log("Inactive actor " + actor.id + " becomes visible, activation");
 				actor.activate();
 			}
 		}
@@ -43,7 +81,7 @@ Scene.prototype.checkActorPosition = function(actor)
 		{
 			if (!actorIsVisibleInY)
 			{
-				//console.log("Active actor becomes invisible, removal");
+				console.log("Active actor " + actor.id + " becomes invisible, removal");
 				actor.remove();
 			}
 		}
@@ -57,6 +95,11 @@ Scene.prototype.checkActorsPosition = function()
 		var actor = this.actors.list[actorId];
 		this.checkActorPosition(actor);
 	}
+	for (var actorId in this.playerActors.list)
+	{
+		var actor = this.playerActors.list[actorId];
+		this.checkActorPosition(actor);
+	}
 };
 
 Scene.prototype.getCameraPosition = function()
@@ -66,8 +109,11 @@ Scene.prototype.getCameraPosition = function()
 
 Scene.prototype.updateCameraPosition = function(deltaTimeSec)
 {
-	this.cameraY += this.speedY * deltaTimeSec;
-	this.cameraY = $.clampValue(this.cameraY,Scene.MIN_CAMERA_Y,Scene.MAX_CAMERA_Y);
+	if (player.state == Actor.State.ACTIVE)
+	{
+		this.cameraY += this.speedY * deltaTimeSec;
+		this.cameraY = $.clampValue(this.cameraY,Scene.MIN_CAMERA_Y,Scene.MAX_CAMERA_Y);
+	}
 };
 
 Scene.prototype.getMinVisibleY = function()
@@ -90,8 +136,11 @@ Scene.prototype.update = function(deltaTimeSec)
 	this.actors.clean();
 	this.actors.update(deltaTimeSec);
 	
+	this.playerActors.clean();
+	this.playerActors.update(deltaTimeSec);
+	
 	this.updateCameraPosition(deltaTimeSec);
-	this.checkCollisionsBetweenActorsAnd(this.player);
+	this.checkActorsCollision();
 	this.checkActorsPosition();
 	
 	//console.log("Camera Y: " + this.cameraY);
@@ -106,6 +155,7 @@ Scene.prototype.render = function(g)
     g.translate(0,-this.cameraY);
     g.drawImage(this.backgroundImage,0,0);
     this.actors.render(g);
+    this.playerActors.render(g);
     
     g.restore();
 };

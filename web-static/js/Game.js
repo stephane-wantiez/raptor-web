@@ -18,11 +18,10 @@ var Game = function()
 	this.initAssets();
 
 	player = new Player();
-	scene = new Scene(player);
-	player.setScene(scene);
+	scene = new Scene();
 	
 	// test values
-	player.setArmor(50);
+	player.setArmor(60);
 	player.setHealth(80);
 	player.setMoney(123450);
 	player.setNbBombs(2);
@@ -45,7 +44,10 @@ Game.prototype.initAssets = function()
     var imageList = {
         "background"  : imagesPath + "background-ocean.png",
         "player-move" : imagesPath +   "sprites_player.png",
-        "bullet"      : imagesPath +    "sprite_bullet.bmp"
+        "bullet"      : imagesPath +    "sprite_bullet.bmp",
+        "enemy1"      : imagesPath +   "sprites_enemy1.png",
+        "enemy2"      : imagesPath +   "sprites_enemy2.png",
+        "enemy3"      : imagesPath +   "sprites_enemy3.png"
     };
     var soundList = {};
     
