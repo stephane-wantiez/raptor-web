@@ -1,0 +1,75 @@
+{ "background" : "background-ocean",
+  "enemies" :
+    [
+		{
+			"type" : "FlyingEnemy1",
+			"posX" : 200,
+			"posY" : 200
+		},
+		{
+			"type" : "FlyingEnemy2",
+			"posX" : 300,
+			"posY" : 400
+		},
+		{
+			"type" : "FlyingEnemy3",
+			"posX" : 200,
+			"posY" : 700
+		},
+		{
+			"type" : "FlyingEnemy1",
+			"posX" : 250,
+			"posY" : 700
+		},
+		{
+			"type" : "FlyingEnemy2",
+			"posX" : 300,
+			"posY" : 700
+		},
+		{
+			"type" : "FlyingEnemy3",
+			"posX" : 100,
+			"posY" : 1000
+		},
+		{
+			"type" : "FlyingEnemy2",
+			"posX" : 500,
+			"posY" : 1400
+		},
+		{
+			"type" : "FlyingEnemy1",
+			"posX" : 600,
+			"posY" : 1700
+		},
+		{
+			"type" : "FlyingEnemy2",
+			"posX" : 200,
+			"posY" : 2000
+		},
+		{
+			"type" : "FlyingEnemy3",
+			"posX" : 600,
+			"posY" : 2000
+		},
+		{
+			"type" : "FlyingEnemy1",
+			"posX" : 400,
+			"posY" : 4000
+		},
+		{
+			"type" : "FlyingEnemy1",
+			"posX" : 200,
+			"posY" : 4500
+		},
+		{
+			"type" : "FlyingEnemy2",
+			"posX" : 400,
+			"posY" : 5000
+		},
+		{
+			"type" : "FlyingEnemy3",
+			"posX" : 300,
+			"posY" : 5200
+		}
+	]
+}
