@@ -8,6 +8,14 @@ ActorsContainer.prototype.add = function(actor)
 	this.list[actor.id] = actor;
 };
 
+ActorsContainer.prototype.addAll = function(actorsArray)
+{
+	for(var actorIndex in actorsArray)
+	{
+		this.add(actorsArray[actorIndex]);
+	}
+};
+
 ActorsContainer.prototype.remove = function(actorId)
 {
 	delete this.list[actorId];
@@ -48,4 +56,9 @@ ActorsContainer.prototype.render = function(g)
 ActorsContainer.prototype.size = function()
 {
 	return Object.keys(this.list).length;
+};
+
+ActorsContainer.prototype.removeAll = function()
+{
+	this.list = {};
 };

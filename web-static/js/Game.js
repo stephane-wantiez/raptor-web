@@ -15,18 +15,7 @@ var Game = function()
     this.graphics.$canvas = $sceneView;
     this.graphics.canvas = sceneView;
 	
-	this.initAssets();
-
-	player = new Player();
-	scene = new Scene();
-	
-	// test values
-	player.setArmor(60);
-	player.setHealth(80);
-	player.setMoney(123450);
-	player.setNbBombs(2);
-	player.setNbShields(3);
-	player.setSecWeapon("missiles");	
+	this.initAssets();	
 	
 	requestAnimFrame(
 		function loop() {
@@ -39,19 +28,41 @@ var Game = function()
 Game.prototype.initAssets = function()
 {
     var assetsPath = "/raptor-web-static/";
-    var imagesPath = assetsPath + "img/";
     
-    var imageList = {
-        "background"  : imagesPath + "background-ocean.png",
-        "player-move" : imagesPath +   "sprites_player.png",
-        "bullet"      : imagesPath +    "sprite_bullet.bmp",
-        "enemy1"      : imagesPath +   "sprites_enemy1.png",
-        "enemy2"      : imagesPath +   "sprites_enemy2.png",
-        "enemy3"      : imagesPath +   "sprites_enemy3.png"
+    var levelsPath = assetsPath + "levels/";
+    var levelsList = {
+    	"testLevel1" : levelsPath + "test-level-01.dat"
     };
+    
+    var imagesPath = assetsPath + "img/";    
+    var imageList = {
+        "background-ocean" : imagesPath + "background-ocean.png",
+        "player-move"      : imagesPath +   "sprites_player.png",
+        "bullet"      	   : imagesPath +    "sprite_bullet.bmp",
+        "enemy1"      	   : imagesPath +   "sprites_enemy1.png",
+        "enemy2"      	   : imagesPath +   "sprites_enemy2.png",
+        "enemy3"      	   : imagesPath +   "sprites_enemy3.png"
+    };
+    
     var soundList = {};
     
-    assetManager.startLoading(imageList,soundList);
+    assetManager.startLoading(levelsList,imageList,soundList);
+};
+
+Game.prototype.onAssetsLoaded = function()
+{
+	player = new Player();
+	scene = new Scene();
+	
+	// test values
+	player.setArmor(60);
+	player.setHealth(80);
+	player.setMoney(123450);
+	player.setNbBombs(2);
+	player.setNbShields(3);
+	player.setSecWeapon("missiles");
+	
+	scene.loadLevel("testLevel1");
 };
 
 Game.prototype.mainLoop = function()
@@ -74,7 +85,12 @@ Game.prototype.mainLoop = function()
     
     if(doneLoading)
     {
-        if (this.timeSinceLoadingEnd == 0) this.timeSinceLoadingEnd = currentTimeMs;
+        if (this.timeSinceLoadingEnd == 0) 
+        {
+        	this.timeSinceLoadingEnd = currentTimeMs;
+        	this.onAssetsLoaded();
+        }
+        
         alphaLoad = $.tween(1,0,this.timeSinceLoadingEnd,1000,$.easeOutExpoCustom);
 	
         this.gameRender(this.graphics);

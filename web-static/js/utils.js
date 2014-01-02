@@ -224,6 +224,11 @@ $.showEase = function(g,rect,ease)
     g.restore();
 };
 
+$.objectToString = function(objectToShow)
+{
+	return JSON.stringify(objectToShow, null, 4);
+};
+
 // UNIT TESTS
 
 testValue = $.getDistanceBetweenPointsSquared({x:1,y:1},{x:2,y:1});

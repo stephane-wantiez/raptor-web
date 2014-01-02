@@ -2,29 +2,25 @@ var Scene = function()
 {
 	this.actors = new ActorsContainer();
 	this.playerActors = new ActorsContainer();
-	this.speedY = Scene.CAMERA_SPEED;	
-	this.cameraY = Scene.MAX_CAMERA_Y;	
-	this.backgroundImage = assetManager.getImage("background");
-	
-	this.generateEnemies();
+	this.currentLevel = "";
 };
 
-Scene.prototype.generateEnemies = function()
+Scene.prototype.resetScene = function()
 {
-	this.actors.add(new FlyingEnemy1("enemy01",200,200));
-	this.actors.add(new FlyingEnemy2("enemy02",300,400));
-	this.actors.add(new FlyingEnemy3("enemy03",200,700));
-	this.actors.add(new FlyingEnemy1("enemy04",250,700));
-	this.actors.add(new FlyingEnemy2("enemy05",300,700));
-	this.actors.add(new FlyingEnemy3("enemy06",100,1000));
-	this.actors.add(new FlyingEnemy2("enemy07",500,1400));
-	this.actors.add(new FlyingEnemy1("enemy08",600,1700));
-	this.actors.add(new FlyingEnemy2("enemy09",200,2000));
-	this.actors.add(new FlyingEnemy3("enemy10",600,2000));
-	this.actors.add(new FlyingEnemy1("enemy11",400,4000));
-	this.actors.add(new FlyingEnemy1("enemy12",200,4500));
-	this.actors.add(new FlyingEnemy2("enemy13",400,5000));
-	this.actors.add(new FlyingEnemy3("enemy14",300,5200));
+	this.actors.removeAll();
+	this.playerActors.removeAll();
+	this.speedY = Scene.CAMERA_SPEED;	
+	this.cameraY = Scene.MAX_CAMERA_Y;
+};
+
+Scene.prototype.loadLevel = function(levelName)
+{
+	this.resetScene();
+	this.currentLevel = levelName;
+	var levelProperties = LevelBuilder.loadLevelData(levelName);
+	console.log(levelProperties);
+	this.backgroundImage = assetManager.getImage(levelProperties["background"]);
+	this.actors.addAll(levelProperties["enemies"]);
 };
 
 Scene.prototype.checkCollisionsBetweenActorsAnd = function(actor)
