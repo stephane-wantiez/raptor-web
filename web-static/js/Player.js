@@ -13,7 +13,9 @@ var Player = function()
 	this.money = 0;
 	this.secWeapon = "";
 	this.nbBombs = 0;
-	
+
+	this.killSound = assetManager.getSound("explosion");
+	this.weaponSound = assetManager.getSound("shoot_basic");
 	this.weaponCreateAmmo = function(){ return new Bullet(self.parent); };
 	this.weaponShootDelayMs = Player.BULLET_SHOOT_WAIT_TIME_MSEC;
 	this.nextAllowedWeaponAttack = 0;
@@ -53,13 +55,11 @@ var Player = function()
 	};
 	
 	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES*Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true);
+	this.createSpriteWithUrl( "explosion", "explosion2", Player.KILL_SPRITE_WIDTH * Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_HEIGHT * Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_FPS, false);
 
-	/*this.spriteList = {
-		"move": new Sprite(this.$elm, "move", "/raptor-web-static/img/sprites_player.png", Player.NB_MOVE_SPRITES*Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true)
-	};*/
-	
 	this.setSprite("move");
 	this.idleSpriteName = "move";
+	this.deadSpriteName = "explosion";
 	
 	this.secWeaponsList = {
 		"missiles" : "/raptor-web-static/img/icon_missiles.png"	
@@ -105,6 +105,11 @@ Player.MOVE_ATTACK_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
 Player.COLLISION_DAMAGE_ENEMY = 100;
 Player.COLLISION_DAMAGE_SELF = 50;
+Player.KILL_SPRITE_NB_ROW = 1;
+Player.KILL_SPRITE_NB_COL = 6;
+Player.KILL_SPRITE_WIDTH  = 65;
+Player.KILL_SPRITE_HEIGHT = 65;
+Player.KILL_SPRITE_FPS = 10;
 
 Player.prototype = new Actor();
 
@@ -292,6 +297,7 @@ Player.prototype.attack = function()
 	{
 		//console.log("Can attack!");
 		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
+		this.weaponSound.play();
 		var projectile = new Bullet(Player.BULLET_SPEED);
 		this.attackWith(projectile);
 	}
@@ -305,27 +311,42 @@ Player.prototype.attackWith = function(projectile)
 	scene.playerActors.add(projectile);
 };
 
+Player.prototype.getTotalArmor = function()
+{
+	return this.armor + this.nbShields * 100 ;
+};
+
+Player.prototype.reduceTotalArmor = function(value)
+{
+	var nbShields = this.nbShields;
+	var armor = this.armor;
+	armor -= value;
+	while((armor < 0) && (nbShields > 0))
+	{
+		nbShields--;
+		armor += 100;
+	}
+	if (armor < 0)
+	{
+		this.setArmor(0);
+		this.setNbShields(0);
+		return Math.abs(armor);
+	}
+	else
+	{
+		this.setArmor(armor);
+		this.setNbShields(nbShields);
+		return 0;
+	}
+};
+
 Player.prototype.damage = function(damage)
 {
-	var healthReduction = damage;
+	var remainingDamage = this.reduceTotalArmor(damage);
 	
-	if (this.armor > 0)
+	if (remainingDamage > 0)
 	{
-		var armorReduction = damage;
-		healthReduction = 0;
-		
-		if (this.armor < damage)
-		{
-			armorReduction = this.armor;
-			healthReduction = damage - this.armor;
-		}
-		
-		this.setArmor(this.armor-armorReduction);
-	}
-	
-	if (healthReduction > 0)
-	{
-		Actor.prototype.damage.call(this,healthReduction);
+		Actor.prototype.damage.call(this,remainingDamage);
 	}
 };
 
@@ -353,7 +374,7 @@ Player.prototype.update = function(deltaTimeSec)
 {	
 	Actor.prototype.update.call(this,deltaTimeSec);
 	
-	if (!game.paused)
+	if (!game.paused && (this.state == Actor.State.ACTIVE))
 	{
 		this.updateState(deltaTimeSec);
 	}

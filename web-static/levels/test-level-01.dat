@@ -56,10 +56,20 @@
 			"posX" : 400,
 			"posY" : 4000
 		},
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 100,
+            "posY" : 4200
+        },
+        {
+            "type" : "FlyingEnemy3",
+            "posX" : 700,
+            "posY" : 4500
+        },
 		{
 			"type" : "FlyingEnemy1",
 			"posX" : 200,
-			"posY" : 4500
+			"posY" : 4700
 		},
 		{
 			"type" : "FlyingEnemy2",

@@ -34,17 +34,24 @@ Game.prototype.initAssets = function()
     	"testLevel1" : levelsPath + "test-level-01.dat"
     };
     
-    var imagesPath = assetsPath + "img/";    
+    var imagesPath = assetsPath + "img/";
     var imageList = {
         "background-ocean" : imagesPath + "background-ocean.png",
         "player-move"      : imagesPath +   "sprites_player.png",
         "bullet"      	   : imagesPath +    "sprite_bullet.bmp",
         "enemy1"      	   : imagesPath +   "sprites_enemy1.png",
         "enemy2"      	   : imagesPath +   "sprites_enemy2.png",
-        "enemy3"      	   : imagesPath +   "sprites_enemy3.png"
+        "enemy3"      	   : imagesPath +   "sprites_enemy3.png",
+        "explosion1"   	   : imagesPath +   	"explosion1.png",
+        "explosion2"   	   : imagesPath +   	"explosion2.png"
     };
-    
-    var soundList = {};
+
+    var soundsPath = assetsPath + "sounds/";
+    var soundList = {
+        "shoot_basic" : soundsPath + "shoot_basic.wav",
+        "bullet_hit"  : soundsPath +  "bullet_hit.wav",
+        "explosion"   : soundsPath +   "explosion.wav"
+    };
     
     assetManager.startLoading(levelsList,imageList,soundList);
 };
@@ -55,11 +62,11 @@ Game.prototype.onAssetsLoaded = function()
 	scene = new Scene();
 	
 	// test values
-	player.setArmor(60);
-	player.setHealth(80);
-	player.setMoney(123450);
-	player.setNbBombs(2);
-	player.setNbShields(3);
+	player.setArmor(100);
+	player.setHealth(100);
+	player.setMoney(0);
+	player.setNbBombs(1);
+	player.setNbShields(2);
 	player.setSecWeapon("missiles");
 	
 	scene.loadLevel("testLevel1");

@@ -25,9 +25,11 @@ var Actor = function(id,width,height)
 	this.state = Actor.State.INACTIVE;
 	this.health = 100;
 	this.deathTime = 0;
+	
+	this.killSound = false;
 };
 
-Actor.State = { INACTIVE : 0, ACTIVE : 1, DEAD : 2 };
+Actor.State = { INACTIVE : 0, ACTIVE : 1, DYING : 2, DEAD : 3 };
 
 Actor.prototype = new PositionChanger("Actor");
 
@@ -208,6 +210,9 @@ Actor.prototype.update = function(deltaTimeSec)
 	if (this.state == Actor.State.ACTIVE)
 	{
 		this.checkLifetime();
+	}
+	if (this.isVisible)
+	{
 		this.checkSprite();
 	}
 };
@@ -239,6 +244,11 @@ Actor.prototype.kill = function()
 {
 	//console.log("Killing actor");
 	var self = this;
+	
+	this.state = Actor.State.DYING;
+	
+	if (this.killSound) this.killSound.play();
+	
 	var doRemove = function(value){ self.remove(); };
 	
 	if ( this.isVisible && (this.deadSpriteName != ""))
@@ -254,6 +264,6 @@ Actor.prototype.kill = function()
 Actor.prototype.remove = function()
 {
 	//console.log("Removing actor");
-	this.state = Actor.State.DEAD;
 	this.isVisible = false;
+	this.state = Actor.State.DEAD;
 };

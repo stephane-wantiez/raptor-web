@@ -10,6 +10,26 @@ var AssetManager = function()
 	this.soundsToLoad = {};
 	this.loadingStarted = false;
     this.renderAlpha = 1;
+    this.soundManagerReady = false;
+    this.soundManagerDebug = false;
+};
+
+AssetManager.prototype.initSystems = function()
+{
+	var self = this;
+	soundManager.setup({
+		onready: function()
+		{
+		    self.soundManagerReady = true;
+		    self.doLoadSounds();
+		},
+		ontimeout: function()
+		{
+		    console.log("Sound Manager initialization failed");
+		    self.soundManagerReady = true;
+		},
+	    debugMode: self.soundManagerDebug
+	});
 };
 
 AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
@@ -75,41 +95,50 @@ AssetManager.prototype.loadImage = function(url, id)
 
 AssetManager.prototype.loadSound = function(url, id, onload)
 {
-	var _this = this;
 	if(!id){
 		id = url;
 	}
-	if(this.sounds[id]){
-		this.assetLoaded();
-	}else{
-		this.soundsToLoad[id] = url;
-		var sound = soundManager.createSound({
-			id: id,
-			url: url,
-			autoLoad: true,
-			autoPlay: false,
-			onload: function() {
-				delete _this.soundsToLoad[id];
-				_this.assetLoaded();
-				if(onload){
-					onload(sound);
+	this.soundsToLoad[id] = url;
+	if (this.soundManagerReady) this.doLoadSound(id);
+};
+
+AssetManager.prototype.doLoadSound = function(id)
+{
+	var _this = this;
+	var url = this.soundsToLoad[id];
+	var sound = soundManager.createSound({
+		id: id,
+		url: url,
+		autoLoad: true,
+		autoPlay: false,
+		onload: function() {
+			delete _this.soundsToLoad[id];
+			_this.assetLoaded();
+			if(onload){
+				onload(sound);
+			}
+		},
+		volume: 100
+	});
+	
+	sound.playLoop = function(){
+		this.play({			
+			onfinish: function() {
+				if(!this._play || user.data.soundEnabled){
+					this.playLoop();
 				}
-			},
-			volume: 100
+			}
 		});
-		
-		sound.playLoop = function(){
-			this.play({			
-				onfinish: function() {
-					if(!this._play || user.data.soundEnabled){
-						this.playLoop();
-					}
-				}
-			});
-		};
-		this.sounds[id] = sound;
+	};
+	this.sounds[id] = sound;
+};
+
+AssetManager.prototype.doLoadSounds = function()
+{
+	for(var soundId in this.soundsToLoad)
+	{
+		this.doLoadSound(soundId);
 	}
-	return this.sounds[id];
 };
 
 AssetManager.prototype.assetLoaded = function()
@@ -165,6 +194,8 @@ AssetManager.prototype.startLoading = function(levelLoadingList, imgLoadingList,
 	this.loadingStartTime = Date.now();	
 	this.totalAssetLoaded = 0;
 	this.totalAssetCount = 0;
+	
+	this.initSystems();
 
 	for(var i in levelLoadingList)
 	{
