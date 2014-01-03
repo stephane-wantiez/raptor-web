@@ -17,7 +17,7 @@ var LevelBuilder =
 	},
 	parseLevelData : function(levelData)
 	{
-		console.log("Parsing level data: " + $.objectToString(levelData));
+		//console.log("Parsing level data: " + $.objectToString(levelData));
 		var levelProperties = {};
 		for(var levelVar in levelData)
 		{
@@ -33,7 +33,7 @@ var LevelBuilder =
 	},
 	parseEnemiesData : function(enemiesData)
 	{
-		console.log("Parsing enemies data: " + $.objectToString(enemiesData));
+		//console.log("Parsing enemies data: " + $.objectToString(enemiesData));
 		var enemiesObjects = [];
 		for(var enemyDataId in enemiesData)
 		{
@@ -45,7 +45,7 @@ var LevelBuilder =
 	},
 	parseEnemyData : function(enemyData,id)
 	{
-		console.log("Parsing enemy " + id + " data: " + $.objectToString(enemyData));
+		//console.log("Parsing enemy " + id + " data: " + $.objectToString(enemyData));
 		var posX = enemyData.posX;
 		var posY = enemyData.posY;
 		

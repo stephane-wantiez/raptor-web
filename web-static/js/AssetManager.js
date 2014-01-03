@@ -22,9 +22,9 @@ AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
 		
 		$.get( fileName, function(fileData)
 		{
-			console.log("Loaded level " + levelName + " file data: " + fileData);
+			//console.log("Loaded level " + levelName + " file data: " + fileData);
 			var loadedLevelProperties = $.parseJSON(fileData);
-			console.log("Loaded level " + levelName + " properties: " + $.objectToString(loadedLevelProperties));
+			//console.log("Loaded level " + levelName + " properties: " + $.objectToString(loadedLevelProperties));
 			_this.levelsProperties[levelName] = loadedLevelProperties;
 		})
 		.fail( function()

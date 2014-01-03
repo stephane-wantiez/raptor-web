@@ -69,7 +69,7 @@ Scene.prototype.checkActorPosition = function(actor)
 		{
 			if (actorIsVisibleInY)
 			{
-				console.log("Inactive actor " + actor.id + " becomes visible, activation");
+				//console.log("Inactive actor " + actor.id + " becomes visible, activation");
 				actor.activate();
 			}
 		}
@@ -77,7 +77,7 @@ Scene.prototype.checkActorPosition = function(actor)
 		{
 			if (!actorIsVisibleInY)
 			{
-				console.log("Active actor " + actor.id + " becomes invisible, removal");
+				//console.log("Active actor " + actor.id + " becomes invisible, removal");
 				actor.remove();
 			}
 		}

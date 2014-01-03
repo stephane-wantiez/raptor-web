@@ -6,40 +6,48 @@ var FlyingEnemy = function(id,width,height,x,y)
 	this.setPosition(x,y);
 };
 
+FlyingEnemy.SHOOT_PROB = 0.05;
+FlyingEnemy.SHOOT_SPEED = 1000;
+FlyingEnemy.SHOOT_REL_POS_Y = 20;
+
 FlyingEnemy.prototype = new MovingActor();
 
-/*FlyingEnemy.prototype.handleCollisionWith = function(otherActor)
-{
-	if (typeof(otherActor) == "Bullet")
-	{
-		console.log("Enemy " + id + " hit by bullet");
-		this.handleCollisionWithBullet(otherActor);
-	}
-	else if (typeof(otherActor) == "Player")
-	{
-		console.log("Enemy " + id + " crashed with player");
-		this.handleCollisionWithPlayer(otherActor);
-	}
-};
-
-FlyingEnemy.prototype.handleCollisionWithBullet = function(bullet)
-{
-	this.damage(bullet.getDamage());
-	bullet.kill();
-};
-
-FlyingEnemy.prototype.handleCollisionWithPlayer = function(player)
-{
-	this.damage(player.getCollisionDamage());
-	player.collidedWithEnemy();
-};*/
-
-/*FlyingEnemy.prototype.update = function(deltaTimeSec)
+FlyingEnemy.prototype.update = function(deltaTimeSec)
 {	
 	MovingActor.prototype.update.call(this,deltaTimeSec);
 	
 	if (!game.paused && (this.state == Actor.State.ACTIVE))
 	{
-		this.updatePosition(deltaTimeSec);
+		this.checkShoot();
 	}
-};*/
+};
+
+FlyingEnemy.prototype.checkShoot = function()
+{
+	if (this.canShoot())
+	{
+		this.doShoot();
+	}
+};
+
+FlyingEnemy.prototype.getShootProb = function()
+{
+	return FlyingEnemy.SHOOT_PROB;
+};
+
+FlyingEnemy.prototype.canShoot = function()
+{
+	return Math.random() < this.getShootProb();
+};
+
+FlyingEnemy.prototype.createProjectile = function()
+{
+	return new Bullet(FlyingEnemy.SHOOT_SPEED);
+};
+
+FlyingEnemy.prototype.doShoot = function()
+{
+	var projectile = this.createProjectile();
+	projectile.setPosition( this.x, this.y + FlyingEnemy.SHOOT_REL_POS_Y );
+	scene.actors.add(projectile);
+};

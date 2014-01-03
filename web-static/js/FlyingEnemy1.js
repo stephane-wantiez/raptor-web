@@ -9,8 +9,14 @@ var FlyingEnemy1 = function(id,x,y)
 
 FlyingEnemy1.prototype = new FlyingEnemy();
 
+FlyingEnemy1.prototype.getShootProb = function()
+{
+	return FlyingEnemy1.SHOOT_PROB;
+};
+
 FlyingEnemy1.WIDTH = 32;
 FlyingEnemy1.HEIGHT = 32;
 FlyingEnemy1.NB_SPRITES_ROW = 1;
 FlyingEnemy1.NB_SPRITES_COL = 3;
 FlyingEnemy1.SPRITE_FPS = 20;
+FlyingEnemy1.SHOOT_PROB = 0.02;

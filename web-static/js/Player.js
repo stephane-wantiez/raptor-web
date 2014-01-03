@@ -15,7 +15,7 @@ var Player = function()
 	this.nbBombs = 0;
 	
 	this.weaponCreateAmmo = function(){ return new Bullet(self.parent); };
-	this.weaponShootDelayMs = Bullet.SHOOT_WAIT_TIME_MSEC;
+	this.weaponShootDelayMs = Player.BULLET_SHOOT_WAIT_TIME_MSEC;
 	this.nextAllowedWeaponAttack = 0;
 	this.useAttackPosition1 = true;
 	
@@ -82,6 +82,8 @@ Player.SHOOT_REL_POSITION_1_X = -20;
 Player.SHOOT_REL_POSITION_2_X =  20;
 Player.SHOOT_REL_POSITION_1_Y = -10;
 Player.SHOOT_REL_POSITION_2_Y = -10;
+Player.BULLET_SPEED = -800;
+Player.BULLET_SHOOT_WAIT_TIME_MSEC = 20;
 Player.INIT_X = Scene.SCREEN_WIDTH / 2;
 Player.INIT_Y = Scene.SCREEN_HEIGHT - 100;
 Player.MIN_X = Player.WIDTH/2 + 20 ;
@@ -290,14 +292,17 @@ Player.prototype.attack = function()
 	{
 		//console.log("Can attack!");
 		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
-		//var projectile = this.weaponCreateAmmo();
-		var projectile = new Bullet(scene.$scene);
-		var attackPos = this.getAttackPosition();
-		projectile.setPosition(attackPos.x,attackPos.y);
-		projectile.speedY += scene.speedY;
-		scene.playerActors.add(projectile);
+		var projectile = new Bullet(Player.BULLET_SPEED);
+		this.attackWith(projectile);
 	}
-	
+};
+
+Player.prototype.attackWith = function(projectile)
+{
+	var attackPos = this.getAttackPosition();
+	projectile.setPosition(attackPos.x,attackPos.y);
+	projectile.speedY += scene.speedY;
+	scene.playerActors.add(projectile);
 };
 
 Player.prototype.damage = function(damage)
@@ -338,7 +343,7 @@ Player.prototype.handleCollisionWith = function(otherActor)
 {
 	if (otherActor instanceof FlyingEnemy)
 	{
-		console.log("Player crashed with enemy " + otherActor.id);
+		//console.log("Player crashed with enemy " + otherActor.id);
 		otherActor.kill();
 		this.collidedWithEnemy();
 	}

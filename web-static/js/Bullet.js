@@ -1,16 +1,6 @@
-var Bullet = function()
+var Bullet = function(speed)
 {
-	MovingActor.call(this, "bullet_" + game.currentFrameTimeMs, Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT);
-
-	this.speedY = Bullet.SPEED_Y;
-	this.isVisible = true;
-	this.state = Actor.State.ACTIVE;
-	this.radius = 2;
-
-	/*this.spriteList = {
-		"bullet": new Sprite(this.$elm, "bullet", "/raptor-web-static/img/sprite_bullet.bmp", Bullet.SPRITE_NB*Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT, Bullet.SPRITE_NB, 1, 20, true)
-	};*/
-	
+	Projectile.call( this, "bullet_" + game.currentFrameTimeMs, speed, Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT, Bullet.RADIUS );
 	
 	this.createSpriteWithUrl("bullet", "bullet", Bullet.SPRITE_NB*Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT, Bullet.SPRITE_NB, 1, 20, true);
 	
@@ -18,22 +8,15 @@ var Bullet = function()
 	this.idleSpriteName = "bullet";
 };
 
-Bullet.prototype = new MovingActor();
+Bullet.prototype = new Projectile();
 
 Bullet.prototype.getDamage = function()
 {
 	return Bullet.DAMAGE;
 };
 
-Bullet.prototype.handleCollisionWith = function(otherActor)
-{
-	otherActor.damage(this.getDamage());
-	this.kill();
-};
-
-Bullet.SPEED_Y = -800;
-Bullet.SHOOT_WAIT_TIME_MSEC = 20;
 Bullet.SPRITE_WIDTH = 1;
 Bullet.SPRITE_HEIGHT = 4;
 Bullet.SPRITE_NB = 1;
+Bullet.RADIUS = 2;
 Bullet.DAMAGE = 5;

@@ -185,7 +185,7 @@ Actor.prototype.isCollidingWith = function(otherActor)
 	var minDist = this.radius + otherActor.radius;
 	var minDistSquared = minDist * minDist;
 	
-	console.log("Checking collision between actor " + this.id + " and " + otherActor.id + " - distSquared=" + distSquared + " - minDistSquared=" + minDistSquared + " - radius= " + this.radius + " & " + otherActor.radius);
+	//console.log("Checking collision between actor " + this.id + " and " + otherActor.id + " - distSquared=" + distSquared + " - minDistSquared=" + minDistSquared + " - radius= " + this.radius + " & " + otherActor.radius);
 	
 	return distSquared <= minDistSquared;
 };
@@ -194,7 +194,7 @@ Actor.prototype.checkCollisionWith = function(otherActor)
 {
 	if (this.isCollidingWith(otherActor))
 	{
-		console.log("Actor " + this.id + " is colliding with actor " + otherActor.id);
+		//console.log("Actor " + this.id + " is colliding with actor " + otherActor.id);
 		this.handleCollisionWith(otherActor);
 		otherActor.handleCollisionWith(this);
 	};
