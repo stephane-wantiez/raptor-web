@@ -10,7 +10,7 @@ var Player = function()
 	this.health = 100;
 	this.armor = 0;
 	this.nbShields = 0;
-	this.money = 0;
+	this.score = 0;
 	this.secWeapon = "";
 	this.nbBombs = 0;
 
@@ -24,14 +24,14 @@ var Player = function()
 	this.healthChanged = true;
 	this.armorChanged = true;
 	this.nbShieldsChanged = true;
-	this.moneyChanged = true;
+	this.scoreChanged = true;
 	this.secWeaponChanged = true;
 	this.nbBombsChanged = true;
 	
 	this.$health    = $("#health-hud-indic");
 	this.$armor     = $("#armor-hud-indic");
 	this.$shields   = $("#shields-indic");
-	this.$money     = $("#money");
+	this.$score     = $("#score");
 	this.$secWeapon = $("#sec-weapon");
 	this.$bombs     = $("#bombs-indic");
     
@@ -96,7 +96,7 @@ Player.MAX_NB_SHIELDS = 10;
 Player.SHIELDS_PERCENT_FACTOR = 100 / Player.MAX_NB_SHIELDS ;
 Player.MAX_NB_BOMBS = 3;
 Player.BOMBS_PERCENT_FACTOR = 100 / Player.MAX_NB_BOMBS ;
-Player.NB_MONEY_DIGITS = 8;
+Player.NB_SCORE_DIGITS = 8;
 Player.MOVE_UP_KEY     = 38 ; // up arrow
 Player.MOVE_DOWN_KEY   = 40 ; // down arrow
 Player.MOVE_LEFT_KEY   = 37 ; // left arrow
@@ -158,15 +158,20 @@ Player.prototype.setNbShields = function(value)
 	}
 };
 
-Player.prototype.setMoney = function(value)
+Player.prototype.setScore = function(value)
 {
 	value = Math.round(value);
 	
-	if (this.money != value)
+	if (this.score != value)
 	{
-		this.money = value;
-		this.moneyChanged = true;
+		this.score = value;
+		this.scoreChanged = true;
 	}
+};
+
+Player.prototype.addScore = function(value)
+{
+	this.setScore( this.score + value );
 };
 
 Player.prototype.setSecWeapon = function(value)
@@ -215,10 +220,10 @@ Player.prototype.updateHud = function()
 		this.nbBombsChanged = false;
 	}
 	
-	if (this.moneyChanged)
+	if (this.scoreChanged)
 	{
-		this.$money.html("$" + $.expandValueDigits(this.money,Player.NB_MONEY_DIGITS));
-		this.moneyChanged = false;
+		this.$score.html($.expandValueDigits(this.score,Player.NB_SCORE_DIGITS));
+		this.scoreChanged = false;
 	}
 	
 	if (this.secWeaponChanged)
@@ -253,14 +258,15 @@ Player.prototype.updateState = function(deltaTimeSec)
 		
 		isAttacking = this.mouseClicked;
 	}
-	else if (this.controlsEnabled)
+	
+	if (this.controlsEnabled)
 	{
 	    if (this.isKeyDown(Player.MOVE_LEFT_KEY )) move.x = -this.speed.x * deltaTimeSec ;
 	    if (this.isKeyDown(Player.MOVE_RIGHT_KEY)) move.x =  this.speed.x * deltaTimeSec ;
 	    if (this.isKeyDown(Player.MOVE_UP_KEY   )) move.y = -this.speed.y * deltaTimeSec ;
 	    if (this.isKeyDown(Player.MOVE_DOWN_KEY )) move.y =  this.speed.y * deltaTimeSec ;
 	    
-	    isAttacking = this.isKeyDown(Player.MOVE_ATTACK_KEY);
+	    isAttacking = isAttacking || this.isKeyDown(Player.MOVE_ATTACK_KEY);
 	}
     
     var isMoving = move.x || move.y;

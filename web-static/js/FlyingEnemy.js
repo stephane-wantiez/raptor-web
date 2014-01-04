@@ -9,6 +9,8 @@ var FlyingEnemy = function(id,width,height,x,y)
 	
 	this.createSpriteWithUrl( "explosion", "explosion1", FlyingEnemy.KILL_SPRITE_WIDTH * FlyingEnemy.KILL_SPRITE_NB_COL, FlyingEnemy.KILL_SPRITE_HEIGHT * FlyingEnemy.KILL_SPRITE_NB_ROW, FlyingEnemy.KILL_SPRITE_NB_COL, FlyingEnemy.KILL_SPRITE_NB_ROW, FlyingEnemy.KILL_SPRITE_FPS, false);
 	this.deadSpriteName = "explosion";
+	
+	this.killScore = FlyingEnemy.KILL_SCORE;
 };
 
 FlyingEnemy.SHOOT_PROB = 0.05;
@@ -19,6 +21,7 @@ FlyingEnemy.KILL_SPRITE_NB_COL = 6;
 FlyingEnemy.KILL_SPRITE_WIDTH  = 32;
 FlyingEnemy.KILL_SPRITE_HEIGHT = 32;
 FlyingEnemy.KILL_SPRITE_FPS = 10;
+FlyingEnemy.KILL_SCORE = 20;
 
 FlyingEnemy.prototype = new MovingActor();
 

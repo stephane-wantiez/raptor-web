@@ -64,7 +64,7 @@ Game.prototype.onAssetsLoaded = function()
 	// test values
 	player.setArmor(100);
 	player.setHealth(100);
-	player.setMoney(0);
+	player.setScore(0);
 	player.setNbBombs(1);
 	player.setNbShields(2);
 	player.setSecWeapon("missiles");

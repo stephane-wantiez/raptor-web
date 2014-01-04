@@ -27,6 +27,7 @@ var Actor = function(id,width,height)
 	this.deathTime = 0;
 	
 	this.killSound = false;
+	this.killScore = 0;
 };
 
 Actor.State = { INACTIVE : 0, ACTIVE : 1, DYING : 2, DEAD : 3 };
@@ -248,6 +249,8 @@ Actor.prototype.kill = function()
 	this.state = Actor.State.DYING;
 	
 	if (this.killSound) this.killSound.play();
+	
+	if (this.killScore > 0) player.addScore(this.killScore); 
 	
 	var doRemove = function(value){ self.remove(); };
 	

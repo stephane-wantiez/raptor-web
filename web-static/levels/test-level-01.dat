@@ -51,11 +51,101 @@
 			"posX" : 600,
 			"posY" : 2000
 		},
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 450,
+            "posY" : 2150
+        },
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 300,
+            "posY" : 2200
+        },
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 100,
+            "posY" : 2400
+        },
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 600,
+            "posY" : 2400
+        },
+        {
+            "type" : "FlyingEnemy3",
+            "posX" : 400,
+            "posY" : 2700
+        },
+        {
+            "type" : "FlyingEnemy3",
+            "posX" : 500,
+            "posY" : 2700
+        },
+        {
+            "type" : "FlyingEnemy3",
+            "posX" : 600,
+            "posY" : 2700
+        },
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 400,
+            "posY" : 3000
+        },
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 350,
+            "posY" : 3050
+        },
 		{
 			"type" : "FlyingEnemy1",
-			"posX" : 400,
-			"posY" : 4000
+			"posX" : 100,
+			"posY" : 3200
 		},
+        {
+            "type" : "FlyingEnemy3",
+            "posX" : 600,
+            "posY" : 3400
+        },
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 400,
+            "posY" : 3500
+        },
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 100,
+            "posY" : 3500
+        },
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 200,
+            "posY" : 3700
+        },
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 400,
+            "posY" : 3700
+        },
+        {
+            "type" : "FlyingEnemy3",
+            "posX" : 600,
+            "posY" : 3700
+        },
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 100,
+            "posY" : 3900
+        },
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 600,
+            "posY" : 3900
+        },
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 400,
+            "posY" : 4000
+        },
         {
             "type" : "FlyingEnemy2",
             "posX" : 100,

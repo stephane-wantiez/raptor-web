@@ -5,6 +5,8 @@ var FlyingEnemy3 = function(id,x,y)
 	this.createSpriteWithUrl( "move", "enemy3", FlyingEnemy3.WIDTH * FlyingEnemy3.NB_SPRITES_COL, FlyingEnemy3.HEIGHT * FlyingEnemy3.NB_SPRITES_ROW, FlyingEnemy3.NB_SPRITES_COL, FlyingEnemy3.NB_SPRITES_ROW, FlyingEnemy3.SPRITE_FPS, true);
 	this.setSprite("move");
 	this.idleSpriteName = "move";
+	
+	this.killScore = FlyingEnemy3.KILL_SCORE;
 };
 
 FlyingEnemy3.prototype = new FlyingEnemy();
@@ -20,3 +22,4 @@ FlyingEnemy3.NB_SPRITES_ROW = 1;
 FlyingEnemy3.NB_SPRITES_COL = 3;
 FlyingEnemy3.SPRITE_FPS = 20;
 FlyingEnemy3.SHOOT_PROB = 0.1;
+FlyingEnemy3.KILL_SCORE = 45;
