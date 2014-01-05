@@ -1,6 +1,6 @@
-var Bullet = function(speed)
+var Bullet = function(speedY,speedX)
 {
-	Projectile.call( this, "bullet_" + game.currentFrameTimeMs, speed, Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT, Bullet.RADIUS );
+	Projectile.call( this, "bullet_" + game.currentFrameTimeMs, speedX, speedY, Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT, Bullet.RADIUS );
 	
 	this.bulletHitSound = assetManager.getSound("bullet_hit");
 	

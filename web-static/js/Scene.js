@@ -2,6 +2,7 @@ var Scene = function()
 {
 	this.actors = new ActorsContainer();
 	this.playerActors = new ActorsContainer();
+	this.boss = false;
 	this.currentLevel = "";
 	this.currentMusic = "";
 };
@@ -27,6 +28,8 @@ Scene.prototype.loadLevel = function(levelName)
 	this.cameraY = this.maxY - Scene.SCREEN_HEIGHT;
 	this.actors.addAll(levelProperties["enemies"]);
 	this.musics = levelProperties["musics"];
+	this.boss = levelProperties["boss"][0];
+	this.actors.add(this.boss);
 };
 
 Scene.prototype.reloadLevel = function()
@@ -167,7 +170,7 @@ Scene.prototype.isActorVisibleInY = function(actor)
 
 Scene.prototype.isBossKilled = function()
 {
-	return true;
+	return this.boss.state == Actor.State.DEAD ;
 };
 
 Scene.prototype.updateState = function()

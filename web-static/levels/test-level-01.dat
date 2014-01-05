@@ -5,6 +5,14 @@
         "boss"    : "music-boss1",
         "victory" : "music-victory"
     },
+  "boss" :
+    [
+        {
+            "type" : "FlyingBoss1",
+            "posX" : 400,
+            "posY" : 100
+        }
+    ],
   "enemies" :
     [
 		{

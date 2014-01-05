@@ -7,6 +7,8 @@ var FlyingEnemy3 = function(id,x,y)
 	this.idleSpriteName = "move";
 	
 	this.killScore = FlyingEnemy3.KILL_SCORE;
+	
+	this.speedY = 800;
 };
 
 FlyingEnemy3.prototype = new FlyingEnemy();

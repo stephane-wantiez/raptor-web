@@ -48,6 +48,11 @@ FlyingEnemy.prototype.getShootProb = function()
 	return FlyingEnemy.SHOOT_PROB;
 };
 
+FlyingEnemy.prototype.getShootPosition = function()
+{
+	return { x : this.x, y : this.y + FlyingEnemy.SHOOT_REL_POS_Y };
+};
+
 FlyingEnemy.prototype.canShoot = function()
 {
 	return Math.random() < this.getShootProb();
@@ -61,6 +66,7 @@ FlyingEnemy.prototype.createProjectile = function()
 FlyingEnemy.prototype.doShoot = function()
 {
 	var projectile = this.createProjectile();
-	projectile.setPosition( this.x, this.y + FlyingEnemy.SHOOT_REL_POS_Y );
+	var shootPos = this.getShootPosition();
+	projectile.setPosition( shootPos.x, shootPos.y );
 	scene.actors.add(projectile);
 };

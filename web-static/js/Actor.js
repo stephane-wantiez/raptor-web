@@ -136,6 +136,11 @@ Actor.prototype.getPositionInScene = function()
 	return this.getPosition();
 };
 
+Actor.prototype.isInLeftScreenHalf = function()
+{
+	return this.isBeforeX(Scene.SCREEN_WIDTH/2);
+};
+
 Actor.prototype.isBeforeX = function(x)
 {
 	return this.x + this.width < x;

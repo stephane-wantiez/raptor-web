@@ -1,11 +1,13 @@
-var Projectile = function(id,speed,width,height,radius)
+var Projectile = function(id,speedX,speedY,width,height,radius)
 {
 	MovingActor.call(this, id, width, height);
 
-	this.speedY = speed;
+	if ($.isDefined(speedX)) this.speedX = speedX;
+	if ($.isDefined(speedY)) this.speedY = speedY;
+	if ($.isDefined(radius)) this.radius = radius;
+	
 	this.isVisible = true;
 	this.state = Actor.State.ACTIVE;
-	this.radius = radius;
 };
 
 Projectile.prototype = new MovingActor();

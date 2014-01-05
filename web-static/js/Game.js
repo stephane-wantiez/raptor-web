@@ -43,7 +43,8 @@ Game.prototype.initAssets = function()
         "enemy2"      	   : imagesPath +   "sprites_enemy2.png",
         "enemy3"      	   : imagesPath +   "sprites_enemy3.png",
         "explosion1"   	   : imagesPath +   	"explosion1.png",
-        "explosion2"   	   : imagesPath +   	"explosion2.png"
+        "explosion2"   	   : imagesPath +   	"explosion2.png",
+        "boss1"            : imagesPath +     "sprite_boss1.png"
     };
 
     var soundsPath = assetsPath + "sounds/";

@@ -6,7 +6,8 @@ var FlyingEnemy1 = function(id,x,y)
 	this.setSprite("move");
 	this.idleSpriteName = "move";
 	
-	this.speedY = 700;
+	this.speedX = 300 * ( this.isInLeftScreenHalf() ? 1 : -1 );
+	this.speedY = 500;
 	
 	this.killScore = FlyingEnemy1.KILL_SCORE;
 };
@@ -23,5 +24,5 @@ FlyingEnemy1.HEIGHT = 32;
 FlyingEnemy1.NB_SPRITES_ROW = 1;
 FlyingEnemy1.NB_SPRITES_COL = 3;
 FlyingEnemy1.SPRITE_FPS = 20;
-FlyingEnemy1.SHOOT_PROB = 0.02;
+FlyingEnemy1.SHOOT_PROB = 0.06;
 FlyingEnemy1.KILL_SCORE = 14;

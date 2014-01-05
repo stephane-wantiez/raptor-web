@@ -25,20 +25,21 @@ var LevelBuilder =
 			
 			switch(levelVar)
 			{
-				case "enemies" : levelProperties["enemies"] = this.parseEnemiesData(levelData[levelVar]); break;
+				case "enemies" : levelProperties["enemies"] = this.parseEnemiesData(levelVarContent,"enemy"); break;
+				case "boss"    : levelProperties["boss"   ] = this.parseEnemiesData(levelVarContent,"boss" ); break;
 				default : levelProperties[levelVar] = levelVarContent; break;
 			}
 		}
 		return levelProperties;
 	},
-	parseEnemiesData : function(enemiesData)
+	parseEnemiesData : function(enemiesData,idPrefix)
 	{
 		//console.log("Parsing enemies data: " + $.objectToString(enemiesData));
 		var enemiesObjects = [];
 		for(var enemyDataId in enemiesData)
 		{
 			var enemyData = enemiesData[enemyDataId];
-			var enemyObject = this.parseEnemyData( enemyData, "enemy" + enemiesObjects.length + 1 );
+			var enemyObject = this.parseEnemyData( enemyData, idPrefix + enemiesObjects.length + 1 );
 			enemiesObjects.push(enemyObject);
 		}
 		return enemiesObjects;
@@ -54,6 +55,7 @@ var LevelBuilder =
 			case "FlyingEnemy1" : return new FlyingEnemy1(id,posX,posY);
 			case "FlyingEnemy2" : return new FlyingEnemy2(id,posX,posY);
 			case "FlyingEnemy3" : return new FlyingEnemy3(id,posX,posY);
+			case "FlyingBoss1"  : return new  FlyingBoss1(id,posX,posY);
 			default : console.log("Unknown enemy type: " + enemyData.type); break;
 		}
 		
