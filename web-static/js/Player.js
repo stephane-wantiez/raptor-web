@@ -4,9 +4,6 @@ var Player = function()
 
 	var self = this;
 	
-	this.state = Actor.State.ACTIVE;
-	this.isVisible = true;
-	
 	this.health = 100;
 	this.armor = 0;
 	this.nbShields = 0;
@@ -16,7 +13,7 @@ var Player = function()
 
 	this.killSound = assetManager.getSound("explosion");
 	this.weaponSound = assetManager.getSound("shoot_basic");
-	this.weaponCreateAmmo = function(){ return new Bullet(self.parent); };
+	this.weaponCreateAmmo = function(){ return new Bullet(Player.BULLET_SPEED); };
 	this.weaponShootDelayMs = Player.BULLET_SHOOT_WAIT_TIME_MSEC;
 	this.nextAllowedWeaponAttack = 0;
 	this.useAttackPosition1 = true;
@@ -57,7 +54,6 @@ var Player = function()
 	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES*Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true);
 	this.createSpriteWithUrl( "explosion", "explosion2", Player.KILL_SPRITE_WIDTH * Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_HEIGHT * Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_FPS, false);
 
-	this.setSprite("move");
 	this.idleSpriteName = "move";
 	this.deadSpriteName = "explosion";
 	
@@ -71,12 +67,12 @@ var Player = function()
 	this.mouseY = this.y;
 	this.mouseMoved = false;
 	this.mouseClicked = false;
-	
-	this.setPosition(Player.INIT_X,Player.INIT_Y);
 };
 
 Player.WIDTH = 65;
 Player.HEIGHT = 65;
+Player.START_POS_X = 400;
+Player.START_POS_Y = 700;
 Player.NB_MOVE_SPRITES = 3;
 Player.SHOOT_REL_POSITION_1_X = -20;
 Player.SHOOT_REL_POSITION_2_X =  20;
@@ -112,6 +108,15 @@ Player.KILL_SPRITE_HEIGHT = 65;
 Player.KILL_SPRITE_FPS = 10;
 
 Player.prototype = new Actor();
+
+Player.prototype.reset = function()
+{
+	Actor.prototype.reset.call(this);
+	this.controlsEnabled = true;
+	this.setHealth(100);
+	this.setScore(0);
+	this.setPosition( Player.START_POS_X, Player.START_POS_Y );
+};
 
 Player.prototype.getPositionInScene = function()
 {
@@ -304,7 +309,7 @@ Player.prototype.attack = function()
 		//console.log("Can attack!");
 		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
 		this.weaponSound.play();
-		var projectile = new Bullet(Player.BULLET_SPEED);
+		var projectile = this.weaponCreateAmmo();
 		this.attackWith(projectile);
 	}
 };

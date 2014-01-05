@@ -3,14 +3,17 @@ var Scene = function()
 	this.actors = new ActorsContainer();
 	this.playerActors = new ActorsContainer();
 	this.currentLevel = "";
+	this.currentMusic = "";
 };
+
+Scene.State = { STARTING : 0, PLAYING : 1, BOSS_FIGHT : 2, VICTORY : 3, DEAD : 4, RESTARTING : 5 };
 
 Scene.prototype.resetScene = function()
 {
 	this.actors.removeAll();
 	this.playerActors.removeAll();
-	this.speedY = Scene.CAMERA_SPEED;	
-	this.cameraY = Scene.MAX_CAMERA_Y;
+	this.speedY = Scene.CAMERA_SPEED;
+	this.state = Scene.State.STARTING;
 };
 
 Scene.prototype.loadLevel = function(levelName)
@@ -18,9 +21,44 @@ Scene.prototype.loadLevel = function(levelName)
 	this.resetScene();
 	this.currentLevel = levelName;
 	var levelProperties = LevelBuilder.loadLevelData(levelName);
-	console.log(levelProperties);
+	//console.log(levelProperties);
 	this.backgroundImage = assetManager.getImage(levelProperties["background"]);
+	this.maxY = this.backgroundImage.height;
+	this.cameraY = this.maxY - Scene.SCREEN_HEIGHT;
 	this.actors.addAll(levelProperties["enemies"]);
+	this.musics = levelProperties["musics"];
+};
+
+Scene.prototype.reloadLevel = function()
+{
+	this.loadLevel(this.currentLevel);
+};
+
+Scene.prototype.launchMusic = function(mode,loop)
+{
+	this.stopMusic();
+	
+	if ( $.isDefined(this.musics) && $.isDefined(this.musics[mode]) )
+	{
+		//console.log("Loading music " + mode + ( loop ? " in loop" : "" ));
+		this.currentMusic = mode;
+		var music = assetManager.getSound(this.musics[mode]);
+		if (loop) music.playLoop();
+		else music.play();
+	}
+};
+
+Scene.prototype.stopMusic = function(mode)
+{
+	if (!$.isDefined(mode) && (this.currentMusic != ""))
+	{
+		mode = this.currentMusic;
+	}
+	if ( $.isDefined(this.musics) && $.isDefined(mode) && $.isDefined(this.musics[mode]) )
+	{
+		var music = assetManager.getSound(this.musics[mode]);
+		music.stop();
+	}
 };
 
 Scene.prototype.checkCollisionsBetweenActorsAnd = function(actor)
@@ -52,7 +90,7 @@ Scene.prototype.checkActorsCollision = function()
 
 Scene.prototype.isActorOutOfXLimits = function(actor)
 {
-	return actor.isBeforeX(Scene.MIN_X) || actor.isAfterX(Scene.MAX_X);
+	return actor.isBeforeX(0) || actor.isAfterX(Scene.SCREEN_WIDTH);
 };
 
 Scene.prototype.checkActorPosition = function(actor)
@@ -105,10 +143,10 @@ Scene.prototype.getCameraPosition = function()
 
 Scene.prototype.updateCameraPosition = function(deltaTimeSec)
 {
-	if (player.state == Actor.State.ACTIVE)
+	if (this.state == Scene.State.PLAYING)
 	{
 		this.cameraY += this.speedY * deltaTimeSec;
-		this.cameraY = $.clampValue(this.cameraY,Scene.MIN_CAMERA_Y,Scene.MAX_CAMERA_Y);
+		this.cameraY = $.clampValue( this.cameraY, 0, this.maxY - Scene.SCREEN_HEIGHT );
 	}
 };
 
@@ -127,6 +165,85 @@ Scene.prototype.isActorVisibleInY = function(actor)
 	return !actor.isBeforeY(this.getMinVisibleY()) && !actor.isAfterY(this.getMaxVisibleY());
 };
 
+Scene.prototype.isBossKilled = function()
+{
+	return true;
+};
+
+Scene.prototype.updateState = function()
+{
+	switch(this.state)
+	{
+		case Scene.State.STARTING :
+		{
+			player.reset();
+			this.state = Scene.State.PLAYING;
+			this.launchMusic("fight", true);
+			break;
+		}
+		case Scene.State.PLAYING :
+		{
+			if (player.state == Actor.State.DEAD)
+			{
+				this.launchMusic("defeat", false);
+				this.state = Scene.State.DEAD;
+			}
+			else if (this.cameraY == 0)
+			{
+				this.launchMusic("boss", true);
+				this.state = Scene.State.BOSS_FIGHT;
+			}
+			break;
+		}
+		case Scene.State.BOSS_FIGHT :
+		{
+			if (player.state == Actor.State.DEAD)
+			{
+				this.launchMusic("defeat", false);
+				this.state = Scene.State.DEAD;
+			}
+			else if (this.isBossKilled())
+			{
+				this.launchMusic("victory", false);
+				this.state = Scene.State.VICTORY;
+			}
+			break;
+		}
+		case Scene.State.VICTORY :
+		{
+			player.controlsEnabled = false;
+			if (player.y > -50)
+			{
+				player.y -= 2;
+			}
+			else
+			{
+				this.timeSinceEndMs = Date.now();
+				this.state = Scene.State.RESTARTING;
+			}
+			break;
+		}
+		case Scene.State.DEAD :
+		{
+			this.actors.removeAll();
+			this.playerActors.removeAll();
+			this.timeSinceEndMs = Date.now();
+			this.state = Scene.State.RESTARTING;
+			break;
+		}
+		case Scene.State.RESTARTING :
+		{
+			var currentTimeMs = Date.now();
+			if ((currentTimeMs - this.timeSinceEndMs) > Scene.WAIT_BEFORE_RESTART_MS)
+			{
+				this.stopMusic();
+				this.reloadLevel();
+			}
+			break;
+		}
+	}
+};
+
 Scene.prototype.update = function(deltaTimeSec)
 {
 	this.actors.clean();
@@ -136,6 +253,8 @@ Scene.prototype.update = function(deltaTimeSec)
 	this.playerActors.update(deltaTimeSec);
 	
 	this.updateCameraPosition(deltaTimeSec);
+	this.updateState();
+	
 	this.checkActorsCollision();
 	this.checkActorsPosition();
 	
@@ -157,14 +276,7 @@ Scene.prototype.render = function(g)
 };
 
 Scene.CAMERA_SPEED = -40;
+Scene.VISIBILITY_OFFSET = 100;
 Scene.SCREEN_WIDTH = 800;
 Scene.SCREEN_HEIGHT = 600;
-Scene.SCENE_WIDTH = 800;
-Scene.SCENE_HEIGHT = 6000;
-Scene.MIN_X = 0;
-Scene.MAX_X = Scene.SCENE_WIDTH;
-Scene.MIN_Y = 0;
-Scene.MAX_Y = Scene.SCENE_HEIGHT;
-Scene.MIN_CAMERA_Y = 0;
-Scene.MAX_CAMERA_Y = Scene.SCENE_HEIGHT - Scene.SCREEN_HEIGHT;
-Scene.VISIBILITY_OFFSET = 100;
+Scene.WAIT_BEFORE_RESTART_MS = 4000;

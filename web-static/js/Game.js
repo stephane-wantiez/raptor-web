@@ -48,9 +48,12 @@ Game.prototype.initAssets = function()
 
     var soundsPath = assetsPath + "sounds/";
     var soundList = {
-        "shoot_basic" : soundsPath + "shoot_basic.wav",
-        "bullet_hit"  : soundsPath +  "bullet_hit.wav",
-        "explosion"   : soundsPath +   "explosion.wav"
+        "shoot_basic"   : soundsPath +   "shoot_basic.wav",
+        "bullet_hit"    : soundsPath +    "bullet_hit.wav",
+        "explosion"     : soundsPath +     "explosion.wav",
+        "music-battle1" : soundsPath + "music-battle1.mp3",
+        "music-boss1"   : soundsPath +   "music-boss1.mp3",
+        "music-victory" : soundsPath + "music-victory.mp3"
     };
     
     assetManager.startLoading(levelsList,imageList,soundList);
@@ -63,8 +66,6 @@ Game.prototype.onAssetsLoaded = function()
 	
 	// test values
 	player.setArmor(100);
-	player.setHealth(100);
-	player.setScore(0);
 	player.setNbBombs(1);
 	player.setNbShields(2);
 	player.setSecWeapon("missiles");

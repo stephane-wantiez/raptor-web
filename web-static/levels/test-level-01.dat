@@ -1,4 +1,10 @@
 { "background" : "background-ocean",
+  "musics" :
+    {
+        "fight"   : "music-battle1",
+        "boss"    : "music-boss1",
+        "victory" : "music-victory"
+    },
   "enemies" :
     [
 		{

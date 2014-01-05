@@ -34,6 +34,16 @@ Actor.State = { INACTIVE : 0, ACTIVE : 1, DYING : 2, DEAD : 3 };
 
 Actor.prototype = new PositionChanger("Actor");
 
+Actor.prototype.reset = function()
+{
+	if (this.idleSpriteName != "")
+	{
+		this.currentSprite = false;
+		this.setSprite(this.idleSpriteName);
+	}
+	this.activate();
+};
+
 Actor.prototype.createSprite = function(id,img,width,height,colCount,rowCount,frameRate,loop)
 {
     this.spriteList[id] = new Sprite(id,img,width,height,colCount,rowCount,frameRate,loop);
@@ -239,6 +249,7 @@ Actor.prototype.activate = function()
 	//console.log("Activating actor");
 	this.state = Actor.State.ACTIVE;
 	this.isVisible = true;
+	this.deathTime = 0;
 };
 
 Actor.prototype.kill = function()
