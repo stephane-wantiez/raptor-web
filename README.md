@@ -18,6 +18,7 @@ TODO:
 - Get font for game
 - Add FlyingActor class with shadow generation (Player will also have that class as prototype)
 - Add Building class for buildings (with Actor as prototype)
+- Adapt game for touch screen (touch instead of mouse click? permanent shoot?)
 
 Classes:
 
