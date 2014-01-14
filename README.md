@@ -10,6 +10,7 @@ TODO:
 - Fix boss alpha
 - Fix shield value when game is reloaded (shields lost)
 - Set "user-select: none" to CSS divs of interface (mouse selection issue).
+- Remove SoundManager2 and use Audio tag instead.
 - Add feedback for enemy and player damages
 - Add feedback on score (+x on killed enemy)
 - Add end screen with replay button
