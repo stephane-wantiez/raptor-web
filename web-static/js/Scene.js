@@ -60,7 +60,7 @@ Scene.prototype.stopMusic = function(mode)
 	if ( $.isDefined(this.musics) && $.isDefined(mode) && $.isDefined(this.musics[mode]) )
 	{
 		var music = assetManager.getSound(this.musics[mode]);
-		music.stop();
+		music.pause();
 	}
 };
 

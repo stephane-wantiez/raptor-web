@@ -115,6 +115,10 @@ Player.prototype.reset = function()
 	this.controlsEnabled = true;
 	this.setHealth(100);
 	this.setScore(0);
+	this.setArmor(100);
+	this.setNbBombs(1);
+	this.setNbShields(2);
+	this.setSecWeapon("missiles");
 	this.setPosition( Player.START_POS_X, Player.START_POS_Y );
 };
 

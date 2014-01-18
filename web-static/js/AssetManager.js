@@ -10,26 +10,6 @@ var AssetManager = function()
 	this.soundsToLoad = {};
 	this.loadingStarted = false;
     this.renderAlpha = 1;
-    this.soundManagerReady = false;
-    this.soundManagerDebug = false;
-};
-
-AssetManager.prototype.initSystems = function()
-{
-	var self = this;
-	soundManager.setup({
-		onready: function()
-		{
-		    self.soundManagerReady = true;
-		    self.doLoadSounds();
-		},
-		ontimeout: function()
-		{
-		    console.log("Sound Manager initialization failed");
-		    self.soundManagerReady = true;
-		},
-	    debugMode: self.soundManagerDebug
-	});
 };
 
 AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
@@ -68,9 +48,8 @@ AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
 AssetManager.prototype.loadImage = function(url, id)
 {
 	var _this = this;
-	if(!id){
-		id = url;
-	}
+	if(!id) id = url;
+	
 	var img = this.images[id];
 	if(!img){
 		this.imagesToLoad[id] = url;
@@ -95,57 +74,40 @@ AssetManager.prototype.loadImage = function(url, id)
 
 AssetManager.prototype.loadSound = function(url, id, onload)
 {
-	if(!id){
-		id = url;
-	}
-	this.soundsToLoad[id] = url;
-	if (this.soundManagerReady) this.doLoadSound(id);
-};
-
-AssetManager.prototype.doLoadSound = function(id)
-{
-	var _this = this;
-	var url = this.soundsToLoad[id];
-	var sound = soundManager.createSound({
-		id: id,
-		url: url,
-		autoLoad: true,
-		autoPlay: false,
-		onload: function() {
-			delete _this.soundsToLoad[id];
-			_this.assetLoaded();
-			if(onload){
-				onload(sound);
-			}
-		},
-		volume: 100
-	});
+	var _this = this;	
+	if(!id) id = url;
 	
-	sound.playLoop = function(){
-		this.play({			
-			onfinish: function() {
-				if(!this._play || user.data.soundEnabled){
-					this.playLoop();
-				}
-			}
-		});
-	};
-	this.sounds[id] = sound;
-};
-
-AssetManager.prototype.doLoadSounds = function()
-{
-	for(var soundId in this.soundsToLoad)
-	{
-		this.doLoadSound(soundId);
+	if(this.sounds[id])
+    {
+		this.assetLoaded();
 	}
+    else
+    {        
+        this.soundsToLoad[id] = url;
+	    var sound = new Sound(url);
+	    
+	    sound.addEventListener("canplay",function(){
+	        delete _this.soundsToLoad[id];
+	        _this.assetLoaded();
+	    });
+	    sound.addEventListener("stalled",function(){
+	        delete _this.soundsToLoad[id];
+	        console.log("Error loading sound " + url);
+	        _this.assetLoaded();
+	    });
+	    
+		this.sounds[id] = sound;
+	}
+	
+	return this.sounds[id];
 };
 
 AssetManager.prototype.assetLoaded = function()
 {
 	this.totalAssetLoaded++;
-	this.loadingTime = Date.now() - this.loadingStartTime;
-	this.loadingEndTime = Date.now();
+	var now = Date.now();
+	this.loadingTime = now - this.loadingStartTime;
+	this.loadingEndTime = now;
 };
 
 AssetManager.prototype.setRenderAlpha = function(a)
@@ -194,8 +156,6 @@ AssetManager.prototype.startLoading = function(levelLoadingList, imgLoadingList,
 	this.loadingStartTime = Date.now();	
 	this.totalAssetLoaded = 0;
 	this.totalAssetCount = 0;
-	
-	this.initSystems();
 
 	for(var i in levelLoadingList)
 	{

@@ -12,6 +12,12 @@ html, body{
     cursor: none;
 }
 
+div{
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
 #screen{
 	position: absolute;
 	width: 800px;

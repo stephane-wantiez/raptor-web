@@ -1,6 +1,8 @@
 var Actor = function(id,width,height)
 {
 	this.id = id;
+	
+	this.creationTimeMs = Date.now();
 
 	this.spriteList = {};
 	this.currentSprite = false;
@@ -24,7 +26,8 @@ var Actor = function(id,width,height)
 	
 	this.state = Actor.State.INACTIVE;
 	this.health = 100;
-	this.deathTime = 0;
+	this.deathTimeMs = 0;
+	this.deathPeriodMs = 0;
 	
 	this.killSound = false;
 	this.killScore = 0;
@@ -163,7 +166,7 @@ Actor.prototype.isAfterY = function(y)
 
 Actor.prototype.isLifetimeOver = function()
 {
-	return ( this.deathTime != 0 ) && ( this.deathTime <= Date.now() );
+	return ( this.deathTimeMs != 0 ) && ( this.deathTimeMs <= Date.now() );
 };
 
 Actor.prototype.checkLifetime = function()
@@ -233,17 +236,24 @@ Actor.prototype.update = function(deltaTimeSec)
 	}
 };
 
+Actor.prototype.canRender = function()
+{
+	return $.isDefined(this.currentSprite);
+};
+
+Actor.prototype.doRender = function(g)
+{
+	this.currentSprite.render(g);
+};
+
 Actor.prototype.render = function(g)
 {
-    if(this.isVisible && this.currentSprite)
+    if(this.isVisible && this.canRender())
     {
         g.save();
         g.translate(this.x,this.y);
         
-        this.currentSprite.render(g);
-        
-        /*g.fillStyle = "white";
-        g.fillRect(0,0,3,3);*/
+        this.doRender(g);
         
         g.restore();
     }
@@ -254,7 +264,11 @@ Actor.prototype.activate = function()
 	//console.log("Activating actor");
 	this.state = Actor.State.ACTIVE;
 	this.isVisible = true;
-	this.deathTime = 0;
+	this.deathTimeMs = 0;
+	if (this.deathPeriodMs > 0)
+	{
+		this.deathTimeMs = Date.now() + this.deathPeriodMs;
+	}
 };
 
 Actor.prototype.kill = function()
@@ -266,7 +280,11 @@ Actor.prototype.kill = function()
 	
 	if (this.killSound) this.killSound.play();
 	
-	if (this.killScore > 0) player.addScore(this.killScore); 
+	if (this.killScore > 0)
+	{
+		player.addScore(this.killScore);
+		scene.actors.add(new ScoreFeedback(this, "+" + this.killScore )); 
+	}
 	
 	var doRemove = function(value){ self.remove(); };
 	

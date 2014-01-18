@@ -65,12 +65,6 @@ Game.prototype.onAssetsLoaded = function()
 	player = new Player();
 	scene = new Scene();
 	
-	// test values
-	player.setArmor(100);
-	player.setNbBombs(1);
-	player.setNbShields(2);
-	player.setSecWeapon("missiles");
-	
 	scene.loadLevel("testLevel1");
 };
 
