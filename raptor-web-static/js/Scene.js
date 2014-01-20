@@ -214,7 +214,7 @@ Scene.prototype.updateState = function()
 		}
 		case Scene.State.VICTORY :
 		{
-			player.controlsEnabled = false;
+			inputManager.playerControlsEnabled = false;
 			if (player.y > -50)
 			{
 				player.y -= 2;
@@ -228,8 +228,6 @@ Scene.prototype.updateState = function()
 		}
 		case Scene.State.DEAD :
 		{
-			this.actors.removeAll();
-			this.playerActors.removeAll();
 			this.timeSinceEndMs = Date.now();
 			this.state = Scene.State.RESTARTING;
 			break;
@@ -239,6 +237,8 @@ Scene.prototype.updateState = function()
 			var currentTimeMs = Date.now();
 			if ((currentTimeMs - this.timeSinceEndMs) > Scene.WAIT_BEFORE_RESTART_MS)
 			{
+				this.actors.removeAll();
+				this.playerActors.removeAll();
 				this.stopMusic();
 				this.reloadLevel();
 			}

@@ -8,17 +8,7 @@ var Projectile = function(id,speedX,speedY,width,height,radius)
 	
 	this.isVisible = true;
 	this.state = Actor.State.ACTIVE;
+	this.health = 1;
 };
 
 Projectile.prototype = new MovingActor();
-
-Projectile.prototype.getDamage = function()
-{
-	return 0;
-};
-
-Projectile.prototype.handleCollisionWith = function(otherActor)
-{
-	otherActor.damage(this.getDamage());
-	this.kill();
-};

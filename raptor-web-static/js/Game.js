@@ -7,15 +7,24 @@ var Game = function()
 	this.elapsedTimeSinceStartupMs = 0;
 	this.elapsedGameTimeSinceStartup = 0;
 	this.timeSinceLoadingEnd = 0;
-	this.paused = false;
+	this.paused = false;	
+	this.pauseMenu = new PauseMenu();
 	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
     this.graphics = sceneView.getContext("2d");
     this.graphics.$canvas = $sceneView;
     this.graphics.canvas = sceneView;
+    
+    inputManager.setCanvasLeftX(this.graphics.$canvas.offset().left);
+    inputManager.setCanvasTopY( this.graphics.$canvas.offset().top );
 	
-	this.initAssets();	
+	inputManager.addPauseKeysListener(function(){
+		self.paused = !self.paused;
+		self.pauseMenu.updateState(self.paused);
+	});
+	
+	this.initAssets();
 	
 	requestAnimFrame(
 		function loop() {
@@ -66,6 +75,11 @@ Game.prototype.onAssetsLoaded = function()
 	scene = new Scene();
 	
 	scene.loadLevel("testLevel1");
+};
+
+Game.prototype.restart = function()
+{
+	scene.reloadLevel();
 };
 
 Game.prototype.mainLoop = function()

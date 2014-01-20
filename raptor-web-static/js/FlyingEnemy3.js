@@ -7,7 +7,8 @@ var FlyingEnemy3 = function(id,x,y)
 	this.idleSpriteName = "move";
 	
 	this.killScore = FlyingEnemy3.KILL_SCORE;
-	
+
+	this.health = FlyingEnemy3.HEALTH;
 	this.speedY = 800;
 };
 
@@ -18,6 +19,7 @@ FlyingEnemy3.prototype.getShootProb = function()
 	return FlyingEnemy3.SHOOT_PROB;
 };
 
+FlyingEnemy3.HEALTH = 60;
 FlyingEnemy3.WIDTH = 32;
 FlyingEnemy3.HEIGHT = 32;
 FlyingEnemy3.NB_SPRITES_ROW = 1;

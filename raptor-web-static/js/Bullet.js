@@ -2,26 +2,16 @@ var Bullet = function(speedY,speedX)
 {
 	Projectile.call( this, "bullet_" + game.currentFrameTimeMs, speedX, speedY, Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT, Bullet.RADIUS );
 	
-	this.bulletHitSound = assetManager.getSound("bullet_hit");
-	
 	this.createSpriteWithUrl("bullet", "bullet", Bullet.SPRITE_NB*Bullet.SPRITE_WIDTH, Bullet.SPRITE_HEIGHT, Bullet.SPRITE_NB, 1, 20, true);
 	
 	this.setSprite("bullet");
 	this.idleSpriteName = "bullet";
+	
+	this.collisionDamage = Bullet.DAMAGE;
+	this.collisionSound = assetManager.getSound("bullet_hit");
 };
 
 Bullet.prototype = new Projectile();
-
-Bullet.prototype.getDamage = function()
-{
-	return Bullet.DAMAGE;
-};
-
-Bullet.prototype.handleCollisionWith = function(otherActor)
-{
-	Projectile.prototype.handleCollisionWith.call(this,otherActor);
-	this.bulletHitSound.play();
-};
 
 Bullet.SPRITE_WIDTH = 1;
 Bullet.SPRITE_HEIGHT = 4;

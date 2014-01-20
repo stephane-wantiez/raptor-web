@@ -15,6 +15,7 @@ var FlyingBoss1 = function(id,x,y)
 	this.health = FlyingBoss1.HEALTH;	
 	this.killScore = FlyingBoss1.KILL_SCORE;	
 	this.currentShootPos = -1;
+	this.collisionDamage = FlyingBoss1.COLLISION_DAMAGE;
 };
 
 FlyingBoss1.prototype = new FlyingEnemy();
@@ -52,6 +53,7 @@ FlyingBoss1.KILL_SPRITE_NB_COL = 6;
 FlyingBoss1.KILL_SPRITE_WIDTH  = 65;
 FlyingBoss1.KILL_SPRITE_HEIGHT = 65;
 FlyingBoss1.KILL_SPRITE_FPS = 10;
+FlyingBoss1.COLLISION_DAMAGE = 1000;
 FlyingBoss1.SHOOT_PROB = 0.25;
 FlyingBoss1.KILL_SCORE = 250;
 FlyingBoss1.SHOOT_NB_POS = 5;

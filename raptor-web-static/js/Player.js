@@ -1,8 +1,6 @@
 var Player = function()
 {
 	Actor.call(this, "player", Player.WIDTH, Player.HEIGHT);
-
-	var self = this;
 	
 	this.health = 100;
 	this.armor = 0;
@@ -18,6 +16,8 @@ var Player = function()
 	this.nextAllowedWeaponAttack = 0;
 	this.useAttackPosition1 = true;
 	
+	this.collisionDamage = Player.COLLISION_DAMAGE_ENEMY;
+	
 	this.healthChanged = true;
 	this.armorChanged = true;
 	this.nbShieldsChanged = true;
@@ -32,15 +32,6 @@ var Player = function()
 	this.$secWeapon = $("#sec-weapon");
 	this.$bombs     = $("#bombs-indic");
     
-	this.controlsEnabled = true;
-	this.mouseEnabled = true;
-	
-    $(document).keyup(function(e){ self.onKeyUp(e.which);});
-    $(document).keydown(function(e){ lastKeyEvent = e; self.onKeyDown(e.which);});
-    $(document).mousemove(function(e){ lastMouseEvent = e; self.onMouseMove(e.pageX,e.pageY);});
-    $(document).mousedown(function(e){ lastMouseEvent = e; self.onMouseDown(e.which);});
-    $(document).mouseup(function(e){ lastMouseEvent = e; self.onMouseUp(e.which);});
-    
     this.minX = Player.MIN_X;
     this.maxX = Player.MAX_X;
     this.minY = Player.MIN_Y;
@@ -51,8 +42,8 @@ var Player = function()
 		y: Player.SPEED_Y
 	};
 	
-	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES*Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true);
-	this.createSpriteWithUrl( "explosion", "explosion2", Player.KILL_SPRITE_WIDTH * Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_HEIGHT * Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_FPS, false);
+	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES * Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true );
+	this.createSpriteWithUrl("explosion", "explosion2", Player.KILL_SPRITE_WIDTH * Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_HEIGHT * Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_FPS, false);
 
 	this.idleSpriteName = "move";
 	this.deadSpriteName = "explosion";
@@ -60,13 +51,6 @@ var Player = function()
 	this.secWeaponsList = {
 		"missiles" : "/raptor-web-static/img/icon_missiles.png"	
 	};
-
-	this.keyList = {};
-	
-	this.mouseX = this.x;
-	this.mouseY = this.y;
-	this.mouseMoved = false;
-	this.mouseClicked = false;
 };
 
 Player.WIDTH = 65;
@@ -112,7 +96,7 @@ Player.prototype = new Actor();
 Player.prototype.reset = function()
 {
 	Actor.prototype.reset.call(this);
-	this.controlsEnabled = true;
+	inputManager.playerControlsEnabled = true;
 	this.setHealth(100);
 	this.setScore(0);
 	this.setArmor(100);
@@ -131,7 +115,7 @@ Player.prototype.getPositionInScene = function()
 
 Player.prototype.setMouseEnabled = function(value)
 {
-	this.mouseEnabled = value;
+	inputManager.mouseEnabled = value;
 };
 
 Player.prototype.setHealth = function(value)
@@ -258,24 +242,24 @@ Player.prototype.updateState = function(deltaTimeSec)
 	var move = {x: 0, y: 0};
 	var isAttacking = false;
 	
-	if (this.controlsEnabled && this.mouseEnabled)
+	if (inputManager.playerControlsEnabled && inputManager.mouseEnabled)
 	{	
-		move.x = $.clampValue(( this.mouseX - this.x ) * 50, -this.speed.x, this.speed.x) * deltaTimeSec ;
-		move.y = $.clampValue(( this.mouseY - this.y ) * 50, -this.speed.y, this.speed.y) * deltaTimeSec ;
+		move.x = $.clampValue(( inputManager.mouseX - this.x ) * 50, -this.speed.x, this.speed.x) * deltaTimeSec ;
+		move.y = $.clampValue(( inputManager.mouseY - this.y ) * 50, -this.speed.y, this.speed.y) * deltaTimeSec ;
 
-		//console.log("Mouse moved: mouseX=" + this.mouseX + " , mouseY=" + this.mouseY + " - x=" + this.x + " , y=" + this.y + " -> move.x=" + move.x + " , move.y=" + move.y);
+		//console.log("Mouse moved: mouseX=" + inputManager.mouseX + " , mouseY=" + inputManager.mouseY + " - x=" + this.x + " , y=" + this.y + " -> move.x=" + move.x + " , move.y=" + move.y);
 		
-		isAttacking = this.mouseClicked;
+		isAttacking = inputManager.mouseClicked;
 	}
 	
-	if (this.controlsEnabled)
+	if (inputManager.playerControlsEnabled)
 	{
-	    if (this.isKeyDown(Player.MOVE_LEFT_KEY )) move.x = -this.speed.x * deltaTimeSec ;
-	    if (this.isKeyDown(Player.MOVE_RIGHT_KEY)) move.x =  this.speed.x * deltaTimeSec ;
-	    if (this.isKeyDown(Player.MOVE_UP_KEY   )) move.y = -this.speed.y * deltaTimeSec ;
-	    if (this.isKeyDown(Player.MOVE_DOWN_KEY )) move.y =  this.speed.y * deltaTimeSec ;
+	    if (inputManager.isKeyDown(Player.MOVE_LEFT_KEY )) move.x = -this.speed.x * deltaTimeSec ;
+	    if (inputManager.isKeyDown(Player.MOVE_RIGHT_KEY)) move.x =  this.speed.x * deltaTimeSec ;
+	    if (inputManager.isKeyDown(Player.MOVE_UP_KEY   )) move.y = -this.speed.y * deltaTimeSec ;
+	    if (inputManager.isKeyDown(Player.MOVE_DOWN_KEY )) move.y =  this.speed.y * deltaTimeSec ;
 	    
-	    isAttacking = isAttacking || this.isKeyDown(Player.MOVE_ATTACK_KEY);
+	    isAttacking = isAttacking || inputManager.isKeyDown(Player.MOVE_ATTACK_KEY);
 	}
     
     var isMoving = move.x || move.y;
@@ -365,26 +349,6 @@ Player.prototype.damage = function(damage)
 	}
 };
 
-Player.prototype.getCollisionDamage = function()
-{
-	return Player.COLLISION_DAMAGE_ENEMY;
-};
-
-Player.prototype.collidedWithEnemy = function()
-{
-	this.damage(Player.COLLISION_DAMAGE_SELF);
-};
-
-Player.prototype.handleCollisionWith = function(otherActor)
-{
-	if (otherActor instanceof FlyingEnemy)
-	{
-		//console.log("Player crashed with enemy " + otherActor.id);
-		otherActor.kill();
-		this.collidedWithEnemy();
-	}
-};
-
 Player.prototype.update = function(deltaTimeSec)
 {	
 	Actor.prototype.update.call(this,deltaTimeSec);
@@ -399,41 +363,4 @@ Player.prototype.update = function(deltaTimeSec)
 	//var pos = this.getPositionInScene();
 	//console.log("Player position in scene: " + pos.x + "," + pos.y );
 	//console.log("Player position: " + this.x + "," + this.y );
-};
-
-Player.prototype.isKeyDown = function(k)
-{
-    return this.keyList[k];
-};
-
-Player.prototype.onKeyDown = function(k)
-{
-    this.keyList[k] = true;
-};
-
-Player.prototype.onKeyUp = function(k)
-{
-    this.keyList[k] = false;
-};
-
-Player.prototype.onMouseMove = function(x,y)
-{
-	this.mouseX = x - game.graphics.$canvas.offset().left ;
-	this.mouseY = y - game.graphics.$canvas.offset().top  ;
-};
-
-Player.prototype.onMouseDown = function(button)
-{
-	if (button == Player.MOUSE_ATTACK_BUTTON)
-	{
-		this.mouseClicked = true;
-	}
-};
-
-Player.prototype.onMouseUp = function(button)
-{
-	if (button == Player.MOUSE_ATTACK_BUTTON)
-	{
-		this.mouseClicked = false;
-	}
 };

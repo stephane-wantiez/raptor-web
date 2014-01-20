@@ -13,7 +13,7 @@ var ScoreFeedback = function(sourceActor,scoreText)
 	this.accelY = ScoreFeedback.SCORE_SPEED_ACCEL;
 	this.maxSpeedY = 0;
 	
-	this.font = "12px 5metrik_bold";
+	this.font = "12px Florsn01";
 	this.fontStyle = "red";
 };
 

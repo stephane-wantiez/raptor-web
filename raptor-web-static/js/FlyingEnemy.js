@@ -22,6 +22,7 @@ FlyingEnemy.KILL_SPRITE_WIDTH  = 32;
 FlyingEnemy.KILL_SPRITE_HEIGHT = 32;
 FlyingEnemy.KILL_SPRITE_FPS = 10;
 FlyingEnemy.KILL_SCORE = 20;
+FlyingEnemy.COLLISION_DAMAGE = 50;
 
 FlyingEnemy.prototype = new MovingActor();
 
@@ -33,6 +34,11 @@ FlyingEnemy.prototype.update = function(deltaTimeSec)
 	{
 		this.checkShoot();
 	}
+};
+
+FlyingEnemy.prototype.getCollisionDamage = function()
+{
+	return FlyingEnemy.COLLISION_DAMAGE;
 };
 
 FlyingEnemy.prototype.checkShoot = function()

@@ -29,6 +29,9 @@ var Actor = function(id,width,height)
 	this.deathTimeMs = 0;
 	this.deathPeriodMs = 0;
 	
+	this.collisionDamage = 0;
+	this.collisionSound = false;
+	
 	this.killSound = false;
 	this.killScore = 0;
 };
@@ -182,6 +185,11 @@ Actor.prototype.setHealth = function(value)
 	this.health = value;
 };
 
+Actor.prototype.getCollisionDamage = function()
+{
+	return this.collisionDamage;
+};
+
 Actor.prototype.damage = function(damage)
 {
 	this.setHealth(this.health-damage);
@@ -222,7 +230,10 @@ Actor.prototype.checkCollisionWith = function(otherActor)
 };
 
 Actor.prototype.handleCollisionWith = function(otherActor)
-{};
+{
+	this.damage(otherActor.getCollisionDamage());	
+	if (this.collisionSound) this.collisionSound.play();
+};
 
 Actor.prototype.update = function(deltaTimeSec)
 {	
