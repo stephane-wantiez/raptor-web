@@ -19,10 +19,7 @@ var Game = function()
     inputManager.setCanvasLeftX(this.graphics.$canvas.offset().left);
     inputManager.setCanvasTopY( this.graphics.$canvas.offset().top );
 	
-	inputManager.addPauseKeysListener(function(){
-		self.paused = !self.paused;
-		self.pauseMenu.updateState(self.paused);
-	});
+	inputManager.addPauseKeysListener(function(){ self.switchPaused(); });
 	
 	this.initAssets();
 	
@@ -79,7 +76,20 @@ Game.prototype.onAssetsLoaded = function()
 
 Game.prototype.restart = function()
 {
+	this.setPaused(false);
+	this.elapsedGameTimeSinceStartup = 0;
 	scene.reloadLevel();
+};
+
+Game.prototype.setPaused = function(paused)
+{
+	this.paused = paused;
+	this.pauseMenu.updateState(paused);
+};
+
+Game.prototype.switchPaused = function()
+{
+	this.setPaused(!this.paused);
 };
 
 Game.prototype.mainLoop = function()
@@ -122,7 +132,7 @@ Game.prototype.mainLoop = function()
 
 Game.prototype.gameUpdate = function(deltaTimeSec)
 {
-	scene.update(deltaTimeSec);
+	 scene.update(deltaTimeSec);
 	player.update(deltaTimeSec);
 };
 

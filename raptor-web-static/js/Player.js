@@ -249,7 +249,7 @@ Player.prototype.updateState = function(deltaTimeSec)
 
 		//console.log("Mouse moved: mouseX=" + inputManager.mouseX + " , mouseY=" + inputManager.mouseY + " - x=" + this.x + " , y=" + this.y + " -> move.x=" + move.x + " , move.y=" + move.y);
 		
-		isAttacking = inputManager.mouseClicked;
+		isAttacking = inputManager.isMouseDown(Player.MOUSE_ATTACK_BUTTON);
 	}
 	
 	if (inputManager.playerControlsEnabled)
@@ -349,11 +349,11 @@ Player.prototype.damage = function(damage)
 	}
 };
 
-Player.prototype.update = function(deltaTimeSec)
+Player.prototype.doUpdate = function(deltaTimeSec)
 {	
-	Actor.prototype.update.call(this,deltaTimeSec);
+	Actor.prototype.doUpdate.call(this,deltaTimeSec);
 	
-	if (!game.paused && (this.state == Actor.State.ACTIVE))
+	if (this.state == Actor.State.ACTIVE)
 	{
 		this.updateState(deltaTimeSec);
 	}

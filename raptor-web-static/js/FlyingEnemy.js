@@ -26,11 +26,11 @@ FlyingEnemy.COLLISION_DAMAGE = 50;
 
 FlyingEnemy.prototype = new MovingActor();
 
-FlyingEnemy.prototype.update = function(deltaTimeSec)
+FlyingEnemy.prototype.doUpdate = function(deltaTimeSec)
 {	
-	MovingActor.prototype.update.call(this,deltaTimeSec);
+	MovingActor.prototype.doUpdate.call(this,deltaTimeSec);
 	
-	if (!game.paused && (this.state == Actor.State.ACTIVE))
+	if (this.state == Actor.State.ACTIVE)
 	{
 		this.checkShoot();
 	}

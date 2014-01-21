@@ -4,7 +4,7 @@ var ScoreFeedback = function(sourceActor,scoreText)
 	MovingActor.call(this,id,ScoreFeedback.SCORE_WIDTH,ScoreFeedback.SCORE_HEIGHT);
 	
 	this.scoreText = scoreText;
-	this.deathPeriodMs = ScoreFeedback.SCORE_PERIOD_MS;
+	this.deathPeriodSec = ScoreFeedback.SCORE_PERIOD_SEC;
 	this.areCollisionsChecked = false;
 	
 	this.x = sourceActor.x + ScoreFeedback.SCORE_DECAL_X;
@@ -23,7 +23,7 @@ ScoreFeedback.SCORE_DECAL_X = -10;
 ScoreFeedback.SCORE_DECAL_Y = -10;
 ScoreFeedback.SCORE_SPEED_Y_ORIG = -10;
 ScoreFeedback.SCORE_SPEED_ACCEL = 10;
-ScoreFeedback.SCORE_PERIOD_MS = 3000;
+ScoreFeedback.SCORE_PERIOD_SEC = 3;
 ScoreFeedback.SCORE_ID_COUNTER = 0;
 
 ScoreFeedback.prototype = new MovingActor();

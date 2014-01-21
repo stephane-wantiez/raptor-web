@@ -26,8 +26,8 @@ var Actor = function(id,width,height)
 	
 	this.state = Actor.State.INACTIVE;
 	this.health = 100;
-	this.deathTimeMs = 0;
-	this.deathPeriodMs = 0;
+	this.lifeTimeSec = 0;
+	this.deathPeriodSec = 0;
 	
 	this.collisionDamage = 0;
 	this.collisionSound = false;
@@ -169,7 +169,7 @@ Actor.prototype.isAfterY = function(y)
 
 Actor.prototype.isLifetimeOver = function()
 {
-	return ( this.deathTimeMs != 0 ) && ( this.deathTimeMs <= Date.now() );
+	return ( this.deathPeriodSec != 0 ) && ( this.lifeTimeSec >= this.deathPeriodSec );
 };
 
 Actor.prototype.checkLifetime = function()
@@ -235,7 +235,7 @@ Actor.prototype.handleCollisionWith = function(otherActor)
 	if (this.collisionSound) this.collisionSound.play();
 };
 
-Actor.prototype.update = function(deltaTimeSec)
+Actor.prototype.doUpdate = function(deltaTimeSec)
 {	
 	if (this.state == Actor.State.ACTIVE)
 	{
@@ -244,6 +244,15 @@ Actor.prototype.update = function(deltaTimeSec)
 	if (this.isVisible)
 	{
 		this.checkSprite();
+	}
+};
+
+Actor.prototype.update = function(deltaTimeSec)
+{
+	if (!game.paused)
+	{
+		this.lifeTimeSec += deltaTimeSec;
+		this.doUpdate(deltaTimeSec);
 	}
 };
 
@@ -272,19 +281,15 @@ Actor.prototype.render = function(g)
 
 Actor.prototype.activate = function()
 {
-	//console.log("Activating actor");
+	console.log("Activating actor " + this.id);
 	this.state = Actor.State.ACTIVE;
 	this.isVisible = true;
-	this.deathTimeMs = 0;
-	if (this.deathPeriodMs > 0)
-	{
-		this.deathTimeMs = Date.now() + this.deathPeriodMs;
-	}
+	this.lifeTimeSec = 0;
 };
 
 Actor.prototype.kill = function()
 {
-	//console.log("Killing actor");
+	console.log("Killing actor " + this.id);
 	var self = this;
 	
 	this.state = Actor.State.DYING;

@@ -12,11 +12,10 @@ var InputManager = function()
     $(document).mouseup(function(e){ lastMouseEvent = e; self.onMouseUp(e.which);});
 
 	this.keyList = {};
-	
+	this.mouseClicked = {};
+	this.mouseMoved = false;
 	this.mouseX = this.x;
 	this.mouseY = this.y;
-	this.mouseMoved = false;
-	this.mouseClicked = false;
 	
 	this.canvasLeftX = 0;
 	this.canvasTopY = 0;
@@ -47,11 +46,6 @@ InputManager.prototype.firePauseKeysEvent = function()
 	}
 };
 
-InputManager.prototype.isKeyDown = function(k)
-{
-    return this.keyList[k];
-};
-
 InputManager.prototype.onKeyDown = function(k)
 {
     this.keyList[k] = true;
@@ -64,6 +58,11 @@ InputManager.prototype.onKeyUp = function(k)
     this.checkSpecialKeys();
 };
 
+InputManager.prototype.isKeyDown = function(k)
+{
+    return this.keyList[k];
+};
+
 InputManager.prototype.onMouseMove = function(x,y)
 {
 	this.mouseX = x - this.canvasLeftX;
@@ -72,18 +71,17 @@ InputManager.prototype.onMouseMove = function(x,y)
 
 InputManager.prototype.onMouseDown = function(button)
 {
-	if (button == Player.MOUSE_ATTACK_BUTTON)
-	{
-		this.mouseClicked = true;
-	}
+	this.mouseClicked[button] = true;
 };
 
 InputManager.prototype.onMouseUp = function(button)
 {
-	if (button == Player.MOUSE_ATTACK_BUTTON)
-	{
-		this.mouseClicked = false;
-	}
+	this.mouseClicked[button] = false;
+};
+
+InputManager.prototype.isMouseDown = function(button)
+{
+    return this.mouseClicked[button];
 };
 
 InputManager.prototype.checkSpecialKeys = function()

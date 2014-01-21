@@ -34,12 +34,13 @@ MovingActor.prototype.updateSpeed = function(deltaTimeSec)
 	this.speedY = $.clampValue( newSpeedY, this.minSpeedY, this.maxSpeedY );
 };
 
-MovingActor.prototype.update = function(deltaTimeSec)
+MovingActor.prototype.doUpdate = function(deltaTimeSec)
 {	
-	Actor.prototype.update.call(this,deltaTimeSec);
+	Actor.prototype.doUpdate.call(this,deltaTimeSec);
 	
-	if (!game.paused && (this.state == Actor.State.ACTIVE))
+	if (this.state == Actor.State.ACTIVE)
 	{
 		this.updatePosition(deltaTimeSec);
+		this.updateSpeed(deltaTimeSec);
 	}
 };

@@ -8,7 +8,6 @@ Created for the Web game programming course of SupInfoGame SIG4GP.
 
 TODO:
 - Add feedback for enemy and player damages
-- Add pause menu
 - Add end screen with replay button
 - Add start menu
 - Get sprites of original game (w/ Camoto tool? DotEmu?) - or use sprites of 1942 (no more Raptor...)
