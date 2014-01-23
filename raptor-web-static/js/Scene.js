@@ -7,7 +7,7 @@ var Scene = function()
 	this.currentMusic = "";
 };
 
-Scene.State = { STARTING : 0, PLAYING : 1, BOSS_FIGHT : 2, VICTORY : 3, DEAD : 4, RESTARTING : 5 };
+Scene.State = { STARTING : 0, PLAYING : 1, BOSS_FIGHT : 2, VICTORY : 3, DEAD : 4, RESTARTING : 5, ENDGAME : 6 };
 
 Scene.prototype.resetScene = function()
 {
@@ -181,7 +181,7 @@ Scene.prototype.updateState = function()
 		{
 			player.reset();
 			this.state = Scene.State.PLAYING;
-			this.launchMusic("fight", true);
+			//this.launchMusic("fight", true);
 			break;
 		}
 		case Scene.State.PLAYING :
@@ -222,14 +222,16 @@ Scene.prototype.updateState = function()
 			else
 			{
 				this.timeSinceEndMs = Date.now();
-				this.state = Scene.State.RESTARTING;
+				game.onVictory();
+				this.state = Scene.State.ENDGAME;
 			}
 			break;
 		}
 		case Scene.State.DEAD :
 		{
 			this.timeSinceEndMs = Date.now();
-			this.state = Scene.State.RESTARTING;
+			game.onGameOver();
+			this.state = Scene.State.ENDGAME;
 			break;
 		}
 		case Scene.State.RESTARTING :
@@ -249,18 +251,20 @@ Scene.prototype.updateState = function()
 
 Scene.prototype.update = function(deltaTimeSec)
 {
-	this.actors.clean();
-	this.actors.update(deltaTimeSec);
-	
-	this.playerActors.clean();
-	this.playerActors.update(deltaTimeSec);
-	
-	this.updateCameraPosition(deltaTimeSec);
-	this.updateState();
-	
-	this.checkActorsCollision();
-	this.checkActorsPosition();
-	
+	if (!game.paused)
+	{
+		this.actors.clean();
+		this.actors.update(deltaTimeSec);
+		
+		this.playerActors.clean();
+		this.playerActors.update(deltaTimeSec);
+		
+		this.updateCameraPosition(deltaTimeSec);
+		this.updateState();
+		
+		this.checkActorsCollision();
+		this.checkActorsPosition();
+	}	
 	//console.log("Camera Y: " + this.cameraY);
 	//console.log("Nb actors in scene: " + this.actors.size());
 };

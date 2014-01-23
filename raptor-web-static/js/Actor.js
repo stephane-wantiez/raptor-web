@@ -281,7 +281,7 @@ Actor.prototype.render = function(g)
 
 Actor.prototype.activate = function()
 {
-	console.log("Activating actor " + this.id);
+	//console.log("Activating actor " + this.id);
 	this.state = Actor.State.ACTIVE;
 	this.isVisible = true;
 	this.lifeTimeSec = 0;
@@ -289,7 +289,7 @@ Actor.prototype.activate = function()
 
 Actor.prototype.kill = function()
 {
-	console.log("Killing actor " + this.id);
+	//console.log("Killing actor " + this.id);
 	var self = this;
 	
 	this.state = Actor.State.DYING;

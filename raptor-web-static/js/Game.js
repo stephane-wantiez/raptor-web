@@ -7,8 +7,7 @@ var Game = function()
 	this.elapsedTimeSinceStartupMs = 0;
 	this.elapsedGameTimeSinceStartup = 0;
 	this.timeSinceLoadingEnd = 0;
-	this.paused = false;	
-	this.pauseMenu = new PauseMenu();
+	this.paused = false;
 	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
@@ -71,6 +70,10 @@ Game.prototype.onAssetsLoaded = function()
 	player = new Player();
 	scene = new Scene();
 	
+	this.pauseMenu = new PauseMenu();
+	this.victoryMenu = new VictoryMenu();
+	this.gameOverMenu = new GameOverMenu();
+	
 	scene.loadLevel("testLevel1");
 };
 
@@ -78,6 +81,8 @@ Game.prototype.restart = function()
 {
 	this.setPaused(false);
 	this.elapsedGameTimeSinceStartup = 0;
+	this.victoryMenu.updateState(false);
+	this.gameOverMenu.updateState(false);
 	scene.reloadLevel();
 };
 
@@ -90,6 +95,23 @@ Game.prototype.setPaused = function(paused)
 Game.prototype.switchPaused = function()
 {
 	this.setPaused(!this.paused);
+};
+
+Game.prototype.onVictory = function()
+{
+	this.paused = true;
+	this.victoryMenu.updateState(true);
+};
+
+Game.prototype.onGameOver = function()
+{
+	this.paused = true;
+	this.gameOverMenu.updateState(true);
+};
+
+Game.prototype.getPlayerScore = function()
+{
+	return player.score;
 };
 
 Game.prototype.mainLoop = function()

@@ -7,8 +7,8 @@ Created for the Web game programming course of SupInfoGame SIG4GP.
 
 
 TODO:
+- Fix y position of plane according to mouse
 - Add feedback for enemy and player damages
-- Add end screen with replay button
 - Add start menu
 - Get sprites of original game (w/ Camoto tool? DotEmu?) - or use sprites of 1942 (no more Raptor...)
 - Get font for game

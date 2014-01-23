@@ -1,36 +1,34 @@
 var PauseMenu = function()
 {
+	var items = {
+		resume : {
+			type : "option",
+			caption : "Resume",
+			clickCallback : function(){ game.switchPaused(); }
+		},
+		restart : {
+			type : "option",
+			caption : "Restart",
+			clickCallback : function(){ game.restart(); }
+		}
+	};
+	
+	MenuFrame.call(this,"pause-menu","Pause",items);
 	this.$screen = $("#screen");
-	
-	this.$menu = $(".menu");
-	
-	this.$pauseMenu = $("<div/>").attr("id","pause-menu");
-	this.$menu.append(this.$pauseMenu);
-	
-	this.$title = $("<div/>").attr("id","pause-menu-title").append("Pause");
-	this.$pauseMenu.append(this.$title);
-	
-	this.$resume = $("<div/>").addClass("pause-menu-option").attr("id","pause-menu-resume").append("Resume");
-	this.$resume.click(function(){ game.switchPaused(); });
-	this.$pauseMenu.append(this.$resume);
-	
-	this.$restart = $("<div/>").addClass("pause-menu-option").attr("id","pause-menu-restart").append("Restart");
-	this.$restart.click(function(){ game.restart(); });
-	this.$pauseMenu.append(this.$restart);
 };
+
+PauseMenu.prototype = new MenuFrame();
 
 PauseMenu.prototype.updateState = function(paused)
 {
+	MenuFrame.prototype.updateState.call(this,paused);
+	
     if(paused)
     {
-    	console.log("Open pause menu");
     	this.$screen.addClass("paused");
-    	this.$pauseMenu.addClass("visible");
     }
     else
     {
-    	console.log("Close pause menu");
     	this.$screen.removeClass("paused");
-    	this.$pauseMenu.removeClass("visible");
     }
 };

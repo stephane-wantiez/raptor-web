@@ -4,15 +4,14 @@
 	height: 100%;
 	width: 100%;
 }
-#pause-menu{
+.menu-frame{
 	position: absolute;
-	height: 100px;
-	width: 100px;
+	width: 120px;
 	background: rgba(11, 146, 47, 0.8);
 	top: 50%;
 	left: 50%;
     margin-top: -35px;
-    margin-left: -50px;
+    margin-left: -60px;
 	border: black solid 2px;
     visibility: hidden;
     opacity:0;
@@ -20,41 +19,71 @@
     -webkit-transform-origin: top left;
     -webkit-transition: all 0.8s ease-out;
 }
-#pause-menu.visible{
+.menu-frame.visible{
     visibility: visible;
     opacity:0.9;
 	-webkit-transform:none;
 }
 
-#pause-menu-title{
+.menu-frame-title{
 	position: absolute;
 	top: 5px;
 	left: 5px;
-	height: 40px;
+	height: 30px;
 	font-family: CutOutsFLF;
 }
 
-.pause-menu-option{
-	position: absolute;
-	left: 50%;
-    margin-left: -40px;
-	height: 20px;
-	width: 80px;
+.menu-frame-item{
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    height:25px;
+    width: 100px;
+    text-align:center;
+    font-family: CutOutsFLF;
+}
+
+.menu-frame-text{
+    font-size: 14px;
+}
+
+.menu-frame-option{
 	border: 2px outset;
 	cursor: pointer;
 	background: rgba(11, 146, 200, 0.8);
 	border: blue solid 1px;
-	text-align:center;
-	font-family: CutOutsFLF;
 }
-.pause-menu-option:hover{
+.menu-frame-option:hover{
 	background: rgba(70, 120, 240, 1);
     cursor: pointer;
 }
 
+#pause-menu{
+	height:110px;
+}
 #pause-menu-resume{
-	top: 40px;
+    top:40px;
 }
 #pause-menu-restart{
-	top: 65px;
+    top:70px;
 }
+
+.endgame-menu{
+    height:130px;
+}
+.endgame-menu-score1{
+    top:40px;
+}
+.endgame-menu-score2{
+    top:60px;
+}
+.endgame-menu-restart{
+    top:95px;
+}
+
+#victory-menu{
+    width: 160px;
+    background: rgba(40, 146, 50, 0.8);
+    margin-left: -80px;
+}
+
