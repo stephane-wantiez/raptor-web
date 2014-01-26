@@ -9,7 +9,7 @@ var FlyingEnemy3 = function(id,x,y)
 	this.killScore = FlyingEnemy3.KILL_SCORE;
 
 	this.health = FlyingEnemy3.HEALTH;
-	this.speedY = 800;
+	this.speedY = 700;
 };
 
 FlyingEnemy3.prototype = new FlyingEnemy();
@@ -17,6 +17,11 @@ FlyingEnemy3.prototype = new FlyingEnemy();
 FlyingEnemy3.prototype.getShootProb = function()
 {
 	return FlyingEnemy3.SHOOT_PROB;
+};
+
+FlyingEnemy.prototype.getShootSpeed = function()
+{
+	return FlyingEnemy3.SHOOT_SPEED;
 };
 
 FlyingEnemy3.HEALTH = 60;
@@ -27,3 +32,4 @@ FlyingEnemy3.NB_SPRITES_COL = 3;
 FlyingEnemy3.SPRITE_FPS = 20;
 FlyingEnemy3.SHOOT_PROB = 0.1;
 FlyingEnemy3.KILL_SCORE = 45;
+FlyingEnemy3.SHOOT_SPEED = 1200;

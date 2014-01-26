@@ -5,21 +5,24 @@ var Scene = function()
 	this.boss = false;
 	this.currentLevel = "";
 	this.currentMusic = "";
+	this.loaded = false;
 };
 
 Scene.State = { STARTING : 0, PLAYING : 1, BOSS_FIGHT : 2, VICTORY : 3, DEAD : 4, RESTARTING : 5, ENDGAME : 6 };
 
-Scene.prototype.resetScene = function()
+Scene.prototype.reset = function()
 {
 	this.actors.removeAll();
 	this.playerActors.removeAll();
 	this.speedY = Scene.CAMERA_SPEED;
 	this.state = Scene.State.STARTING;
+	this.loaded = false;
+	this.stopMusic();
 };
 
 Scene.prototype.loadLevel = function(levelName)
 {
-	this.resetScene();
+	this.reset();
 	this.currentLevel = levelName;
 	var levelProperties = LevelBuilder.loadLevelData(levelName);
 	//console.log(levelProperties);
@@ -30,6 +33,7 @@ Scene.prototype.loadLevel = function(levelName)
 	this.musics = levelProperties["musics"];
 	this.boss = levelProperties["boss"][0];
 	this.actors.add(this.boss);
+	this.loaded = true;
 };
 
 Scene.prototype.reloadLevel = function()
@@ -60,7 +64,7 @@ Scene.prototype.stopMusic = function(mode)
 	if ( $.isDefined(this.musics) && $.isDefined(mode) && $.isDefined(this.musics[mode]) )
 	{
 		var music = assetManager.getSound(this.musics[mode]);
-		music.pause();
+		music.stop();
 	}
 };
 
@@ -181,7 +185,7 @@ Scene.prototype.updateState = function()
 		{
 			player.reset();
 			this.state = Scene.State.PLAYING;
-			//this.launchMusic("fight", true);
+			this.launchMusic("fight", true);
 			break;
 		}
 		case Scene.State.PLAYING :
@@ -251,6 +255,8 @@ Scene.prototype.updateState = function()
 
 Scene.prototype.update = function(deltaTimeSec)
 {
+	if (!this.loaded) return;
+	
 	if (!game.paused)
 	{
 		this.actors.clean();
@@ -271,6 +277,8 @@ Scene.prototype.update = function(deltaTimeSec)
 
 Scene.prototype.render = function(g)
 {
+	if (!this.loaded) return;
+	
 	g.save();
 	
 	// go to the origin of the scene, and draw the scene actors from there

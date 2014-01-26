@@ -7,6 +7,7 @@ var Game = function()
 	this.elapsedTimeSinceStartupMs = 0;
 	this.elapsedGameTimeSinceStartup = 0;
 	this.timeSinceLoadingEnd = 0;
+	this.started = false;
 	this.paused = false;
 	
     var $sceneView = $("#scene-view");
@@ -30,6 +31,9 @@ var Game = function()
 	);
 };
 
+Game.TITLE = "1945: Mission Raptor";
+Game.SUBTITLE = "a game by Stephane Wantiez";
+
 Game.prototype.initAssets = function()
 {
     var assetsPath = "/raptor-web-static/";
@@ -41,6 +45,7 @@ Game.prototype.initAssets = function()
     
     var imagesPath = assetsPath + "img/";
     var imageList = {
+        "title"            : imagesPath +            "title.png",
         "background-ocean" : imagesPath + "background-ocean.png",
         "player-move"      : imagesPath +   "sprites_player.png",
         "bullet"      	   : imagesPath +    "sprite_bullet.bmp",
@@ -57,6 +62,7 @@ Game.prototype.initAssets = function()
         "shoot_basic"   : soundsPath +   "shoot_basic.wav",
         "bullet_hit"    : soundsPath +    "bullet_hit.wav",
         "explosion"     : soundsPath +     "explosion.wav",
+        "music-menu"    : soundsPath +    "music-menu.mp3",
         "music-battle1" : soundsPath + "music-battle1.mp3",
         "music-boss1"   : soundsPath +   "music-boss1.mp3",
         "music-victory" : soundsPath + "music-victory.mp3"
@@ -66,15 +72,40 @@ Game.prototype.initAssets = function()
 };
 
 Game.prototype.onAssetsLoaded = function()
-{
-	player = new Player();
+{	
 	scene = new Scene();
+	player = new Player();
 	
+	this.mainMenu = new MainMenu();
 	this.pauseMenu = new PauseMenu();
 	this.victoryMenu = new VictoryMenu();
 	this.gameOverMenu = new GameOverMenu();
 	
+	this.launchMainMenu();
+};
+
+Game.prototype.launchMainMenu = function()
+{
+	scene.reset();
+	player.reset();
+	
+	this.mainMenu.updateState(true);
+	this.victoryMenu.updateState(false);
+	this.gameOverMenu.updateState(false);
+	this.pauseMenu.updateState(false);
+	this.pause = true;
+	this.started = false;
+};
+
+Game.prototype.start = function()
+{
 	scene.loadLevel("testLevel1");
+	this.elapsedGameTimeSinceStartup = 0;
+	this.mainMenu.updateState(false);
+	this.victoryMenu.updateState(false);
+	this.gameOverMenu.updateState(false);
+	this.started = true;
+	this.setPaused(false);
 };
 
 Game.prototype.restart = function()
@@ -88,6 +119,7 @@ Game.prototype.restart = function()
 
 Game.prototype.setPaused = function(paused)
 {
+	if (!this.started) return;
 	this.paused = paused;
 	this.pauseMenu.updateState(paused);
 };

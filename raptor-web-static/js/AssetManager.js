@@ -137,9 +137,10 @@ AssetManager.prototype.renderLoadingProgress = function(g)
     g.fillStyle = "rgb(" + parseInt((1-this.getLoadingProgress())*255) + "," + parseInt(this.getLoadingProgress()*255) + ",0)";
     g.fillRect(0,0,this.getLoadingProgress()*200,20);
     
+    var loadingProgress = Math.round(this.getLoadingProgress() * 100);
     g.font = "10px 5metrik_bold";
     g.fillStyle = "black";
-    g.fillText("Loading: " + this.getLoadingProgress() * 100 + "%",50,14);
+    g.fillText("Loading: " + loadingProgress + "%",70,14);
     
     //g.globalAlpha = 1;
     

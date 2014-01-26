@@ -33,7 +33,10 @@ FlyingBoss1.prototype.getShootProb = function()
 
 FlyingBoss1.prototype.getShootPosition = function()
 {
-	return { x : this.x + FlyingBoss1.SHOOT_REL_POS_X[this.currentShootPos], y : this.y + FlyingBoss1.SHOOT_REL_POS_Y[this.currentShootPos] };
+	var sinTime = Math.sin(game.elapsedGameTimeSinceStartup);
+	var shootVarX = sinTime * FlyingBoss1.SHOOT_MAX_VAR_X;
+	var shootVarY = sinTime * FlyingBoss1.SHOOT_MAX_VAR_Y;
+	return { x : this.x + FlyingBoss1.SHOOT_REL_POS_X[this.currentShootPos] + shootVarX, y : this.y + FlyingBoss1.SHOOT_REL_POS_Y[this.currentShootPos] + shootVarY };
 };
 
 FlyingBoss1.prototype.createProjectile = function()
@@ -61,3 +64,5 @@ FlyingBoss1.SHOOT_REL_POS_X = [  -20,  -20,  20,  20,   0 ];
 FlyingBoss1.SHOOT_REL_POS_Y = [  -20,   20,  20, -20,  30 ];
 FlyingBoss1.SHOOT_PROJ_SP_X = [ -400, -200, 200, 400,   0 ];
 FlyingBoss1.SHOOT_PROJ_SP_Y = [  200,  400, 400, 200, 500 ];
+FlyingBoss1.SHOOT_MAX_VAR_X = 10;
+FlyingBoss1.SHOOT_MAX_VAR_Y = 10;

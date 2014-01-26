@@ -247,9 +247,14 @@ Actor.prototype.doUpdate = function(deltaTimeSec)
 	}
 };
 
+Actor.prototype.canUpdate = function()
+{
+	return !game.paused && scene.loaded;
+};
+
 Actor.prototype.update = function(deltaTimeSec)
 {
-	if (!game.paused)
+	if (this.canUpdate())
 	{
 		this.lifeTimeSec += deltaTimeSec;
 		this.doUpdate(deltaTimeSec);

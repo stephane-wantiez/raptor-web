@@ -13,11 +13,12 @@ var Sound = function(url)
     var sourceElem = document.createElement("source");
     sourceElem.src = url;
     
-    switch(url.substring(url.length-3))
+    var sourceType = url.substring(url.length-3);
+    
+    switch(sourceType)
     {
         case "mp3" : sourceElem.type = "audio/mpeg"; break;
-        case "wav" : sourceElem.type = "audio/wav"; break;
-        case "ogg" : sourceElem.type = "audio/ogg"; break;
+        default    : sourceElem.type = "audio/" + sourceType; break;
     }
     
     this.audio.appendChild(sourceElem);
@@ -47,7 +48,7 @@ Sound.prototype.pause = function()
 	this.audio.pause();
 };
 
-Sound.prototype.pause = function()
+Sound.prototype.stop = function()
 {
 	this.audio.pause();
 };

@@ -17,14 +17,24 @@
     [
 		{
 			"type" : "FlyingEnemy1",
-			"posX" : 200,
+			"posX" : 500,
 			"posY" : 200
 		},
 		{
 			"type" : "FlyingEnemy2",
-			"posX" : 300,
+			"posX" : 200,
 			"posY" : 400
 		},
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 400,
+            "posY" : 400
+        },
+        {
+            "type" : "FlyingEnemy2",
+            "posX" : 600,
+            "posY" : 400
+        },
 		{
 			"type" : "FlyingEnemy3",
 			"posX" : 200,
@@ -50,6 +60,11 @@
 			"posX" : 500,
 			"posY" : 1400
 		},
+        {
+            "type" : "FlyingEnemy3",
+            "posX" : 100,
+            "posY" : 1550
+        },
 		{
 			"type" : "FlyingEnemy1",
 			"posX" : 600,
@@ -166,6 +181,11 @@
             "posY" : 4200
         },
         {
+            "type" : "FlyingEnemy1",
+            "posX" : 500,
+            "posY" : 4300
+        },
+        {
             "type" : "FlyingEnemy3",
             "posX" : 700,
             "posY" : 4500
@@ -175,6 +195,11 @@
 			"posX" : 200,
 			"posY" : 4700
 		},
+        {
+            "type" : "FlyingEnemy1",
+            "posX" : 600,
+            "posY" : 4800
+        },
 		{
 			"type" : "FlyingEnemy2",
 			"posX" : 400,

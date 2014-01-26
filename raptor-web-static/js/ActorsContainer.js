@@ -60,5 +60,8 @@ ActorsContainer.prototype.size = function()
 
 ActorsContainer.prototype.removeAll = function()
 {
-	this.list = {};
+	for (var actorId in this.list)
+	{
+		delete this.list[actorId];
+	}
 };

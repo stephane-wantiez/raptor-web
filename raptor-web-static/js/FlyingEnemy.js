@@ -59,6 +59,11 @@ FlyingEnemy.prototype.getShootPosition = function()
 	return { x : this.x, y : this.y + FlyingEnemy.SHOOT_REL_POS_Y };
 };
 
+FlyingEnemy.prototype.getShootSpeed = function()
+{
+	return FlyingEnemy.SHOOT_SPEED;
+};
+
 FlyingEnemy.prototype.canShoot = function()
 {
 	return Math.random() < this.getShootProb();
@@ -66,7 +71,7 @@ FlyingEnemy.prototype.canShoot = function()
 
 FlyingEnemy.prototype.createProjectile = function()
 {
-	return new Bullet(FlyingEnemy.SHOOT_SPEED);
+	return new Bullet(this.getShootSpeed());
 };
 
 FlyingEnemy.prototype.doShoot = function()

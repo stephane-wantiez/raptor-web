@@ -10,6 +10,11 @@ var PauseMenu = function()
 			type : "option",
 			caption : "Restart",
 			clickCallback : function(){ game.restart(); }
+		},
+		exit : {
+			type : "option",
+			caption : "Exit",
+			clickCallback : function(){ game.launchMainMenu(); }
 		}
 	};
 	

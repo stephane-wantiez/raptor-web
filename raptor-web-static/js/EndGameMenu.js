@@ -18,6 +18,12 @@ var EndGameMenu = function(menuId,title)
 			caption : "Restart",
 			clickCallback : function(){ game.restart(); },
 			extraClass : "endgame-menu-restart"
+		},
+		exit : {
+			type : "option",
+			caption : "Exit",
+			clickCallback : function(){ game.launchMainMenu(); },
+			extraClass : "endgame-menu-exit"
 		}
 	};
 	

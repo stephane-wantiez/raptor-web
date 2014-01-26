@@ -97,6 +97,7 @@ Player.prototype.reset = function()
 {
 	Actor.prototype.reset.call(this);
 	inputManager.playerControlsEnabled = true;
+	this.nextAllowedWeaponAttack = 0;
 	this.setHealth(100);
 	this.setScore(0);
 	this.setArmor(100);

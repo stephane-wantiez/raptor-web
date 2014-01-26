@@ -58,8 +58,56 @@
     cursor: pointer;
 }
 
+#main-menu{
+    width: 100%;
+    height:100%;
+    top: 0px;
+    left: 0px;
+    margin-top: 0px;
+    margin-left: 0px;
+    border: none;
+    opacity:1;
+    background: rgba(0, 99, 191, 1);
+    cursor: none;
+    -webkit-transform:none;
+}
+#main-menu.visible{
+    opacity:1;
+    cursor: auto;
+}
+#main-menu-title{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: 0px;
+    margin-left: -150px;
+    width: 300px;
+    height: 30px;
+    font-family: CutOutsFLF;
+    text-align:center;
+    font-size: 14px;
+    font-style:italic;
+}
+#main-menu-start{
+    top: 50%;
+    margin-top: 100px;
+}
+#menu-title-screen{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -140px;
+    visibility: hidden;
+    opacity:0;
+}
+#menu-title-screen.visible{
+    visibility: visible;
+    opacity:1;
+}
+
 #pause-menu{
-	height:110px;
+	height:140px;
 }
 #pause-menu-resume{
     top:40px;
@@ -67,9 +115,12 @@
 #pause-menu-restart{
     top:70px;
 }
+#pause-menu-exit{
+    top:100px;
+}
 
 .endgame-menu{
-    height:130px;
+    height:160px;
 }
 .endgame-menu-score1{
     top:40px;
@@ -79,6 +130,9 @@
 }
 .endgame-menu-restart{
     top:95px;
+}
+.endgame-menu-exit{
+    top:125px;
 }
 
 #victory-menu{
