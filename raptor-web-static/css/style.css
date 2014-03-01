@@ -1,0 +1,326 @@
+/** 
+* CSS style file generated on Sat, 01 Mar 2014 20:45:48 +0100
+**/
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\0-base.css **/
+
+@font-face{
+    font-family: 5metrik_bold;
+    src: url(../font/5metrik_bold.ttf);
+}
+@font-face{
+    font-family: CutOutsFLF;
+    src: url(../font/CutOutsFLF.ttf);
+}
+@font-face{
+    font-family: Florsn01;
+    src: url(../font/Florsn01.ttf);
+}
+
+html, body{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background: black;
+}
+
+div{
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+#screen{
+	position: absolute;
+	width: 800px;
+	height: 600px;
+	background: blue;
+	top: 50%;
+	left: 50%;
+	margin-left: -400px;
+	margin-top: -300px;
+    cursor: none;
+}
+
+#screen.paused{
+    cursor: auto;
+}
+
+
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\1-scene.css **/
+
+#scene-view{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\gui.css **/
+
+.menu{
+    z-index: 10;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+}
+.menu-frame{
+	position: absolute;
+	width: 120px;
+	background: rgba(11, 146, 47, 0.8);
+	top: 50%;
+	left: 50%;
+    margin-top: -35px;
+    margin-left: -60px;
+	border: black solid 2px;
+    visibility: hidden;
+    opacity:0;
+    -webkit-transform:scale(0) translate(-1000px,-1000px) rotate3d(1,1,1,-300deg);
+    -webkit-transform-origin: top left;
+    -webkit-transition: all 0.8s ease-out;
+}
+.menu-frame.visible{
+    visibility: visible;
+    opacity:0.9;
+	-webkit-transform:none;
+}
+
+.menu-frame-title{
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	height: 30px;
+	font-family: CutOutsFLF;
+}
+
+.menu-frame-item{
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    height:25px;
+    width: 100px;
+    text-align:center;
+    font-family: CutOutsFLF;
+}
+
+.menu-frame-text{
+    font-size: 14px;
+}
+
+.menu-frame-option{
+	border: 2px outset;
+	cursor: pointer;
+	background: rgba(11, 146, 200, 0.8);
+	border: blue solid 1px;
+}
+.menu-frame-option:hover{
+	background: rgba(70, 120, 240, 1);
+    cursor: pointer;
+}
+
+#main-menu{
+    width: 100%;
+    height:100%;
+    top: 0px;
+    left: 0px;
+    margin-top: 0px;
+    margin-left: 0px;
+    border: none;
+    opacity:1;
+    background: rgba(0, 99, 191, 1);
+    cursor: none;
+    -webkit-transform:none;
+}
+#main-menu.visible{
+    opacity:1;
+    cursor: auto;
+}
+#main-menu-title{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: 0px;
+    margin-left: -150px;
+    width: 300px;
+    height: 30px;
+    font-family: CutOutsFLF;
+    text-align:center;
+    font-size: 14px;
+    font-style:italic;
+}
+#main-menu-start{
+    top: 50%;
+    margin-top: 100px;
+}
+#menu-title-screen{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -140px;
+    visibility: hidden;
+    opacity:0;
+}
+#menu-title-screen.visible{
+    visibility: visible;
+    opacity:1;
+}
+
+#pause-menu{
+	height:140px;
+}
+#pause-menu-resume{
+    top:40px;
+}
+#pause-menu-restart{
+    top:70px;
+}
+#pause-menu-exit{
+    top:100px;
+}
+
+.endgame-menu{
+    height:160px;
+}
+.endgame-menu-score1{
+    top:40px;
+}
+.endgame-menu-score2{
+    top:60px;
+}
+.endgame-menu-restart{
+    top:95px;
+}
+.endgame-menu-exit{
+    top:125px;
+}
+
+#victory-menu{
+    width: 160px;
+    background: rgba(40, 146, 50, 0.8);
+    margin-left: -80px;
+}
+
+
+
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\hud.css **/
+
+#hud div {
+	z-index: 5;
+}
+
+#inner-huds{
+	position: absolute;
+	top:0%;
+	left: 3%;
+	width: 94%;
+	height: 100%;
+}
+
+#upper-huds{
+    position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 50px;
+    /*border: white solid 1px;*/
+}
+#downer-huds{
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    width: 100%;
+    height: 30px;
+    /*border: yellow solid 1px;*/
+    margin-top: -30px;
+}
+
+#shields{
+    position: absolute;
+    left: 2%;
+    top: 5px;
+    width: 200px;
+    height: 20px;
+    /*border: green solid 1px;*/
+}
+#shields-indic{
+    width: 40%;
+    height: 100%;
+    background-image: url(../img/icon_shield.png);
+    background-position: left center;
+    /*border: cyan solid 1px;*/
+}
+
+#bombs{
+    position: absolute;
+    left: 2%;
+    bottom: 5px;
+    width: 72px;
+    height: 22px;
+    /*border: green solid 1px;*/
+}
+#bombs-indic{
+    width: 40%;
+    height: 100%;
+    background-image: url(../img/icon_bomb.png);
+    background-position: left center;
+    /*border: cyan solid 1px;*/
+}
+
+.gauge-hud{
+    position: absolute;
+    top: 0px;
+    width: 2%;
+    height: 100%;
+    border: black solid 1px;
+    background-color: black;
+}
+.gauge-hud-indic{
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    background-image: url(../img/icon_gauge.gif);
+    background-position: center bottom;
+	-webkit-transition: height 0.5s ease-in-out;
+	-moz-transition: height 0.5s ease-in-out;
+	-ms-transition: height 0.5s ease-in-out;
+	-o-transition: height 0.5s ease-in-out;
+	transition: height 0.5s ease-in-out;
+}
+#armor-hud{
+	position:absolute;
+	left:0%;
+}
+#health-hud{
+    position:absolute;
+    left:98%;
+}
+
+#score{
+    position: absolute;
+    left: 50%;
+    width: 200px;
+    margin-left: -100px;
+    text-align: center;
+    font-family: CutOutsFLF;
+    font-size: 25px;
+    color: #DF821A;
+    /*border: red solid 1px;*/
+}
+
+#sec-weapon{
+	position:absolute;
+	left: 95%;
+	top: 5px;
+	width: 32px;
+	height: 32px;
+    /*border: grey solid 1px;*/
+}
+
+
