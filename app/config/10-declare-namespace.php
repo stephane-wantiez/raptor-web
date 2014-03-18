@@ -7,6 +7,6 @@ $zendLoader->register();
 
 $zendLoader->registerNamespace( 'aes',               VENDOR_PATH . 'aes' );
 $zendLoader->registerNamespace( 'passwordHashUtils', VENDOR_PATH . 'passwordHashUtils' );
-$zendLoader->registerNamespace( 'coursWeb',             SRC_PATH . 'coursWeb' );
+$zendLoader->registerNamespace( 'raptorWeb',            SRC_PATH . 'raptorWeb' );
 
 include VENDOR_PATH . 'facebook/facebook.php' ;

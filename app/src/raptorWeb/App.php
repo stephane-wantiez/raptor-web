@@ -1,6 +1,6 @@
 <?php
 
-namespace coursWeb;
+namespace raptorWeb;
 
 class App
 {

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="12.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>190</x>
+      <y>80</y>
+      <w>200</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>User
+--
++ Id : long
++ Login : string
++ FirstName : string
++ LastName : string
++ Email : string
+- PassHash : string
++ FacebookId : long
+--
++ create()
++ update()
++ remove()
++ getFbFriends() : List&lt;long&gt;
++ getFbPicturePath() : sring
++ toJSON() : string
++ getNewGameScore() : </panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>570</x>
+      <y>80</y>
+      <w>200</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>Score
+--
++ Id : long
++ GameDT : DateTime
++ Value : int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>360</x>
+      <y>120</y>
+      <w>230</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+r1=+UserId
+m1=1
+m2=*</panel_attributes>
+    <additional_attributes>30;30;210;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>890</x>
+      <y>80</y>
+      <w>110</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Enumeration&gt;&gt;
+ScoreType
+--
+Current
+Best</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>740</x>
+      <y>110</y>
+      <w>170</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=+Type</panel_attributes>
+    <additional_attributes>150;30;30;30</additional_attributes>
+  </element>
+</diagram>

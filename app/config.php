@@ -1,6 +1,6 @@
 <?php 
 /** 
-* Configuration file generated on Tue, 18 Mar 2014 15:32:41 +0100
+* Configuration file generated on Tue, 18 Mar 2014 16:12:55 +0100
 **/
 
 /** From file C:\workspace\raptor-web\app\config\01-define.php **/
@@ -29,7 +29,7 @@ $zendLoader->register();
 
 $zendLoader->registerNamespace( 'aes',               VENDOR_PATH . 'aes' );
 $zendLoader->registerNamespace( 'passwordHashUtils', VENDOR_PATH . 'passwordHashUtils' );
-$zendLoader->registerNamespace( 'coursWeb',             SRC_PATH . 'coursWeb' );
+$zendLoader->registerNamespace( 'raptorWeb',            SRC_PATH . 'raptorWeb' );
 
 include VENDOR_PATH . 'facebook/facebook.php' ;
 
