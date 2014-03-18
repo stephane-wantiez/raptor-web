@@ -1,8 +1,8 @@
 /** 
-* Script file generated on Sat, 01 Mar 2014 20:45:48 +0100
+* Script file generated on Tue, 18 Mar 2014 15:32:41 +0100
 **/
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
 
 window.requestAnimFrame = (function() {
   return window.requestAnimationFrame ||
@@ -248,7 +248,7 @@ if (testValue != "00001234") console.error("$.expandValueDigits is WRONG: " + te
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-assets\0-Sound.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-assets\0-Sound.js **/
 
 var Sound = function(url)
 {
@@ -307,7 +307,7 @@ Sound.prototype.stop = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-assets\1-AssetManager.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-assets\1-AssetManager.js **/
 
 var AssetManager = function()
 {
@@ -529,7 +529,7 @@ assetManager = new AssetManager();
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\2-inputs\InputManager.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\2-inputs\InputManager.js **/
 
 var InputManager = function()
 {
@@ -634,7 +634,7 @@ inputManager = new InputManager();
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\3-graphics\Sprite.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\3-graphics\Sprite.js **/
 
 var Sprite = function(id, img, width, height, colCount, rowCount, frameRate, loop)
 {
@@ -786,7 +786,7 @@ Sprite.prototype.render = function(g)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\0-PositionChanger.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\0-PositionChanger.js **/
 
 var PositionChanger = function()
 {	
@@ -821,7 +821,7 @@ PositionChanger.prototype.setPosition = function(x, y)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\1-Actor.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\1-Actor.js **/
 
 var Actor = function(id,width,height)
 {
@@ -1153,7 +1153,7 @@ Actor.prototype.remove = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\2-ActorsContainer.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\2-ActorsContainer.js **/
 
 var ActorsContainer = function()
 {
@@ -1225,7 +1225,7 @@ ActorsContainer.prototype.removeAll = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\3-MovingActor.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\3-MovingActor.js **/
 
 var MovingActor = function(id,width,height)
 {
@@ -1276,7 +1276,7 @@ MovingActor.prototype.doUpdate = function(deltaTimeSec)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\0-Projectile.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\0-Projectile.js **/
 
 var Projectile = function(id,speedX,speedY,width,height,radius)
 {
@@ -1295,7 +1295,7 @@ Projectile.prototype = new MovingActor();
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\1-Bullet.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\1-Bullet.js **/
 
 var Bullet = function(speedY,speedX)
 {
@@ -1320,7 +1320,7 @@ Bullet.DAMAGE = 5;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\2-FlyingEnemy.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\2-FlyingEnemy.js **/
 
 var FlyingEnemy = function(id,width,height,x,y)
 {
@@ -1408,7 +1408,7 @@ FlyingEnemy.prototype.doShoot = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingBoss1.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingBoss1.js **/
 
 var FlyingBoss1 = function(id,x,y)
 {
@@ -1481,7 +1481,7 @@ FlyingBoss1.SHOOT_MAX_VAR_Y = 10;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy1.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy1.js **/
 
 var FlyingEnemy1 = function(id,x,y)
 {
@@ -1514,7 +1514,7 @@ FlyingEnemy1.KILL_SCORE = 14;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy2.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy2.js **/
 
 var FlyingEnemy2 = function(id,x,y)
 {
@@ -1535,7 +1535,7 @@ FlyingEnemy2.SPRITE_FPS = 20;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy3.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy3.js **/
 
 var FlyingEnemy3 = function(id,x,y)
 {
@@ -1575,7 +1575,7 @@ FlyingEnemy3.SHOOT_SPEED = 1200;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\ScoreFeedback.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\ScoreFeedback.js **/
 
 var ScoreFeedback = function(sourceActor,scoreText)
 {
@@ -1621,7 +1621,7 @@ ScoreFeedback.prototype.doRender = function(g)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\0-LevelBuilder.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\0-LevelBuilder.js **/
 
 var LevelBuilder =
 {
@@ -1689,7 +1689,7 @@ var LevelBuilder =
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\Scene.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\Scene.js **/
 
 var Scene = function()
 {
@@ -1991,7 +1991,7 @@ Scene.WAIT_BEFORE_RESTART_MS = 4000;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\0-MenuFrame.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\0-MenuFrame.js **/
 
 var MenuFrame = function(menuId,title,items,menuExtraClass,menuTitleExtraClass)
 {	
@@ -2069,7 +2069,7 @@ MenuFrame.prototype.updateState = function(openMenu)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\1-EndGameMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\1-EndGameMenu.js **/
 
 var EndGameMenu = function(menuId,title)
 {
@@ -2121,7 +2121,7 @@ EndGameMenu.prototype.updateState = function(gameEnd)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\GameOverMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\GameOverMenu.js **/
 
 var GameOverMenu = function()
 {
@@ -2131,7 +2131,7 @@ var GameOverMenu = function()
 GameOverMenu.prototype = new EndGameMenu();
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\MainMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\MainMenu.js **/
 
 var MainMenu = function()
 {
@@ -2177,7 +2177,7 @@ MainMenu.prototype.updateState = function(showMenu)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\PauseMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\PauseMenu.js **/
 
 var PauseMenu = function()
 {
@@ -2220,7 +2220,7 @@ PauseMenu.prototype.updateState = function(paused)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\VictoryMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\VictoryMenu.js **/
 
 var VictoryMenu = function()
 {
@@ -2230,7 +2230,7 @@ var VictoryMenu = function()
 VictoryMenu.prototype = new EndGameMenu();
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\8-player\Player.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\8-player\Player.js **/
 
 var Player = function()
 {
@@ -2602,7 +2602,7 @@ Player.prototype.doUpdate = function(deltaTimeSec)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\9-game\Game.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\9-game\Game.js **/
 
 var Game = function()
 {
