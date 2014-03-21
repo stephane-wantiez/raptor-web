@@ -7,26 +7,20 @@ class User
     const LOGIN_MIN_LENGTH = 3;
     const PASS_MIN_LENGTH = 3;
     
-	private $id;
+	public $id;
 	public $login;
-	public $xp;
-	public $hp;
-	public $power;
-	public $fbId;
+	public $facebookId;
 	public $firstName;
 	public $lastName;
 	public $email;
 	public $picture;
 	public $friends;
 	
-	private function __construct($id="",$login="",$xp=0,$hp=100,$power=0,$fbId=0,$firstName="",$lastName="",$email="",$picture="")
+	private function __construct($id="",$login="",$facebookId=0,$firstName="",$lastName="",$email="",$picture="")
 	{
 		$this->id = (int) $id;
 		$this->login = $login;
-		$this->xp = (int) $xp;
-		$this->hp = (int) $hp;
-		$this->power = (int) $power;
-		$this->fbId = (int) $fbId;
+		$this->facebookId = (int) $facebookId;
 		$this->firstName = $firstName;
 		$this->lastName = $lastName;
 		$this->email = $email;
@@ -34,7 +28,7 @@ class User
 		$this->friends = [];
 	}
 	
-	public function addXP($xpIncrement)
+	/*public function addXP($xpIncrement)
 	{		
 		$db = App::getInstance()->getDb();
 		$query = $db->prepare('UPDATE user SET xp=xp+:xpInc WHERE id=:id');		
@@ -57,15 +51,13 @@ class User
 		
 		$this->xp = $res->xp;
 		return $this->xp;
-	}
+	}*/
 	
 	public function toJSON()
 	{
 		return json_encode([
+			'id'      => $this->id,
 			'name'    => $this->login,
-			'xp'      => $this->xp,
-			'hp'      => $this->hp,
-			'power'   => $this->power,
 			'picture' => $this->picture,
 			'friends' => $this->friends
 		]);
@@ -90,9 +82,9 @@ class User
 		{
 			$userData = $query->fetch();
 		
-			if ($userData && self::validatePassword($password, $userData->password))
+			if ($userData && self::validatePassword($password, $userData->passHash))
 			{
-				$user = new User($userData->id,$userData->login,$userData->xp,$userData->hp,$userData->power);
+				$user = new User($userData->id,$userData->login);
 				$_SESSION['user'] = $user;
 				return true;
 			}
@@ -107,32 +99,15 @@ class User
 		}
 	}
 	
-	private static function authentifyAppOnFacebook(\Facebook $fb)
+	private function create()
 	{
-		$fbLoginUrl = $fb->getLoginUrl([
-			'scope' => 'email,user_likes,publish_actions',
-			'redirect_uri' => 'https://apps.facebook.com' . FB_APP_NAMESPACE
-		]);
-		
-		die('<!doctype html><html><body>
-			 	<script>
-					top.location.href="' . $fbLoginUrl . '"
-				</script>
-			 </body></html>');
-	}
-	
-	private function insertIntoDB()
-	{
-		$query = $db->prepare('INSERT INTO user (  login,  xp,  hp,  power,  fbId,  firstName,  lastName,  email )' .
-							           ' VALUES ( :login, :xp, :hp, :power, :fbId, :firstName, :lastName, :email )');
+		$query = $db->prepare('INSERT INTO user (  login,  facebookId,  firstName,  lastName,  email )' .
+							           ' VALUES ( :login, :facebookId, :firstName, :lastName, :email )');
 			
 		//var_dump($fbUser);
 		
 		$params = [ 'login' 	=> $this->firstName,
-					'xp'    	=> $this->xp,
-					'hp'    	=> $this->hp,
-					'power' 	=> $this->power,
-					'fbId'  	=> $this->fbId,
+					'facebookId'  	=> $this->facebookId,
 					'firstName' => $this->firstName,
 					'lastName'  => $this->lastName,
 					'email'     => $this->email ];
@@ -142,9 +117,9 @@ class User
 			throw new UserException("Couldn't execute insert user into DB");
 		}
 			
-		$query = $db->prepare('SELECT id FROM user WHERE login=:login, fbId=:fbId, email=:email');
+		$query = $db->prepare('SELECT id FROM user WHERE login=:login, facebookId=:facebookId, email=:email');
 			
-		if (!$query->execute([ 'login' => $this->firstName, 'fbId' => $this->fbId, 'email' => $this->email ]))
+		if (!$query->execute([ 'login' => $this->firstName, 'facebookId' => $this->facebookId, 'email' => $this->email ]))
 		{
 			throw new UserException("Couldn't get created user from DB");
 		}
@@ -161,16 +136,16 @@ class User
 	
 	private static function insertFacebookUser($fbUser)
 	{		
-		$user = new User( 0, $fbUser['first_name'], 0, 100, 0, $fbUser['id'], $fbUser['first_name'], $fbUser['last_name'], $fbUser['email']);
+		$user = new User( 0, $fbUser['first_name'], $fbUser['id'], $fbUser['first_name'], $fbUser['last_name'], $fbUser['email']);
 		$user->addPictureToUser();
-		$user->insertIntoDB();
+		$user->create();
 	}
 	
 	private function addPictureToUser()
 	{
-		if ($this->fbId != 0)
+		if ($this->facebookId != 0)
 		{
-			$this->picture = '//graph.facebook.com/' . $this->fbId . '/picture';
+			$this->picture = '//graph.facebook.com/' . $this->facebookId . '/picture';
 		}
 	}
 	
@@ -178,10 +153,7 @@ class User
 	{
 		$this->id = $data->id;
 		$this->login = $data->login;
-		$this->xp = $data->xp;
-		$this->hp = $data->hp;
-		$this->power = $data->power;
-		$this->fbId = $data->fbId;
+		$this->facebookId = $data->facebookId;
 		$this->firstName = $data->firstName;
 		$this->lastName = $data->lastName;
 		$this->email = $data->email;
@@ -198,10 +170,10 @@ class User
 			$query = 'SELECT * FROM user WHERE id=:id';
 			$params = [ 'id' => $this->id ];
 		}
-		else if ($fbId != 0)
+		else if ($facebookId != 0)
 		{
-			$query = 'SELECT * FROM user WHERE fbId=:fbId';
-			$params = [ 'fbId' => $this->fbId ];
+			$query = 'SELECT * FROM user WHERE facebookId=:facebookId';
+			$params = [ 'facebookId' => $this->facebookId ];
 		}
 		else if ($login != "")
 		{
@@ -230,16 +202,16 @@ class User
 		if (!$fbUserId)
 		{
 			// not logged -> redirect to login
-			self::authentifyAppOnFacebook($fb);
+			App::authentifyOnFacebook($fb);
 		}
 		
 		$fbUser = $fb->api('/me');
 		
 		// get DB user tuple for FB user
 		$db = App::getInstance()->getDb();
-		$query = $db->prepare('SELECT * FROM user WHERE fbId=:fbId');
+		$query = $db->prepare('SELECT * FROM user WHERE facebookId=:facebookId');
 		
-		if (!$query->execute([ 'fbId' => $fbUserId ]))
+		if (!$query->execute([ 'facebookId' => $fbUserId ]))
 		{
 			throw new UserException("Couldn't get facebook user from DB");
 		}
@@ -249,16 +221,13 @@ class User
 		// if none, create DB user from FB user
 		if (!$userData)
 		{			
-			$query = $db->prepare('INSERT INTO user (  login,  xp,  hp,  power,  fbId,  firstName,  lastName,  email )' .
-										   ' VALUES ( :login, :xp, :hp, :power, :fbId, :firstName, :lastName, :email )');
+			$query = $db->prepare('INSERT INTO user (  login,  facebookId,  firstName,  lastName,  email )' .
+										   ' VALUES ( :login, :facebookId, :firstName, :lastName, :email )');
 			
 			//var_dump($fbUser);
 	
 			$params = [ 'login' 	=> $fbUser['first_name'],
-						'xp'    	=> 0,
-						'hp'    	=> 100,
-						'power' 	=> 0,
-						'fbId'  	=> $fbUserId,
+						'facebookId'  	=> $fbUserId,
 						'firstName' => $fbUser['first_name'],
 						'lastName'  => $fbUser['last_name'],
 						'email'     => $fbUser['email']];
@@ -268,9 +237,9 @@ class User
 				throw new UserException("Couldn't execute insert facebook user into DB");
 			}
 			
-			$query = $db->prepare('SELECT * FROM user WHERE fbId=:fbId');
+			$query = $db->prepare('SELECT * FROM user WHERE facebookId=:facebookId');
 			
-			if (!$query->execute([ 'fbId' => $fbUserId ]))
+			if (!$query->execute([ 'facebookId' => $fbUserId ]))
 			{
 				throw new UserException("Couldn't get created facebook user from DB");
 			}
@@ -284,8 +253,7 @@ class User
 		}
 		
 		// save user in session
-		$user = new User($userData->id,$userData->login,$userData->xp,$userData->hp,$userData->power,
-						 $userData->fbId,$userData->firstName,$userData->lastName,$userData->email);
+		$user = new User($userData->id,$userData->login,$userData->facebookId,$userData->firstName,$userData->lastName,$userData->email);
 		$user->addPictureToUser();
 		$user->loadFacebookFriendsList($fb);
 		$_SESSION['user'] = $user;
@@ -347,9 +315,9 @@ class User
 		}
 	}
 	
-	public function updateFriendsWithXp($friendsId)
+	public function updateFriends($friendsId)
 	{
-		$queryStr = 'SELECT fbId AS id, firstName AS name, xp FROM user WHERE fbId IN ("' . implode('","', $friendsId) . '")';
+		$queryStr = 'SELECT facebookId AS id, firstName AS name FROM user WHERE facebookId IN ("' . implode('","', $friendsId) . '")';
 		
 		$db = App::getInstance()->getDb();
 		$query = $db->prepare($queryStr);
@@ -384,7 +352,7 @@ class User
 				}
 			}
 			
-			$this->updateFriendsWithXp($friendsId);
+			$this->updateFriends($friendsId);
 		}
 	}
 }
