@@ -1,6 +1,6 @@
 <?php
 
-namespace raptorWeb;
+namespace raptorWeb\model;
 
 class DbException extends \Exception
 {

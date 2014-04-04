@@ -1,8 +1,8 @@
 <?php
 
-namespace raptorWeb;
+namespace raptorWeb\model;
 
-class User
+class User extends Record
 {
     const LOGIN_MIN_LENGTH = 3;
     const PASS_MIN_LENGTH = 3;
@@ -28,31 +28,6 @@ class User
 		$this->friends = [];
 	}
 	
-	/*public function addXP($xpIncrement)
-	{		
-		$db = App::getInstance()->getDb();
-		$query = $db->prepare('UPDATE user SET xp=xp+:xpInc WHERE id=:id');		
-		if (!$query->execute([ 'xpInc' => $xpIncrement, 'id' => $this->id ]))
-		{
-			throw new UserException("Couldn't update user XP in DB");
-		}
-
-		$query = $db->prepare('SELECT xp FROM user WHERE id=:id');		
-		if (!$query->execute([ 'id' => $this->id ]))
-		{
-			throw new UserException("Couldn't update user XP in DB");
-		}
-		
-		$res = $query->fetch();
-		if (!$res)
-		{
-			throw new UserException("Couldn't read new user XP from DB");
-		}
-		
-		$this->xp = $res->xp;
-		return $this->xp;
-	}*/
-	
 	public function toJSON()
 	{
 		return json_encode([
@@ -73,65 +48,48 @@ class User
 		return \passwordHashUtils\PasswordHashUtils::validate_password($inputPassword, $dbPasswordHashed);
 	}
 	
-	public static function login($login,$password)
+	private static function doLogin($userData,$password)
 	{
-		$db = App::getInstance()->getDb();
-		$query = $db->prepare('SELECT * FROM user WHERE login=:login');
-		
-		if ($query->execute([ 'login' => $login ]))
+		if ($userData && self::validatePassword($password, $userData->passHash))
 		{
-			$userData = $query->fetch();
-		
-			if ($userData && self::validatePassword($password, $userData->passHash))
-			{
-				$user = new User($userData->id,$userData->login);
-				$_SESSION['user'] = $user;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			throw new UserException("Couldn't execute login query on DB");
+			$user = new User($userData->id,$userData->login);
+			$_SESSION['user'] = $user;
 		}
 	}
 	
-	private function create()
+	public static function login($login,$password)
 	{
-		$query = $db->prepare('INSERT INTO user (  login,  facebookId,  firstName,  lastName,  email )' .
-							           ' VALUES ( :login, :facebookId, :firstName, :lastName, :email )');
-			
-		//var_dump($fbUser);
+		$user = new User();
+		$user->read(['login' => $login], 'User::doLogin', $password);
+	}
+	
+	private function readCallback($userData)
+	{
+		$this->id 			= $userData['id'];
+		$this->login 		= $userData['login'];
+		$this->facebookId   = $userData['facebookId'];
+		$this->firstName    = $userData['firstName'];;
+		$this->lastName  	= $userData['lastName'];
+		$this->email 		= $userData['email'];
+	}
+	
+	public function create()
+	{
+		$createParams = [ 'login' 	   => $this->firstName,
+						  'facebookId' => $this->facebookId,
+						  'firstName'  => $this->firstName,
+						  'lastName'   => $this->lastName,
+						  'email'      => $this->email ];
+				
+		$this->create($createParams);
 		
-		$params = [ 'login' 	=> $this->firstName,
-					'facebookId'  	=> $this->facebookId,
-					'firstName' => $this->firstName,
-					'lastName'  => $this->lastName,
-					'email'     => $this->email ];
-			
-		if (!$query->execute($params))
-		{
-			throw new UserException("Couldn't execute insert user into DB");
-		}
-			
-		$query = $db->prepare('SELECT id FROM user WHERE login=:login, facebookId=:facebookId, email=:email');
-			
-		if (!$query->execute([ 'login' => $this->firstName, 'facebookId' => $this->facebookId, 'email' => $this->email ]))
-		{
-			throw new UserException("Couldn't get created user from DB");
-		}
-			
-		$userData = $query->fetch();
+		$readParams = [ 'login' 	 => $this->firstName,
+						'facebookId' => $this->facebookId,
+						'email' 	 => $this->email ];
 		
-		if (!$userData)
-		{
-			throw new UserException("Couldn't get created user from DB");
-		}
+		$readCallback = array( $this, 'readCallback' );
 		
-		$this->id = $userData->id;
+		$this->read($readParams, $readCallback, null);
 	}
 	
 	private static function insertFacebookUser($fbUser)
