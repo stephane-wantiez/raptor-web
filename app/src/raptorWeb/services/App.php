@@ -1,6 +1,6 @@
 <?php
 
-namespace raptorWeb;
+namespace raptorWeb\services;
 
 class App
 {
@@ -53,7 +53,7 @@ class App
 	public static function authentifyOnFacebook(\Facebook $fb)
 	{
 		$fbLoginUrl = $fb->getLoginUrl([
-			'scope' => 'email,user_likes,publish_actions',
+			'scope'        => 'email,user_likes,publish_actions',
 			'redirect_uri' => 'https://apps.facebook.com' . FB_APP_NAMESPACE
 		]);
 		
@@ -81,7 +81,7 @@ class App
     private function runFacebook()
     {
     	$this->fb = new \Facebook([
-			'appId' => FB_APP_ID,
+			'appId'  => FB_APP_ID,
     		'secret' => FB_APP_SECRET	
     	]);
         
@@ -102,7 +102,7 @@ class App
     		$_SESSION['locale'] = $signedRequest['user']['locale'];
     	}
     	
-    	User::loginFacebook($this->fb);
+    	UserService::loginFacebookUser($this->fb);
         
         if (isset($_SESSION['user']))
         {
@@ -140,7 +140,7 @@ class App
 	        }
 	        else if (isset($_REQUEST['action-login']) || isset($_REQUEST['action-register']))
 	        {
-	            if (!isset($_REQUEST['login']))
+	            if (!isset($_REQUEST['userName']))
 	            {
 	                $errorMessage = 'The login is missing!';
 	            }
@@ -150,18 +150,23 @@ class App
 	            }
 	            else
 	            {
-	                $login = trim($_REQUEST['login']);
+	                $userName = trim($_REQUEST['userName']);
 	                $password = $_REQUEST['password'];
 	                
 	                if (isset($_REQUEST['action-register']))
 	                {
-                		User::register($login, $password);
-                		$this->reloadPageWithParams(['user-created' => $login]);
+	                	$firstName = $_REQUEST['firstName'];
+	                	$lastName  = $_REQUEST['lastName'];
+	                	$email     = $_REQUEST['email'];
+	                	
+                		UserService::registerUser($userName, $password, $firstName, $lastName, $email);
+                		$this->reloadPageWithParams(['user-created' => $userName]);
 	                }
 	                else if (isset($_REQUEST['action-login']))
 	                {
-	                	$logged = User::login($login, $password);
-	                	if (!$logged)
+	                	$user = UserService::loginUser($userName, $password);
+	                	
+	                	if ($user == null)
 	                	{
 	                		$errorMessage = 'Invalid login and/or password for user';
 	                	}
@@ -188,25 +193,49 @@ class App
         }
     }
     
+    private function checkSessionUser()
+    {
+    	if (!isset($_SESSION['user']))
+    	{
+    		throw new UserException('The user session has expired');
+    	}
+    }
+    
+    private function checkSessionScore()
+    {
+    	if (!isset($_SESSION['score']))
+    	{
+    		throw new UserException('No valid score in session');
+    	}
+    }
+    
     public function api($action,$data)
     {
     	$res = false;
     	
    		try
    		{
-	    	if (!isset($_SESSION['user']))
-	    	{
-	    		throw new UserException('The user session has expired');
-	    	}
-	    	else
-	    	{
-	    		$user = $_SESSION['user'];
+	    	$this->checkSessionUser();
+	    	$user = $_SESSION['user'];
     				
-		    	switch($action)
-		    	{
-		    		default: break; // TODO
-		    	}				    	
-	    	}
+		    switch($action)
+		    {
+		    	case 'game-start':
+		   			UserService::onGameStart($user);
+		   			break;
+		    			
+		   		case 'game-score-update':
+		   			$this->checkSessionScore();
+		   			$score = $_SESSION['score'];
+		   			UserService::onGameScoreUpdate($score, $data, false);
+		   			break;
+		    			
+		   		case 'game-end':
+		   			$this->checkSessionScore();
+		   			$score = $_SESSION['score'];
+		   			UserService::onGameScoreUpdate($score, $data, true);
+		   			break;
+		    }
    		}
    		catch(UserException $e)
    		{

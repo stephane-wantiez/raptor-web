@@ -1,6 +1,6 @@
 <?php
 
-namespace raptorWeb;
+namespace raptorWeb\services;
 
 class UserException extends \Exception
 {
