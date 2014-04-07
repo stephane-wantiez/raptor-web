@@ -87,13 +87,19 @@ AssetManager.prototype.loadSound = function(url, id, onload)
 	    var sound = new Sound(url);
 	    
 	    sound.addEventListener("canplay",function(){
-	        delete _this.soundsToLoad[id];
-	        _this.assetLoaded();
+	    	if ($.isDefined(_this.soundsToLoad[id]))
+        	{
+        		delete _this.soundsToLoad[id];
+        		_this.assetLoaded();
+        	}
 	    });
 	    sound.addEventListener("stalled",function(){
-	        delete _this.soundsToLoad[id];
-	        console.log("Error loading sound " + url);
-	        _this.assetLoaded();
+	    	if ($.isDefined(_this.soundsToLoad[id]))
+        	{
+        		console.log("Error loading sound " + url);
+        		delete _this.soundsToLoad[id];
+        		_this.assetLoaded();
+        	}
 	    });
 	    
 		this.sounds[id] = sound;

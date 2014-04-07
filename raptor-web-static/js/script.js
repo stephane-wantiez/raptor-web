@@ -1,5 +1,5 @@
 /** 
-* Script file generated on Tue, 18 Mar 2014 16:12:55 +0100
+* Script file generated on Mon, 07 Apr 2014 14:04:52 +0200
 **/
 
 /** From file C:\workspace\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
@@ -398,13 +398,19 @@ AssetManager.prototype.loadSound = function(url, id, onload)
 	    var sound = new Sound(url);
 	    
 	    sound.addEventListener("canplay",function(){
-	        delete _this.soundsToLoad[id];
-	        _this.assetLoaded();
+	    	if ($.isDefined(_this.soundsToLoad[id]))
+        	{
+        		delete _this.soundsToLoad[id];
+        		_this.assetLoaded();
+        	}
 	    });
 	    sound.addEventListener("stalled",function(){
-	        delete _this.soundsToLoad[id];
-	        console.log("Error loading sound " + url);
-	        _this.assetLoaded();
+	    	if ($.isDefined(_this.soundsToLoad[id]))
+        	{
+        		console.log("Error loading sound " + url);
+        		delete _this.soundsToLoad[id];
+        		_this.assetLoaded();
+        	}
 	    });
 	    
 		this.sounds[id] = sound;

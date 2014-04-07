@@ -2,7 +2,7 @@
 
 define('DB_DRIVER','mysql');
 define('DB_HOST','localhost');
-define('DB_NAME','cours-web');
+define('DB_NAME','raptor-web');
 define('DB_USER','root');
 define('DB_PASS','');
 

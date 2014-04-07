@@ -1,4 +1,4 @@
 <?php
 
-session_name('SIGWEB_SESSID');
+session_name('RAPTOR_WEB_SESSID');
 session_start();
