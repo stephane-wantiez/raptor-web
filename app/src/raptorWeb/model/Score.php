@@ -9,62 +9,71 @@ class Score extends ActiveRecord
 	public $value;
 	public $gameDone;
 	
-	public function Score($id=0,$userId=0,$gameDT=0,$value=0,$gameDone=false)
+	public function __construct($id=0,$userId=0,$gameDT=0,$value=0,$gameDone=false)
 	{
-		parent::ActiveRecord('score',$id);
+		parent::__construct('score',$id);
+		$this->registerClass('\raptorWeb\model\Score');
 		$this->fillWithData($id,$userId,$gameDT,$value,$gameDone);
-	}
-	
-	protected function createRecord()
-	{
-		return new Score();
 	}
 	
 	public function fillWithData($id=0,$userId=0,$gameDT=0,$value=0,$gameDone=false)
 	{
-		$this->id = $id;
-		$this->userId = $userId;
-		$this->gameDT = $gameDT;
-		$this->value = $value;
+		$this->id       = $id;
+		$this->userId   = $userId;
+		$this->gameDT   = $gameDT;
+		$this->value    = $value;
 		$this->gameDone = $gameDone;
 	}
 	
 	public function fillWithDbTuple($scoreData)
 	{
-		$this->fillWithData($scoreData['id'],$scoreData['userId'],$scoreData['gameDT'],$scoreData['value'],$scoreData['gameDone']);
+		$this->fillWithData($scoreData->id,
+							$scoreData->user_id,
+							$scoreData->game_dt,
+							$scoreData->value,
+							$scoreData->game_done);
 	}
 	
-	protected function getDbParamsForModification()
+	protected function fillWithRecord($record)
 	{
-		return [ 'userId'   => $this->userId,
-				 'gameDT'   => $this->gameDT,
-				 'value'    => $this->value,
-				 'gameDone' => $this->gameDone ];
+		parent::fillWithRecord($record);
+		$this->userId   = $record->userId;
+		$this->gameDT   = $record->gameDT;
+		$this->value    = $record->value;
+		$this->gameDone = $record->gameDone;
+	}
+	
+	protected function getDbParamsForSaving()
+	{
+		return [ 'user_id'   => $this->userId,
+				 'game_dt'   => $this->gameDT,
+				 'value'     => $this->value,
+				 'game_done' => $this->gameDone ];
 	}
 	
 	protected function getDbParamsForReading()
 	{
-		return [ 'userId' => $this->userId,
-				 'gameDT' => $this->gameDT ];
+		return [ 'user_id' => $this->userId,
+				 'game_dt' => $this->gameDT ];
 	}
 	
 	public static function listForUser($userId,$onlyDone=false)
 	{
-		$selectParams = [ 'userId' => $userId ];
-		if ($onlyDone) $selectParams['gameDone'] = true;
-		return Score::select('score', $selectParams, [ 'gameDT' => 'ASC' ]);
+		$selectParams = [ 'user_id' => $userId ];
+		if ($onlyDone) $selectParams['game_done'] = true;
+		return Score::select('score', $selectParams, [ 'game_dt' => 'ASC' ]);
 	}
 	
 	public static function purgeOrphansForUser($userId)
 	{
-		Score::bulkDelete('score', [ 'userId' => $userId, 'gameDone' => false ]);
+		Score::bulkDelete('score', [ 'user_id' => $userId, 'game_done' => false ]);
 	}
 	
 	public function initForUser($userId)
 	{
-		$this->userId = $userId;
-		$this->gameDT = time();
-		$this->value = 0;
+		$this->userId   = $userId;
+		$this->gameDT   = time();
+		$this->value    = 0;
 		$this->gameDone = false;
 	}
 	
@@ -73,8 +82,9 @@ class Score extends ActiveRecord
 		return json_encode([
 			'id'       => $this->id,
 			'userId'   => $this->userId,
+			'gameDT'   => $this->gameDT,
 			'value'    => $this->value,
 			'gameDone' => $this->gameDone
-		]);
+		], JSON_PRETTY_PRINT );
 	}
 }

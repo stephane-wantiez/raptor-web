@@ -22,10 +22,10 @@ function buildConfig( $configType = 'dev' )
 	$outputFileName = '../config.php';
 	
 	$filesContent = [];
-	browseDir($mainPath,'.php',$filesContent);
-	browseDir($secPath ,'.php',$filesContent);
+	browseDir($mainPath,'.php',$filesContent, false);
+	browseDir($secPath ,'.php',$filesContent, false);
 	ksort($filesContent);
 	
-	$fileHeader = '<?php ' . NL . '/** ' . NL . '* Configuration file generated on ' . date(DATE_RFC2822) . NL . '**/' . NL;
+	$fileHeader = '<?php ' . NL . '/** ' . NL . '* Configuration file generated for ' . $configType . ' on ' . date(DATE_RFC2822) . NL . '**/' . NL;
 	generateConfigFile($outputFileName,$filesContent,$fileHeader,'phpFileContentFilter');
 }

@@ -13,7 +13,7 @@ function genericFileContentFilter($filePath,$fileContent)
 		   NL ;
 }
 
-function browseDir($path,$fileExt,&$filesContent)
+function browseDir($path,$fileExt,&$filesContent,$exploreSubDir=true)
 {
 	$fileExtSize = strlen($fileExt);
     $dir = opendir($path);
@@ -25,7 +25,7 @@ function browseDir($path,$fileExt,&$filesContent)
     
         if (($file != '.') && ($file != '..'))
         {
-            if (is_dir($fullPath))
+            if ($exploreSubDir && is_dir($fullPath))
             {
                 browseDir($fullPath,$fileExt,$filesContent);
             }

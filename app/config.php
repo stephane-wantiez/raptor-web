@@ -1,6 +1,6 @@
 <?php 
 /** 
-* Configuration file generated on Mon, 07 Apr 2014 14:04:52 +0200
+* Configuration file generated for dev-sa on Fri, 11 Apr 2014 16:30:36 +0200
 **/
 
 /** From file C:\workspace\raptor-web\app\config\01-define.php **/
@@ -38,35 +38,23 @@ include VENDOR_PATH . 'facebook/facebook.php' ;
 
 /** From file C:\workspace\raptor-web\app\config\20-session.php **/
 
-session_name('SIGWEB_SESSID');
+session_name('RAPTOR_WEB_SESSID');
 session_start();
 
 
-/** From file C:\workspace\raptor-web\app\config\dev\10-database.php **/
+/** From file C:\workspace\raptor-web\app\config\dev-sa\10-database.php **/
 
 define('DB_DRIVER','mysql');
 define('DB_HOST','localhost');
 define('DB_NAME','raptor-web');
 define('DB_USER','root');
 define('DB_PASS','');
+define('DB_DEBUG','true');
 
 define('DB_DSN', DB_DRIVER . ':host=' . DB_HOST . ';dbname=' . DB_NAME );
 
 
-/** From file C:\workspace\raptor-web\app\config\dev\10-uri.php **/
+/** From file C:\workspace\raptor-web\app\config\dev-sa\10-uri.php **/
 
 define( 'WEB_STATIC_URI', '/raptor-web-static/' );
-
-
-/** From file C:\workspace\raptor-web\app\config\dev\20-facebook.php **/
-
-define('FB_APP_ID','663616497013077');
-define('FB_APP_SECRET','73deda9ba398def7150573f80d2b1476');
-define('FB_APP_NAMESPACE','raptorWeb');
-
-
-/** From file C:\workspace\raptor-web\app\config\prod\database.php **/
-
-// define DB parameters here
-$dbType = "oracle";
 

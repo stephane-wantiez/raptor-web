@@ -244,4 +244,15 @@ class App
    		
 		if ($res) echo json_encode($res);
     }
+    
+    public function testDB()
+    {
+    	$user = new \raptorWeb\model\User(0,42,"john_doe","password","John","Doe","john.doe@email.com");
+    	$user->create();
+    	echo "<br/>" . $user->toJSON() . "<br/>";
+    	$user->email = "test@gmail.com";
+    	$user->update();
+    	echo "<br/>" . $user->toJSON() . "<br/>";
+    	$user->delete();
+    }
 }

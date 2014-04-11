@@ -4,48 +4,67 @@ namespace raptorWeb\model;
 
 abstract class ActiveRecord
 {	
-	private static $DEBUG_MODE = FALSE;
 	protected $tableName;
 	protected $id;
+	protected static $tableToClass = [];
 	
-	protected function ActiveRecord($tableName,$id=0)
+	protected function __construct($tableName,$id=0)
 	{
 		$this->tableName = $tableName;
 		$this->id = (int) $id;
 	}
 	
+	protected function registerClass($objectName)
+	{
+		self::$tableToClass[$this->tableName] = $objectName;
+	}
+	
+	protected static function createRecordForTable($tableName)
+	{
+		if (isset(self::$tableToClass[$tableName])) return new self::$tableToClass[$tableName];
+		return null;
+	}
+	
+	protected static function getDB()
+	{
+		return \raptorWeb\services\App::getInstance()->getDb();
+	}
+	
 	protected static function debug($info)
 	{
-		if ($DEBUG_MODE) echo $info;
+		if (DB_DEBUG) echo $info;
 	}
 	
-	protected static function debugQuery($queryName,$query)
+	protected static function debugQuery($queryName,$query,$params=[])
 	{
-		if ($DEBUG_MODE) self::debug('Query ' . $queryName . ' : ' . $query);
+		if (DB_DEBUG)
+		{
+			$paramsStr = self::completeDebugQueryWithParams($params);
+			if ($paramsStr) $paramsStr = ' - Params: ' . $paramsStr;
+			self::debug('<br/>Query ' . $queryName . ' : ' . $query . $paramsStr . "<br/>");
+		}
 	}
-	
-	protected abstract function createRecord();
 	
 	protected function fillWithDbTuple($tupleData)
 	{
-		$this->id = $tupleData['id'];
+		$this->id = $tupleData->id;
 	}
 	
-	protected abstract function getDbParamsForModification();
+	protected function fillWithRecord($record)
+	{
+		$this->id        = $record->id;
+		$this->tableName = $record->tableName;
+	}
+	
+	protected abstract function getDbParamsForSaving();
 	protected abstract function getDbParamsForReading();
 	
-	public function toJSON($params)
-	{
-		if (!$params) $params = [ 'id' => $this->id ];
-		return json_encode($params);
-	}
-	
-	protected static function completeQueryWithParams($readParams,$separator=', ')
+	protected static function completeQueryWithParams($params,$separator=', ')
 	{
 		$queryParams = "";
 		$firstParam = true;
 		
-		foreach ( $readParams as $paramName => $paramValue )
+		foreach ( $params as $paramName => $paramValue )
 		{
 			if (!$firstParam)
 			{
@@ -55,6 +74,27 @@ abstract class ActiveRecord
 			$queryParams .= $paramName . '=:' . $paramName ;
 			$firstParam = false;
 		}
+		
+		return $queryParams;
+	}
+	
+	protected static function completeDebugQueryWithParams($params,$separator=', ')
+	{
+		$queryParams = "";
+		$firstParam = true;
+		
+		foreach ( $params as $paramName => $paramValue )
+		{
+			if (!$firstParam)
+			{
+				$queryParams .= $separator;
+			}
+				
+			$queryParams .= $paramName . '=' . $paramValue ;
+			$firstParam = false;
+		}
+		
+		return $queryParams;
 	}
 	
 	protected static function completeCreateQueryWithParams($createParams)
@@ -98,14 +138,13 @@ abstract class ActiveRecord
 		return $orderByStr;
 	}
 	
-	public function create($createParams)
+	public function create($createParams=null)
 	{
-		$db = App::getInstance()->getDb();
-		if ($createParams == null) $createParams = $this->getDbParamsForModification();
+		if ($createParams == null) $createParams = $this->getDbParamsForSaving();
 		
 		$queryStr = 'INSERT INTO ' . $this->tableName . ' ' . self::completeCreateQueryWithParams($createParams);
-		$query = $db->prepare($queryStr);
-		self::debugQuery('create', $queryStr);
+		$query = self::getDB()->prepare($queryStr);
+		self::debugQuery('create', $queryStr, $createParams);
 			
 		if (!$query->execute($createParams))
 		{
@@ -120,10 +159,8 @@ abstract class ActiveRecord
 		$this->id = $data->id;
 	}
 	
-	public static function select($tableName,$selectParams,$orderParams = null)
-	{
-		$db = App::getInstance()->getDb();
-		
+	public static function select($tableName,$selectParams,$orderParams=null)
+	{		
 		$queryStr = 'SELECT * FROM ' . $tableName ;
 		$queryStr .= ' WHERE ' . self::completeQueryWithParams($selectParams,' AND ') ;
 		if ($orderParams && count($orderParams))
@@ -131,8 +168,8 @@ abstract class ActiveRecord
 			$queryStr .= ' ORDER BY ' . self::completeQueryWithOrderByParams($orderParams);
 		}
 		 	
-		$query = $db->prepare($queryStr);
-		self::debugQuery('select', $queryStr);
+		$query = self::getDB()->prepare($queryStr);
+		self::debugQuery('select', $queryStr, $selectParams);
 	
 		if (!$query->execute($selectParams))
 		{
@@ -146,7 +183,7 @@ abstract class ActiveRecord
 		{
 			foreach( $tuples as $tuple )
 			{
-				$record = $this->createRecord();
+				$record = self::createRecordForTable($tableName);
 				$record->fillWithDbTuple($tuple);
 				$res[] = $record;
 			}
@@ -155,7 +192,7 @@ abstract class ActiveRecord
 		return $res;
 	}
 	
-	public function read($readParams)
+	public function read($readParams=null)
 	{
 		if ($readParams == null) $readParams = [ 'id' => $this->id ];
 		
@@ -163,7 +200,7 @@ abstract class ActiveRecord
 		
 		if ($res && count($res))
 		{
-			$this = $res[0];
+			$this->fillWithRecord($res[0]);
 			return true;
 		}
 		else
@@ -177,19 +214,18 @@ abstract class ActiveRecord
 		return $this->read([ 'id' => $id ]);
 	}
 	
-	public function update($updateParams,$selectParams)
+	public function update($updateParams=null,$selectParams=null)
 	{
-		$db = App::getInstance()->getDb();
-		if ($updateParams == null) $updateParams = $this->getDbParamsForModification();
+		if ($updateParams == null) $updateParams = $this->getDbParamsForSaving();
 		if ($selectParams == null) $selectParams = [ 'id' => $this->id ];
 		
 		$updateQueryParams = self::completeQueryWithParams($updateParams) ;
-		$selectQueryParams = self::completeQueryWithParams($readParams, ' AND ') ;
+		$selectQueryParams = self::completeQueryWithParams($selectParams, ' AND ') ;
 		$allParams = array_merge($updateParams,$selectParams);
 		
 		$queryStr = 'UPDATE ' . $this->tableName . ' SET ' . $updateQueryParams . ' WHERE ' . $selectQueryParams ;	
-		$query = $db->prepare($queryStr);
-		self::debugQuery('update', $queryStr);
+		$query = self::getDB()->prepare($queryStr);
+		self::debugQuery('update', $queryStr, $allParams);
 	
 		if (!$query->execute($allParams))
 		{
@@ -198,14 +234,12 @@ abstract class ActiveRecord
 	}
 	
 	public static function bulkDelete($tableName,$deleteParams)
-	{
-		$db = App::getInstance()->getDb();
-			
+	{			
 		$deleteQueryParams = self::completeQueryWithParams($deleteParams, ' AND ') ;
 	
 		$queryStr = 'DELETE FROM ' . $tableName . ' WHERE ' . $deleteQueryParams ;
-		$query = $db->prepare($queryStr);
-		self::debugQuery('delete', $queryStr);
+		$query = self::getDB()->prepare($queryStr);
+		self::debugQuery('delete', $queryStr, $deleteParams);
 	
 		if (!$query->execute($deleteParams))
 		{
@@ -213,7 +247,7 @@ abstract class ActiveRecord
 		}
 	}
 	
-	public function delete($deleteParams)
+	public function delete($deleteParams=null)
 	{
 		if ($deleteParams == null) $deleteParams = [ 'id' => $this->id ];
 		self::bulkDelete($this->tableName, $deleteParams);
