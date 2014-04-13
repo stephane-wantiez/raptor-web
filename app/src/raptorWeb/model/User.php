@@ -4,7 +4,7 @@ namespace raptorWeb\model;
 
 class User extends ActiveRecord
 {
-    const LOGIN_MIN_LENGTH = 3;
+    const USERNAME_MIN_LENGTH = 3;
     const PASS_MIN_LENGTH = 3;
     
     // persistent data
@@ -64,6 +64,7 @@ class User extends ActiveRecord
 	{
 		return [ 'fb_id'      => $this->facebookId,
 		         'username'   => $this->userName,
+		         'password'   => $this->password,
 		         'firstname'  => $this->firstName,
 		         'lastname'   => $this->lastName,
 		         'email'      => $this->email ];
@@ -79,9 +80,11 @@ class User extends ActiveRecord
 	public function toJSON()
 	{
 		return json_encode([
-			'id'      => $this->id,
-			'name'    => $this->userName,
-			'friends' => $this->friends
+			'id'        => $this->id,
+			'username'  => $this->userName,
+			'firstname' => $this->firstName,
+			'lastname'  => $this->lastName,
+			'friends'   => $this->friends
 		], JSON_PRETTY_PRINT );
 	}
 	

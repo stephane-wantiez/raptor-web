@@ -114,7 +114,6 @@ class App
     {
         $okMessage = false;
         $errorMessage = false;
-        $userData = false;
         
         if (isset($_REQUEST['user-created']))
         {
@@ -140,9 +139,9 @@ class App
 	        }
 	        else if (isset($_REQUEST['action-login']) || isset($_REQUEST['action-register']))
 	        {
-	            if (!isset($_REQUEST['userName']))
+	            if (!isset($_REQUEST['username']))
 	            {
-	                $errorMessage = 'The login is missing!';
+	                $errorMessage = 'The user name is missing!';
 	            }
 	            else if (!isset($_REQUEST['password']))
 	            {
@@ -150,30 +149,59 @@ class App
 	            }
 	            else
 	            {
-	                $userName = trim($_REQUEST['userName']);
+	                $userName = trim($_REQUEST['username']);
 	                $password = $_REQUEST['password'];
 	                
 	                if (isset($_REQUEST['action-register']))
 	                {
-	                	$firstName = $_REQUEST['firstName'];
-	                	$lastName  = $_REQUEST['lastName'];
-	                	$email     = $_REQUEST['email'];
-	                	
-                		UserService::registerUser($userName, $password, $firstName, $lastName, $email);
-                		$this->reloadPageWithParams(['user-created' => $userName]);
+	                	if (!isset($_REQUEST['password2']))
+	                	{
+	                		$errorMessage = 'The password check is missing!';
+	                	}
+	                	else 
+	                	{	                	
+		                	$password2 = $_REQUEST['password2'];
+		                	$firstName = $_REQUEST['firstname'];
+		                	$lastName  = $_REQUEST['lastname'];
+		                	$email     = $_REQUEST['email'];
+		                	
+		                	if ($password != $password2)
+		                	{
+		                		$errorMessage = 'The password is invalid!';
+		                	}
+		                	else
+		                	{
+		                		try
+		                		{
+		                			UserService::registerUser($userName, $password, $firstName, $lastName, $email, 0, true);
+		                			$this->reloadPageWithParams(['user-created' => $userName]);
+		                		}
+		                		catch(Exception $e)
+		                		{
+		                			$errorMessage = $e->getMessage();
+		                		}
+		                	}
+	                	}
 	                }
 	                else if (isset($_REQUEST['action-login']))
 	                {
-	                	$user = UserService::loginUser($userName, $password);
-	                	
-	                	if ($user == null)
+	                	try
 	                	{
-	                		$errorMessage = 'Invalid login and/or password for user';
-	                	}
-	                	else
-	                	{
-							$this->reloadPage();
-	                	}
+		                	$user = UserService::loginUser($userName, $password);
+		                	
+		                	if ($user == null)
+		                	{
+		                		$errorMessage = 'Invalid login and/or password for user';
+		                	}
+		                	else
+		                	{
+								$this->reloadPage();
+		                	}
+                		}
+                		catch(Exception $e)
+                		{
+                			$errorMessage = $e->getMessage();
+                		}
 	                }
 	            }
 	        }        
@@ -186,6 +214,10 @@ class App
         if (isset($_SESSION['user']))
         {
             include( TEMPLATES_PATH . 'main.tpl' );
+        }
+        else if(isset($_REQUEST['action-register-page']))
+        {
+            include( TEMPLATES_PATH . 'register.tpl' );
         }
         else
         {
@@ -249,10 +281,19 @@ class App
     {
     	$user = new \raptorWeb\model\User(0,42,"john_doe","password","John","Doe","john.doe@email.com");
     	$user->create();
-    	echo "<br/>" . $user->toJSON() . "<br/>";
+    	echo "User:<br/>";
+    	echo $user->toJSON() . "<br/>";
     	$user->email = "test@gmail.com";
     	$user->update();
-    	echo "<br/>" . $user->toJSON() . "<br/>";
+    	echo $user->toJSON() . "<br/>";
+    	$score = new \raptorWeb\model\Score(0,$user->id,time(),42,false);
+    	$score->create();
+    	echo "Score:<br/>";
+    	echo $score->toJSON() . "<br/>";
+    	$score->value = 666;
+    	$score->gameDone = true;
+    	$score->update();
+    	echo $score->toJSON() . "<br/>";
     	$user->delete();
     }
 }

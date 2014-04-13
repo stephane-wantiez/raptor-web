@@ -1,9 +1,9 @@
 <?php 
 /** 
-* Configuration file generated for dev-sa on Fri, 11 Apr 2014 16:30:36 +0200
+* Configuration file generated for dev-sa on Sun, 13 Apr 2014 20:32:03 +0200
 **/
 
-/** From file C:\workspace\raptor-web\app\config\01-define.php **/
+/** From file D:\GitHub\raptor-web\app\config\01-define.php **/
 
 define('NL',"\n");
 define('TAB',"\t");
@@ -20,7 +20,7 @@ define('TEMPLATES_PATH', APP_PATH . 'templates/' );
 define('ENCRYPT_ENABLED', false );
 
 
-/** From file C:\workspace\raptor-web\app\config\10-declare-namespace.php **/
+/** From file D:\GitHub\raptor-web\app\config\10-declare-namespace.php **/
 
 include VENDOR_PATH . 'Zend/Loader/StandardAutoloader.php' ;
 
@@ -36,13 +36,13 @@ $zendLoader->registerNamespace( 'raptorWeb\services',   SRC_PATH . 'raptorWeb/se
 include VENDOR_PATH . 'facebook/facebook.php' ;
 
 
-/** From file C:\workspace\raptor-web\app\config\20-session.php **/
+/** From file D:\GitHub\raptor-web\app\config\20-session.php **/
 
 session_name('RAPTOR_WEB_SESSID');
 session_start();
 
 
-/** From file C:\workspace\raptor-web\app\config\dev-sa\10-database.php **/
+/** From file D:\GitHub\raptor-web\app\config\dev-sa\10-database.php **/
 
 define('DB_DRIVER','mysql');
 define('DB_HOST','localhost');
@@ -54,7 +54,7 @@ define('DB_DEBUG','true');
 define('DB_DSN', DB_DRIVER . ':host=' . DB_HOST . ';dbname=' . DB_NAME );
 
 
-/** From file C:\workspace\raptor-web\app\config\dev-sa\10-uri.php **/
+/** From file D:\GitHub\raptor-web\app\config\dev-sa\10-uri.php **/
 
 define( 'WEB_STATIC_URI', '/raptor-web-static/' );
 

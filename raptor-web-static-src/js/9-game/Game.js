@@ -146,6 +146,21 @@ Game.prototype.getPlayerScore = function()
 	return player.score;
 };
 
+Game.prototype.sayHello = function()
+{
+	return 'Welcome back, ' + user.firstname + ' ' + user.lastname + '!' ;
+};
+
+Game.prototype.canLogout = function()
+{
+	return nofblogin;
+};
+
+Game.prototype.logout = function()
+{
+	location.href = location.href + '?logout';
+};
+
 Game.prototype.mainLoop = function()
 {
 	var currentTimeMs = Date.now();

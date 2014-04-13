@@ -6,7 +6,7 @@ class UserService
 {
 	private static function getUser($userId)
 	{
-		$user = new raptorWeb\model\User();
+		$user = new \raptorWeb\model\User();
 		$userFound = $user->readWithId($userId);
 		if (!$userFound) throw new UserException('Could find user with id ' . $userId);
 		return $user;
@@ -14,8 +14,8 @@ class UserService
 	
 	public static function onGameStart($user)
 	{
-		raptorWeb\model\Score::purgeOrphansForUser($user->id);
-		$score = new raptorWeb\model\Score();
+		\raptorWeb\model\Score::purgeOrphansForUser($user->id);
+		$score = new \raptorWeb\model\Score();
 		$score->initForUser($user->id);
 		$score->create();
 		$_SESSION['score'] = $score;
@@ -35,27 +35,27 @@ class UserService
 	
 	private static function validatePassword($inputPassword,$dbPasswordHashed)
 	{
+		//die('Comparing passwords ['. $inputPassword .'] and [' . $dbPasswordHashed . ']');
 		return \passwordHashUtils\PasswordHashUtils::validate_password($inputPassword, $dbPasswordHashed);
 	}
 	
 	public static function registerUser($userName,$password,$firstName,$lastName,$email,$facebookId=0,$checkCredentials=true)
 	{
-		if ( $checkCredentials && (strlen($login) < raptorWeb\model\User::LOGIN_MIN_LENGTH))
+		if ( $checkCredentials && (strlen($userName) < \raptorWeb\model\User::USERNAME_MIN_LENGTH))
 		{
-			throw new UserException('The login is too short! It must have at least ' . raptorWeb\model\User::LOGIN_MIN_LENGTH . ' characters.');
+			throw new UserException('The user name is too short! It must have at least ' . raptorWeb\model\User::USERNAME_MIN_LENGTH . ' characters.');
 		}
-		else if ( $checkCredentials && (strlen($password) < raptorWeb\model\User::PASS_MIN_LENGTH))
+		else if ( $checkCredentials && (strlen($password) < \raptorWeb\model\User::PASS_MIN_LENGTH))
 		{
 			throw new UserException('The password is too short! It must have at least ' . raptorWeb\model\User::PASS_MIN_LENGTH . ' characters.');
 		}
-		else
-		{
-			$passHash = '';
-			if ($password) $passHash = self::getPasswordHash($password);
-			$user = new raptorWeb\model\User( 0, $facebookId, $userName, $passHash, $firstName, $lastName, $email);
-			$user->create();
-			return $user;
-		}
+		
+		$passHash = '';
+		if ($password) $passHash = self::getPasswordHash($password);
+		$user = new \raptorWeb\model\User( 0, $facebookId, $userName, $passHash, $firstName, $lastName, $email);
+		$user->create();
+		$_SESSION['user'] = $user;
+		return $user;
 	}
 	
 	public static function registerFacebookUser($fbUser)
@@ -66,12 +66,15 @@ class UserService
 	
 	public static function loginUser($userName,$password)
 	{		
-		$user = new raptorWeb\model\User();
-		$userFound = $user->read([ 'userName' => $userName ]);
+		$user = new \raptorWeb\model\User();
+		$userFound = $user->read([ 'username' => $userName ]);
+		
+		//if (!$userFound) throw new UserException('No such user found');
 	
 		if ($userFound && self::validatePassword($password, $user->password))
 		{
 			$_SESSION['user'] = $user;
+			$_SESSION['nofb'] = true;
 			return $user;
 		}
 		else
@@ -92,8 +95,8 @@ class UserService
 		
 		$fbUser = $fb->api('/me');
 		
-		$user = new raptorWeb\model\User();
-		$userFound = $user->read([ 'facebookId' => $fbUserId ]);
+		$user = new \raptorWeb\model\User();
+		$userFound = $user->read([ 'fb_id' => $fbUserId ]);
 		
 		// if none, register FB user
 		if (!$userFound)

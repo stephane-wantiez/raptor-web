@@ -3,10 +3,20 @@ var MainMenu = function()
 	this.music = assetManager.getSound("music-menu");
 	
 	var items = {
+		hello : {
+			type : "text",
+			captionCallback : function() { return game.sayHello(); }
+		},	
 		start : {
 			type : "option",
 			caption : "Start Game",
 			clickCallback : function(){ game.start(); }
+		},
+		logout : {
+			type : "option",
+			caption : "Logout",
+			validatorCallback : function() { return game.canLogout(); },
+			clickCallback : function(){ game.logout(); }
 		}
 	};
 	

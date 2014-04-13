@@ -14,16 +14,21 @@ include('header.tpl');
 
 <form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <div style="color:white;">
-        <label for="login">Login: </label> 
-        <input type="text" id="login" name="login"></input>
+        <label for="username">User name: </label> 
+        <input type="text" id="username" name="username" required autofocus></input>
     </div>
     <div style="color:white;">
         <label for="password">Password: </label> 
-        <input type="password" id="password" name="password"></input>
+        <input type="password" id="password" name="password" required></input>
     </div>
     <div>
-        <input type="submit" name="action-login" value="Login"></input>
-        <input type="submit" name="action-register" value="Register"></input>
+        <input type="submit" name="action-login" value="Login"></input><br/>
+    </div>
+</form>
+
+<form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+    <div>
+        <input type="submit" name="action-register-page" value="Register new user"></input>
     </div>
 </form>
 

@@ -88,9 +88,20 @@
     font-size: 14px;
     font-style:italic;
 }
+#main-menu-hello{
+    font-size: 15px;
+    top: 50%;
+    margin-top: 70px;
+    margin-left: -200px;
+    width: 400px;
+}
 #main-menu-start{
     top: 50%;
     margin-top: 100px;
+}
+#main-menu-logout{
+    top: 50%;
+    margin-top: 130px;
 }
 #menu-title-screen{
     position: absolute;

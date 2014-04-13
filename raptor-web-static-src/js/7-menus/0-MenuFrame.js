@@ -23,11 +23,22 @@ var MenuFrame = function(menuId,title,items,menuExtraClass,menuTitleExtraClass)
 	{
 		var itemElem = items[itemId];
 		var itemType = itemElem.type;
+		var itemValidator = itemElem.validator;
+		var itemValidatorCallback = itemElem.validatorCallback;
 		var itemCaption = itemElem.caption;
 		var itemCaptionCallback = itemElem.captionCallback;
 		var itemClickCallback = itemElem.clickCallback;
 		var itemClass = "menu-frame-"+itemType;
 		var itemExtraClass = itemElem.extraClass;
+		
+		if ($.isDefined(itemValidator))
+		{
+			if(!itemValidator) continue;
+		}
+		if ($.isDefined(itemValidatorCallback))
+		{
+			if(!itemValidatorCallback()) continue;
+		}
 		
 		if ($.isDefined(itemCaptionCallback))
 		{

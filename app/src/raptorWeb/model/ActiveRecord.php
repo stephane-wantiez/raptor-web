@@ -5,7 +5,7 @@ namespace raptorWeb\model;
 abstract class ActiveRecord
 {	
 	protected $tableName;
-	protected $id;
+	public $id;
 	protected static $tableToClass = [];
 	
 	protected function __construct($tableName,$id=0)
