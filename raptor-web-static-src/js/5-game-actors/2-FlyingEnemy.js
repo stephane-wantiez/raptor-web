@@ -1,16 +1,19 @@
 var FlyingEnemy = function(id,width,height,x,y)
 {
-	MovingActor.call(this,id,width,height);
+	if ($.isDefined(id))
+	{
+		MovingActor.call(this,id,width,height);
+		
+		this.speedY = 500;
+		this.setPosition(x,y);
 	
-	this.speedY = 500;
-	this.setPosition(x,y);
-
-	this.killSound = assetManager.getSound("explosion");
-	
-	this.createSpriteWithUrl( "explosion", "explosion1", FlyingEnemy.KILL_SPRITE_WIDTH * FlyingEnemy.KILL_SPRITE_NB_COL, FlyingEnemy.KILL_SPRITE_HEIGHT * FlyingEnemy.KILL_SPRITE_NB_ROW, FlyingEnemy.KILL_SPRITE_NB_COL, FlyingEnemy.KILL_SPRITE_NB_ROW, FlyingEnemy.KILL_SPRITE_FPS, false);
-	this.deadSpriteName = "explosion";
-	
-	this.killScore = FlyingEnemy.KILL_SCORE;
+		this.killSound = assetManager.getSound("explosion");
+		
+		this.createSpriteWithUrl( "explosion", "explosion1", FlyingEnemy.KILL_SPRITE_WIDTH * FlyingEnemy.KILL_SPRITE_NB_COL, FlyingEnemy.KILL_SPRITE_HEIGHT * FlyingEnemy.KILL_SPRITE_NB_ROW, FlyingEnemy.KILL_SPRITE_NB_COL, FlyingEnemy.KILL_SPRITE_NB_ROW, FlyingEnemy.KILL_SPRITE_FPS, false);
+		this.deadSpriteName = "explosion";
+		
+		this.killScore = FlyingEnemy.KILL_SCORE;
+	}
 };
 
 FlyingEnemy.SHOOT_PROB = 0.05;

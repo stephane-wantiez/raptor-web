@@ -9,7 +9,7 @@ var AssetManager = function()
 	this.imagesToLoad = {};
 	this.soundsToLoad = {};
 	this.loadingStarted = false;
-    this.renderAlpha = 1;
+    //this.renderAlpha = 1;
 };
 
 AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
@@ -116,12 +116,12 @@ AssetManager.prototype.assetLoaded = function()
 	this.loadingEndTime = now;
 };
 
-AssetManager.prototype.setRenderAlpha = function(a)
+/*AssetManager.prototype.setRenderAlpha = function(a)
 {
     this.renderAlpha = a;
-};
+};*/
 
-AssetManager.prototype.renderLoadingProgress = function(g)
+/*AssetManager.prototype.renderLoadingProgress = function(g)
 {
     //console.log("Progress: " + this.getLoadingProgress());
     
@@ -151,7 +151,7 @@ AssetManager.prototype.renderLoadingProgress = function(g)
     //g.globalAlpha = 1;
     
     g.restore();
-};
+};*/
 
 AssetManager.prototype.isDoneLoading = function()
 {
@@ -219,5 +219,3 @@ AssetManager.prototype.getSound = function(id)
 {
 	return this.sounds[id];
 };
-
-assetManager = new AssetManager();

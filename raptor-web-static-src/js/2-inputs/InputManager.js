@@ -96,5 +96,3 @@ InputManager.ESC_KEY_CODE = 27;
 InputManager.PAUSE_KEY_CODE = 19;
 InputManager.P_KEY_CODE = 80;
 
-inputManager = new InputManager();
-

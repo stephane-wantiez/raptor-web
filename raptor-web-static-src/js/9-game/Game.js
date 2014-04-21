@@ -2,6 +2,7 @@ var Game = function()
 {
 	var self = this;
 	
+	this.state = 0; // Loading
 	this.timeAtStartupMs = Date.now();
 	this.currentFrameTimeMs = this.timeAtStartupMs;
 	this.elapsedTimeSinceStartupMs = 0;
@@ -10,6 +11,10 @@ var Game = function()
 	this.started = false;
 	this.paused = false;
 	
+	this.loadingLevel = false;
+	this.loadingLevelProgress = 0;
+	this.loadingLevelName = '';
+	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
     this.graphics = sceneView.getContext("2d");
@@ -17,8 +22,7 @@ var Game = function()
     this.graphics.canvas = sceneView;
     
     inputManager.setCanvasLeftX(this.graphics.$canvas.offset().left);
-    inputManager.setCanvasTopY( this.graphics.$canvas.offset().top );
-	
+    inputManager.setCanvasTopY( this.graphics.$canvas.offset().top );	
 	inputManager.addPauseKeysListener(function(){ self.switchPaused(); });
 	
 	this.initAssets();
@@ -30,6 +34,8 @@ var Game = function()
 		}					
 	);
 };
+
+Game.State = { LOADING : 0, LOADING_END : 1, MAIN_MENU : 2, LEVEL_LOAD : 3, LEVEL_LOAD_END : 4, PLAYING : 5 };
 
 Game.TITLE = "1945: Mission Raptor";
 Game.SUBTITLE = "a game by Stephane Wantiez";
@@ -89,6 +95,7 @@ Game.prototype.launchMainMenu = function()
 	scene.reset();
 	player.reset();
 	
+	this.state = Game.State.MAIN_MENU;
 	this.mainMenu.updateState(true);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
@@ -100,6 +107,10 @@ Game.prototype.launchMainMenu = function()
 Game.prototype.start = function()
 {
 	scene.loadLevel("testLevel1");
+	this.state = Game.State.LEVEL_LOAD;
+	this.loadingLevel = false;
+	this.loadingLevelName = "testLevel1";
+	this.loadingLevelProgress = 1;
 	this.elapsedGameTimeSinceStartup = 0;
 	this.mainMenu.updateState(false);
 	this.victoryMenu.updateState(false);
@@ -161,6 +172,38 @@ Game.prototype.logout = function()
 	location.href = location.href + '?logout';
 };
 
+Game.prototype.showLoadingScreen = function(g,text,textPosX,progress,alpha)
+{
+    //console.log("Progress: " + this.getLoadingProgress());
+    
+    g.save();
+    
+    g.globalAlpha = alpha;
+    
+    g.fillStyle = "black";
+    g.fillRect(0,0,g.canvas.width,g.canvas.height);
+    g.translate(g.canvas.width/2-100,g.canvas.height/2-10);
+    
+    var gradient = g.createLinearGradient(0,0,200,20);
+    gradient.addColorStop(0,"#00F");
+    gradient.addColorStop(1,"#F00");
+    
+    g.fillStyle = gradient;
+    g.fillRect(0,0,200,20);
+    
+    g.fillStyle = "rgb(" + parseInt((1-progress)*255) + "," + parseInt(progress*255) + ",0)";
+    g.fillRect(0,0,progress*200,20);
+    
+    var loadingProgress = Math.round(progress * 100);
+    g.font = "10px 5metrik_bold";
+    g.fillStyle = "black";
+    g.fillText(text + ": " + loadingProgress + "%",textPosX,14);
+    
+    //g.globalAlpha = 1;
+    
+    g.restore();
+};
+
 Game.prototype.mainLoop = function()
 {
 	var currentTimeMs = Date.now();
@@ -176,26 +219,70 @@ Game.prototype.mainLoop = function()
     this.graphics.drawTimeMillis = currentTimeMs;    
     this.graphics.clearRect(0,0,this.graphics.canvas.width,this.graphics.canvas.height);
     
-    var doneLoading = assetManager.isDoneLoading();
-    var alphaLoad = 1;
-    
-    if(doneLoading)
+    switch(this.state)
     {
-        if (this.timeSinceLoadingEnd == 0) 
-        {
-        	this.timeSinceLoadingEnd = currentTimeMs;
-        	this.onAssetsLoaded();
-        }
-        
-        alphaLoad = $.tween(1,0,this.timeSinceLoadingEnd,1000,$.easeOutExpoCustom);
-	
-        this.gameRender(this.graphics);
-        this.gameUpdate(deltaTimeSec);
-    }
-    if(!doneLoading || alphaLoad > 0)
-    {
-        assetManager.setRenderAlpha(alphaLoad);
-        assetManager.renderLoadingProgress(this.graphics);
+    	case Game.State.LOADING:
+    	{
+    		if (assetManager.isDoneLoading())
+    		{
+    			console.log('Switching to state LOAD_END');
+    			this.state = Game.State.LOAD_END;
+            	this.timeSinceLoadingEnd = currentTimeMs;
+    			this.onAssetsLoaded();
+    		}
+    		
+    		this.showLoadingScreen(this.graphics, 'Loading game', 60, assetManager.getLoadingProgress(), 1);    		
+    		break;
+    	}
+    	case Game.State.LEVEL_LOAD:
+    	{
+    		if (!this.loadingLevel)
+    		{
+    			console.log('Switching to state LEVEL_LOAD_END');
+    			this.state = Game.State.LEVEL_LOAD_END;
+            	this.timeSinceLoadingEnd = currentTimeMs;
+    		}
+    		
+    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 30, this.loadingLevelProgress, 1);    		
+    		break;
+    	}
+    	case Game.State.LOADING_END:
+    	{    		
+    		var alphaLoad = $.tween(1,0,this.timeSinceLoadingEnd,1000,$.easeOutExpoCustom);
+    		
+    		if (alphaLoad < 0.01)
+    		{
+    			console.log('Switching to state MAIN_MENU');
+    			this.state = Game.State.MAIN_MENU;    			
+    		}
+    		
+    		this.gameRender(this.graphics);
+    		
+    		this.showLoadingScreen(this.graphics, 'Loading game', 60, 100, alphaLoad);    		
+    		break;
+    	}
+    	case Game.State.LEVEL_LOAD_END:
+    	{    		
+    		var alphaLoad = $.tween(1,0,this.timeSinceLoadingEnd,1000,$.easeOutExpoCustom);
+    		
+    		if (alphaLoad < 0.01)
+    		{
+    			console.log('Switching to state PLAYING');
+    			this.state = Game.State.PLAYING;    			
+    		}
+    		
+    		this.gameRender(this.graphics);
+    		
+    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 60, 100, alphaLoad);    		
+    		break;
+    	}
+    	case Game.State.MAIN_MENU:
+    	case Game.State.PLAYING:
+    	{
+            this.gameRender(this.graphics);
+            this.gameUpdate(deltaTimeSec);
+            break;
+    	}
     }
 };
 
@@ -218,6 +305,9 @@ Game.prototype.gameRender = function(g)
 $(document).ready(function()
 {
 	console.log("Game started");
+	assetManager = new AssetManager();
+	inputManager = new InputManager();
+	serverManager = new ServerManager();
 	game = new Game();
 });
 
