@@ -7,6 +7,7 @@ $zendLoader->register();
 
 $zendLoader->registerNamespace( 'aes',               VENDOR_PATH . 'aes' );
 $zendLoader->registerNamespace( 'passwordHashUtils', VENDOR_PATH . 'passwordHashUtils' );
+$zendLoader->registerNamespace( 'lib3dduo',          VENDOR_PATH . 'lib3dduo');
 $zendLoader->registerNamespace( 'raptorWeb',            SRC_PATH . 'raptorWeb' );
 $zendLoader->registerNamespace( 'raptorWeb\model',      SRC_PATH . 'raptorWeb/model' );
 $zendLoader->registerNamespace( 'raptorWeb\services',   SRC_PATH . 'raptorWeb/services' );

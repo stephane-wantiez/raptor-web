@@ -1,6 +1,6 @@
 <?php 
 /** 
-* Configuration file generated for dev-sa on Mon, 21 Apr 2014 17:27:19 +0200
+* Configuration file generated for dev-sa on Wed, 23 Apr 2014 17:18:52 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\app\config\01-define.php **/
@@ -29,6 +29,7 @@ $zendLoader->register();
 
 $zendLoader->registerNamespace( 'aes',               VENDOR_PATH . 'aes' );
 $zendLoader->registerNamespace( 'passwordHashUtils', VENDOR_PATH . 'passwordHashUtils' );
+$zendLoader->registerNamespace( 'lib3dduo',          VENDOR_PATH . 'lib3dduo');
 $zendLoader->registerNamespace( 'raptorWeb',            SRC_PATH . 'raptorWeb' );
 $zendLoader->registerNamespace( 'raptorWeb\model',      SRC_PATH . 'raptorWeb/model' );
 $zendLoader->registerNamespace( 'raptorWeb\services',   SRC_PATH . 'raptorWeb/services' );
