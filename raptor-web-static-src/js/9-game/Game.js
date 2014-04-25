@@ -11,10 +11,6 @@ var Game = function()
 	this.started = false;
 	this.paused = false;
 	
-	this.loadingLevel = false;
-	this.loadingLevelProgress = 0;
-	this.loadingLevelName = '';
-	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
     this.graphics = sceneView.getContext("2d");
@@ -44,11 +40,6 @@ Game.prototype.initAssets = function()
 {
     var assetsPath = "/raptor-web-static/";
     
-    var levelsPath = assetsPath + "levels/";
-    var levelsList = {
-    	"testLevel1" : levelsPath + "test-level-01.dat"
-    };
-    
     var imagesPath = assetsPath + "img/";
     var imageList = {
         "title"            : imagesPath +            "title.png",
@@ -74,13 +65,13 @@ Game.prototype.initAssets = function()
         "music-victory" : soundsPath + "music-victory.mp3"
     };
     
-    assetManager.startLoading(levelsList,imageList,soundList);
+    assetManager.startLoading(imageList,soundList);
 };
 
 Game.prototype.onAssetsLoaded = function()
 {	
 	scene = new Scene();
-	player = new Player();
+	player = new Player(config.PLAYER);
 	
 	this.mainMenu = new MainMenu();
 	this.pauseMenu = new PauseMenu();
@@ -104,19 +95,19 @@ Game.prototype.launchMainMenu = function()
 	this.started = false;
 };
 
-Game.prototype.start = function()
+Game.prototype.launchLevel = function(levelNumber)
 {
-	scene.loadLevel("testLevel1");
 	this.state = Game.State.LEVEL_LOAD;
-	this.loadingLevel = false;
-	this.loadingLevelName = "testLevel1";
-	this.loadingLevelProgress = 1;
-	this.elapsedGameTimeSinceStartup = 0;
 	this.mainMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
-	this.started = true;
-	this.setPaused(false);
+	levelLoader.loadLevel(levelNumber);
+};
+
+Game.prototype.startLevel = function(levelProperties)
+{
+	scene.loadLevel(levelProperties);
+	this.elapsedGameTimeSinceStartup = 0;
 };
 
 Game.prototype.restart = function()
@@ -236,14 +227,25 @@ Game.prototype.mainLoop = function()
     	}
     	case Game.State.LEVEL_LOAD:
     	{
-    		if (!this.loadingLevel)
+    		if (levelLoader.isLevelLoadingFailed())
+    		{
+    			var errorMsg = 'Error while loading level ' + levelLoader.getLevelNumber() + ': ' + JSON.stringify(levelLoader.getLevelLoadingError(), null, '\n');
+    			alert(errorMsg);
+    			this.state = Game.State.MAIN_MENU;
+    		}
+    		else if (levelLoader.isLevelLoaded())
     		{
     			console.log('Switching to state LEVEL_LOAD_END');
-    			this.state = Game.State.LEVEL_LOAD_END;
+    			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.8, 1);
+    			//alert(JSON.stringify(levelLoader.getLevelData(), null, '\n'));
+    			this.startLevel(levelLoader.getLevelData());
             	this.timeSinceLoadingEnd = currentTimeMs;
+    			this.state = Game.State.LEVEL_LOAD_END;
     		}
-    		
-    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 30, this.loadingLevelProgress, 1);    		
+    		else
+    		{
+    			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.2, 1);
+    		}    		
     		break;
     	}
     	case Game.State.LOADING_END:
@@ -253,12 +255,12 @@ Game.prototype.mainLoop = function()
     		if (alphaLoad < 0.01)
     		{
     			console.log('Switching to state MAIN_MENU');
-    			this.state = Game.State.MAIN_MENU;    			
+    			this.state = Game.State.MAIN_MENU;
     		}
     		
     		this.gameRender(this.graphics);
     		
-    		this.showLoadingScreen(this.graphics, 'Loading game', 60, 100, alphaLoad);    		
+    		this.showLoadingScreen(this.graphics, 'Loading game', 60, 1, alphaLoad);    		
     		break;
     	}
     	case Game.State.LEVEL_LOAD_END:
@@ -268,12 +270,14 @@ Game.prototype.mainLoop = function()
     		if (alphaLoad < 0.01)
     		{
     			console.log('Switching to state PLAYING');
-    			this.state = Game.State.PLAYING;    			
+    			this.started = true;
+    			this.setPaused(false);
+    			this.state = Game.State.PLAYING;
     		}
     		
     		this.gameRender(this.graphics);
     		
-    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 60, 100, alphaLoad);    		
+    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 60, 1, alphaLoad);    		
     		break;
     	}
     	case Game.State.MAIN_MENU:
@@ -308,6 +312,7 @@ $(document).ready(function()
 	assetManager = new AssetManager();
 	inputManager = new InputManager();
 	serverManager = new ServerManager();
+	levelLoader = new LevelLoader();
 	game = new Game();
 });
 

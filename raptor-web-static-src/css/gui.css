@@ -98,6 +98,8 @@
 #main-menu-start{
     top: 50%;
     margin-top: 100px;
+    margin-left: -70px;
+    width: 140px;
 }
 #main-menu-logout{
     top: 50%;

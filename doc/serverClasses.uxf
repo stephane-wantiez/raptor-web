@@ -4,33 +4,31 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>80</x>
-      <y>290</y>
-      <w>200</w>
-      <h>210</h>
+      <x>190</x>
+      <y>280</y>
+      <w>240</w>
+      <h>170</h>
     </coordinates>
     <panel_attributes>User
 --
-+ Login : string
++ FacebookId : long
++ UserName : string
+- Password : string
 + FirstName : string
 + LastName : string
 + Email : string
-- PassHash : string
-+ FacebookId : long
 --
-+ getFbFriends() : List&lt;long&gt;
-+ getFbPicturePath() : string
-+ getNewGameScore() : Score
-+ onEndOfGame(Score)</panel_attributes>
++ toJSON() : string
++ setFriendsFromFacebookIds(List)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>440</x>
+      <x>580</x>
       <y>290</y>
       <w>200</w>
-      <h>100</h>
+      <h>140</h>
     </coordinates>
     <panel_attributes>Score
 --
@@ -38,62 +36,190 @@
 + Value : int
 + GameDone : bool
 --
-+ addScore(int)</panel_attributes>
++ toJSON() : string
+# listForUser(long)
+# purgeOrphansForUser(long)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>250</x>
-      <y>300</y>
-      <w>210</w>
+      <x>400</x>
+      <y>310</y>
+      <w>200</w>
       <h>50</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;-
-r1=+UserId
+r1=+ UserId
 m1=1
 m2=*</panel_attributes>
-    <additional_attributes>30;30;190;30</additional_attributes>
+    <additional_attributes>30;30;180;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>320</x>
-      <y>40</y>
-      <w>140</w>
-      <h>140</h>
+      <x>440</x>
+      <y>30</y>
+      <w>150</w>
+      <h>190</h>
     </coordinates>
     <panel_attributes>ActiveRecord
 --
 + Id : long
++ TableName : string
 --
 + create()
 + read()
 + update()
 + remove()
+# select()
+# bulkDelete()
 + toJSON() : string</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>220</x>
-      <y>150</y>
-      <w>160</w>
-      <h>160</h>
+      <x>370</x>
+      <y>190</y>
+      <w>130</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>140;30;30;140</additional_attributes>
+    <additional_attributes>110;30;30;90</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>390</x>
-      <y>150</y>
-      <w>120</w>
-      <h>160</h>
+      <x>510</x>
+      <y>190</y>
+      <w>140</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>30;30;100;140</additional_attributes>
+    <additional_attributes>30;30;120;100</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>240</x>
+      <y>790</y>
+      <w>110</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Enemy
+--
++ Id : long
++ PosX : int
++ PosY : int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>450</x>
+      <y>790</y>
+      <w>160</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>EnemyType
+--
++ Id : long
++ Type : string
++ Boss : boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>320</x>
+      <y>810</y>
+      <w>150</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+r1=+ Type
+m1=1
+m2=*</panel_attributes>
+    <additional_attributes>130;30;30;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>210</x>
+      <y>520</y>
+      <w>170</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>Level
+--
++ Id : long
++ Name : string
++ Background : string
++ Music_Boss : string
++ Music_Defeat : string
++ Music_Fight : string
++ Music_Victory : string</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>240</x>
+      <y>640</y>
+      <w>90</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+r1=+ Level
+r2=+ Enemies
+m1=1
+m2=*</panel_attributes>
+    <additional_attributes>50;30;50;150</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>740</x>
+      <y>550</y>
+      <w>160</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>ConfigType
+--
++ Id : long
++ Name : string
++ Identifier : string</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>470</x>
+      <y>550</y>
+      <w>160</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>Config
+--
++ Id : long
++ Name : string
++ Identifier : string
++ Value : double</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>600</x>
+      <y>570</y>
+      <w>160</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+r1=+ Type
+m1=1
+m2=*</panel_attributes>
+    <additional_attributes>140;30;30;30</additional_attributes>
   </element>
 </diagram>

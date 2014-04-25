@@ -20,18 +20,17 @@ Scene.prototype.reset = function()
 	this.stopMusic();
 };
 
-Scene.prototype.loadLevel = function(levelName)
+Scene.prototype.loadLevel = function(levelProperties)
 {
 	this.reset();
-	this.currentLevel = levelName;
-	var levelProperties = LevelBuilder.loadLevelData(levelName);
-	//console.log(levelProperties);
-	this.backgroundImage = assetManager.getImage(levelProperties["background"]);
+	this.currentLevel = levelProperties;
+	var levelData = LevelBuilder.parseLevelData(levelProperties);
+	this.backgroundImage = assetManager.getImage(levelData["background"]);
 	this.maxY = this.backgroundImage.height;
 	this.cameraY = this.maxY - Scene.SCREEN_HEIGHT;
-	this.actors.addAll(levelProperties["enemies"]);
-	this.musics = levelProperties["musics"];
-	this.boss = levelProperties["boss"][0];
+	this.actors.addAll(levelData["enemies"]);
+	this.musics = levelData["musics"];
+	this.boss = levelData["boss"][0];
 	this.actors.add(this.boss);
 	this.loaded = true;
 };
@@ -45,7 +44,7 @@ Scene.prototype.launchMusic = function(mode,loop)
 {
 	this.stopMusic();
 	
-	if ( $.isDefined(this.musics) && $.isDefined(this.musics[mode]) )
+	if ( $.isDefined(this.musics) && $.isDefined(this.musics[mode]) && (this.musics[mode] != '') )
 	{
 		//console.log("Loading music " + mode + ( loop ? " in loop" : "" ));
 		this.currentMusic = mode;

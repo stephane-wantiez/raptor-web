@@ -1,5 +1,5 @@
 /** 
-* Script file generated on Wed, 23 Apr 2014 17:18:52 +0200
+* Script file generated on Fri, 25 Apr 2014 20:47:18 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
@@ -311,19 +311,19 @@ Sound.prototype.stop = function()
 
 var AssetManager = function()
 {
-	this.levelsProperties = {};
+	//this.levelsProperties = {};
 	this.images = {};
 	this.sounds = {};
-	this.levelsError = {};
+	//this.levelsError = {};
 	this.imagesError = {};
-	this.levelsToLoad = {};
+	//this.levelsToLoad = {};
 	this.imagesToLoad = {};
 	this.soundsToLoad = {};
 	this.loadingStarted = false;
     //this.renderAlpha = 1;
 };
 
-AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
+/*AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
 {
 	var _this = this;
 	var levelProperties = this.levelsProperties[levelName];
@@ -354,7 +354,7 @@ AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
 		this.assetLoaded();
 	}
 	return levelProperties;
-};
+};*/
 
 AssetManager.prototype.loadImage = function(url, id)
 {
@@ -469,16 +469,16 @@ AssetManager.prototype.isDoneLoading = function()
 	return this.totalAssetCount <= this.totalAssetLoaded;
 };
 
-AssetManager.prototype.startLoading = function(levelLoadingList, imgLoadingList, soundLoadingList)
+AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
 {
 	this.loadingStartTime = Date.now();	
 	this.totalAssetLoaded = 0;
 	this.totalAssetCount = 0;
 
-	for(var i in levelLoadingList)
+	/*for(var i in levelLoadingList)
 	{
 		this.totalAssetCount++;
-	}
+	}*/
 	for(var i in imgLoadingList)
 	{
 		this.totalAssetCount++;
@@ -490,10 +490,10 @@ AssetManager.prototype.startLoading = function(levelLoadingList, imgLoadingList,
 	
 	this.loadingStarted = true;
 
-	for(var i in levelLoadingList)
+	/*for(var i in levelLoadingList)
 	{
 		this.loadLevelProperties(levelLoadingList[i], i);
-	}
+	}*/
 	for(var i in imgLoadingList)
 	{
 		this.loadImage(imgLoadingList[i], i);
@@ -516,10 +516,10 @@ AssetManager.prototype.getLoadingProgress = function()
 	}
 };
 
-AssetManager.prototype.getLevelProperties = function(levelName)
+/*AssetManager.prototype.getLevelProperties = function(levelName)
 {
 	return this.levelsProperties[levelName];
-};
+};*/
 
 AssetManager.prototype.getImage = function(id)
 {
@@ -552,7 +552,7 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 			{
 				if (res != '')
 				{
-					successCallback(JSON.parse(res));
+					successCallback(res);
 				}
 				else
 				{
@@ -560,12 +560,12 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 				}
 			}
 		},
-		error: function(err){
+		error: function(err){			
 			if ($.isDefined(errorCallback))
 			{
 				if (err != '')
 				{
-					errorCallback(JSON.parse(err));
+					errorCallback(err);
 				}
 				else
 				{
@@ -574,6 +574,11 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 			}
 		}
 	});
+};
+
+ServerManager.prototype.requestLevelData = function(levelNumber,successCallback,errorCallback)
+{
+	this.sendRequest('get-level',levelNumber,successCallback,errorCallback);
 };
 
 
@@ -1671,25 +1676,80 @@ ScoreFeedback.prototype.doRender = function(g)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\0-LevelBuilder.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\0-LevelLoader.js **/
+
+var LevelLoader = function()
+{
+	this.levelNumber = 0;
+	this.levelData = false;
+	this.levelLoaded = false;
+	this.levelError = false;
+};
+
+LevelLoader.prototype.loadLevel = function(levelNumber)
+{
+	var self = this;
+	this.levelNumber = levelNumber;
+	this.levelData = false;
+	this.levelLoaded = false;
+	this.levelError = false;
+	
+	serverManager.requestLevelData(levelNumber,
+	function(data)
+	{
+		self.onLevelLoaded(data);
+	},
+	function(error)
+	{
+		self.onLevelLoadingError(error);
+	});	
+};
+
+LevelLoader.prototype.onLevelLoaded = function(levelData)
+{
+	this.levelData = levelData;
+	this.levelLoaded = true;
+	this.levelError = false;
+};
+
+LevelLoader.prototype.onLevelLoadingError = function(error)
+{
+	this.levelData = false;
+	this.levelLoaded = false;
+	this.levelError = error;
+};
+
+LevelLoader.prototype.getLevelNumber = function()
+{
+	return this.levelNumber;
+};
+
+LevelLoader.prototype.getLevelData = function()
+{
+	return this.levelData;
+};
+
+LevelLoader.prototype.isLevelLoaded = function()
+{
+	return this.levelLoaded;
+};
+
+LevelLoader.prototype.isLevelLoadingFailed = function()
+{
+	return this.levelError;
+};
+
+LevelLoader.prototype.getLevelLoadingError = function()
+{
+	return this.levelError;
+};
+
+
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\1-LevelBuilder.js **/
 
 var LevelBuilder =
 {
-	/**
-	 * Reads level data file, and return the level objects (with enemy objects loaded).
-	 * 
-	 * The level data file should be a JSON file with the following content:
-	 * - enemies : array of elements:
-	 *   - type : class name
-	 *   - posX : position on X-axis
-	 *   - posY : position on Y-axis
-	 */
-	loadLevelData : function(levelName)
-	{
-		console.log("Loading data of level " + levelName);
-		var levelData = assetManager.getLevelProperties(levelName);
-		return this.parseLevelData(levelData);
-	},
 	parseLevelData : function(levelData)
 	{
 		//console.log("Parsing level data: " + $.objectToString(levelData));
@@ -1763,18 +1823,17 @@ Scene.prototype.reset = function()
 	this.stopMusic();
 };
 
-Scene.prototype.loadLevel = function(levelName)
+Scene.prototype.loadLevel = function(levelProperties)
 {
 	this.reset();
-	this.currentLevel = levelName;
-	var levelProperties = LevelBuilder.loadLevelData(levelName);
-	//console.log(levelProperties);
-	this.backgroundImage = assetManager.getImage(levelProperties["background"]);
+	this.currentLevel = levelProperties;
+	var levelData = LevelBuilder.parseLevelData(levelProperties);
+	this.backgroundImage = assetManager.getImage(levelData["background"]);
 	this.maxY = this.backgroundImage.height;
 	this.cameraY = this.maxY - Scene.SCREEN_HEIGHT;
-	this.actors.addAll(levelProperties["enemies"]);
-	this.musics = levelProperties["musics"];
-	this.boss = levelProperties["boss"][0];
+	this.actors.addAll(levelData["enemies"]);
+	this.musics = levelData["musics"];
+	this.boss = levelData["boss"][0];
 	this.actors.add(this.boss);
 	this.loaded = true;
 };
@@ -1788,7 +1847,7 @@ Scene.prototype.launchMusic = function(mode,loop)
 {
 	this.stopMusic();
 	
-	if ( $.isDefined(this.musics) && $.isDefined(this.musics[mode]) )
+	if ( $.isDefined(this.musics) && $.isDefined(this.musics[mode]) && (this.musics[mode] != '') )
 	{
 		//console.log("Loading music " + mode + ( loop ? " in loop" : "" ));
 		this.currentMusic = mode;
@@ -2205,8 +2264,8 @@ var MainMenu = function()
 		},	
 		start : {
 			type : "option",
-			caption : "Start Game",
-			clickCallback : function(){ game.start(); }
+			caption : "Launch Level 1",
+			clickCallback : function(){ game.launchLevel(1); }
 		},
 		logout : {
 			type : "option",
@@ -2303,7 +2362,7 @@ VictoryMenu.prototype = new EndGameMenu();
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\8-player\Player.js **/
 
-var Player = function()
+var Player = function(playerConfig)
 {
 	Actor.call(this, "player", Player.WIDTH, Player.HEIGHT);
 	
@@ -2313,15 +2372,18 @@ var Player = function()
 	this.score = 0;
 	this.secWeapon = "";
 	this.nbBombs = 0;
+	
+	this.maxNbShields = playerConfig.MAX_NB_SHIELDS;
+	this.maxNbBombs = playerConfig.MAX_NB_BOMBS;
 
 	this.killSound = assetManager.getSound("explosion");
 	this.weaponSound = assetManager.getSound("shoot_basic");
-	this.weaponCreateAmmo = function(){ return new Bullet(Player.BULLET_SPEED); };
-	this.weaponShootDelayMs = Player.BULLET_SHOOT_WAIT_TIME_MSEC;
+	this.weaponCreateAmmo = function(){ return new Bullet(-1 * playerConfig.BULLET_SPEED); };
+	this.weaponShootDelayMs = playerConfig.BULLET_SHOOT_WAIT_TIME_MSEC;
 	this.nextAllowedWeaponAttack = 0;
 	this.useAttackPosition1 = true;
 	
-	this.collisionDamage = Player.COLLISION_DAMAGE_ENEMY;
+	this.collisionDamage = playerConfig.COLLISION_DAMAGE_ENEMY;
 	
 	this.healthChanged = true;
 	this.armorChanged = true;
@@ -2343,8 +2405,8 @@ var Player = function()
     this.maxY = Player.MAX_Y;
 	
 	this.speed = {
-		x: Player.SPEED_X,
-		y: Player.SPEED_Y
+		x: playerConfig.SPEED_X,
+		y: playerConfig.SPEED_Y
 	};
 	
 	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES * Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true );
@@ -2367,20 +2429,12 @@ Player.SHOOT_REL_POSITION_1_X = -20;
 Player.SHOOT_REL_POSITION_2_X =  20;
 Player.SHOOT_REL_POSITION_1_Y = -10;
 Player.SHOOT_REL_POSITION_2_Y = -10;
-Player.BULLET_SPEED = -800;
-Player.BULLET_SHOOT_WAIT_TIME_MSEC = 20;
 Player.INIT_X = Scene.SCREEN_WIDTH / 2;
 Player.INIT_Y = Scene.SCREEN_HEIGHT - 100;
 Player.MIN_X = Player.WIDTH/2 + 20 ;
 Player.MAX_X = Scene.SCREEN_WIDTH - Player.WIDTH/2 - 20 ;
 Player.MIN_Y = Player.WIDTH/2 + 50 ;
 Player.MAX_Y = Scene.SCREEN_HEIGHT - Player.HEIGHT/2 - 30 ;
-Player.SPEED_X = 3000;
-Player.SPEED_Y = 2000;
-Player.MAX_NB_SHIELDS = 10;
-Player.SHIELDS_PERCENT_FACTOR = 100 / Player.MAX_NB_SHIELDS ;
-Player.MAX_NB_BOMBS = 3;
-Player.BOMBS_PERCENT_FACTOR = 100 / Player.MAX_NB_BOMBS ;
 Player.NB_SCORE_DIGITS = 8;
 Player.MOVE_UP_KEY     = 38 ; // up arrow
 Player.MOVE_DOWN_KEY   = 40 ; // down arrow
@@ -2388,8 +2442,6 @@ Player.MOVE_LEFT_KEY   = 37 ; // left arrow
 Player.MOVE_RIGHT_KEY  = 39 ; // right arrow
 Player.MOVE_ATTACK_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
-Player.COLLISION_DAMAGE_ENEMY = 100;
-Player.COLLISION_DAMAGE_SELF = 50;
 Player.KILL_SPRITE_NB_ROW = 1;
 Player.KILL_SPRITE_NB_COL = 6;
 Player.KILL_SPRITE_WIDTH  = 65;
@@ -2448,7 +2500,7 @@ Player.prototype.setArmor = function(value)
 
 Player.prototype.setNbShields = function(value)
 {	
-	value = $.clampValue(value,0,Player.MAX_NB_SHIELDS);
+	value = $.clampValue(value,0,this.maxNbShields);
 	
 	if (this.nbShields != value)
 	{
@@ -2484,7 +2536,7 @@ Player.prototype.setSecWeapon = function(value)
 
 Player.prototype.setNbBombs = function(value)
 {	
-	value = $.clampValue(value,0,Player.MAX_NB_BOMBS);
+	value = $.clampValue(value,0,this.maxNbBombs);
 	
 	if (this.nbBombs != value)
 	{
@@ -2509,13 +2561,13 @@ Player.prototype.updateHud = function()
 	
 	if (this.nbShieldsChanged)
 	{
-		this.$shields.css("width", (Player.SHIELDS_PERCENT_FACTOR * this.nbShields) + "%" );
+		this.$shields.css("width", (100 / this.maxNbShields * this.nbShields) + "%" );
 		this.nbShieldsChanged = false;
 	}
 	
 	if (this.nbBombsChanged)
 	{
-		this.$bombs.css("width", (Player.BOMBS_PERCENT_FACTOR * this.nbBombs) + "%" );
+		this.$bombs.css("width", (100 / this.maxNbBombs * this.nbBombs) + "%" );
 		this.nbBombsChanged = false;
 	}
 	
@@ -2597,10 +2649,10 @@ Player.prototype.getAttackPosition = function()
 
 Player.prototype.attack = function()
 {
-	//console.log("Attack command");
+	console.log("Attack command - this.nextAllowedWeaponAttack=" + this.nextAllowedWeaponAttack + " - game.elapsedGameTimeSinceStartup=" + game.elapsedGameTimeSinceStartup);
 	if (this.nextAllowedWeaponAttack < game.elapsedGameTimeSinceStartup)
 	{
-		//console.log("Can attack!");
+		console.log("Can attack!");
 		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
 		this.weaponSound.play();
 		var projectile = this.weaponCreateAmmo();
@@ -2688,10 +2740,6 @@ var Game = function()
 	this.started = false;
 	this.paused = false;
 	
-	this.loadingLevel = false;
-	this.loadingLevelProgress = 0;
-	this.loadingLevelName = '';
-	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
     this.graphics = sceneView.getContext("2d");
@@ -2721,11 +2769,6 @@ Game.prototype.initAssets = function()
 {
     var assetsPath = "/raptor-web-static/";
     
-    var levelsPath = assetsPath + "levels/";
-    var levelsList = {
-    	"testLevel1" : levelsPath + "test-level-01.dat"
-    };
-    
     var imagesPath = assetsPath + "img/";
     var imageList = {
         "title"            : imagesPath +            "title.png",
@@ -2751,13 +2794,13 @@ Game.prototype.initAssets = function()
         "music-victory" : soundsPath + "music-victory.mp3"
     };
     
-    assetManager.startLoading(levelsList,imageList,soundList);
+    assetManager.startLoading(imageList,soundList);
 };
 
 Game.prototype.onAssetsLoaded = function()
 {	
 	scene = new Scene();
-	player = new Player();
+	player = new Player(config.PLAYER);
 	
 	this.mainMenu = new MainMenu();
 	this.pauseMenu = new PauseMenu();
@@ -2781,19 +2824,19 @@ Game.prototype.launchMainMenu = function()
 	this.started = false;
 };
 
-Game.prototype.start = function()
+Game.prototype.launchLevel = function(levelNumber)
 {
-	scene.loadLevel("testLevel1");
 	this.state = Game.State.LEVEL_LOAD;
-	this.loadingLevel = false;
-	this.loadingLevelName = "testLevel1";
-	this.loadingLevelProgress = 1;
-	this.elapsedGameTimeSinceStartup = 0;
 	this.mainMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
-	this.started = true;
-	this.setPaused(false);
+	levelLoader.loadLevel(levelNumber);
+};
+
+Game.prototype.startLevel = function(levelProperties)
+{
+	scene.loadLevel(levelProperties);
+	this.elapsedGameTimeSinceStartup = 0;
 };
 
 Game.prototype.restart = function()
@@ -2913,14 +2956,25 @@ Game.prototype.mainLoop = function()
     	}
     	case Game.State.LEVEL_LOAD:
     	{
-    		if (!this.loadingLevel)
+    		if (levelLoader.isLevelLoadingFailed())
+    		{
+    			var errorMsg = 'Error while loading level ' + levelLoader.getLevelNumber() + ': ' + JSON.stringify(levelLoader.getLevelLoadingError(), null, '\n');
+    			alert(errorMsg);
+    			this.state = Game.State.MAIN_MENU;
+    		}
+    		else if (levelLoader.isLevelLoaded())
     		{
     			console.log('Switching to state LEVEL_LOAD_END');
-    			this.state = Game.State.LEVEL_LOAD_END;
+    			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.8, 1);
+    			//alert(JSON.stringify(levelLoader.getLevelData(), null, '\n'));
+    			this.startLevel(levelLoader.getLevelData());
             	this.timeSinceLoadingEnd = currentTimeMs;
+    			this.state = Game.State.LEVEL_LOAD_END;
     		}
-    		
-    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 30, this.loadingLevelProgress, 1);    		
+    		else
+    		{
+    			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.2, 1);
+    		}    		
     		break;
     	}
     	case Game.State.LOADING_END:
@@ -2930,12 +2984,12 @@ Game.prototype.mainLoop = function()
     		if (alphaLoad < 0.01)
     		{
     			console.log('Switching to state MAIN_MENU');
-    			this.state = Game.State.MAIN_MENU;    			
+    			this.state = Game.State.MAIN_MENU;
     		}
     		
     		this.gameRender(this.graphics);
     		
-    		this.showLoadingScreen(this.graphics, 'Loading game', 60, 100, alphaLoad);    		
+    		this.showLoadingScreen(this.graphics, 'Loading game', 60, 1, alphaLoad);    		
     		break;
     	}
     	case Game.State.LEVEL_LOAD_END:
@@ -2945,12 +2999,14 @@ Game.prototype.mainLoop = function()
     		if (alphaLoad < 0.01)
     		{
     			console.log('Switching to state PLAYING');
-    			this.state = Game.State.PLAYING;    			
+    			this.started = true;
+    			this.setPaused(false);
+    			this.state = Game.State.PLAYING;
     		}
     		
     		this.gameRender(this.graphics);
     		
-    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 60, 100, alphaLoad);    		
+    		this.showLoadingScreen(this.graphics, 'Loading level ' + this.loadingLevelName, 60, 1, alphaLoad);    		
     		break;
     	}
     	case Game.State.MAIN_MENU:
@@ -2985,6 +3041,7 @@ $(document).ready(function()
 	assetManager = new AssetManager();
 	inputManager = new InputManager();
 	serverManager = new ServerManager();
+	levelLoader = new LevelLoader();
 	game = new Game();
 });
 

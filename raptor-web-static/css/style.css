@@ -1,5 +1,5 @@
 /** 
-* CSS style file generated on Wed, 23 Apr 2014 17:18:52 +0200
+* CSS style file generated on Fri, 25 Apr 2014 20:47:18 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\css\0-base.css **/
@@ -163,6 +163,8 @@ div{
 #main-menu-start{
     top: 50%;
     margin-top: 100px;
+    margin-left: -70px;
+    width: 140px;
 }
 #main-menu-logout{
     top: 50%;

@@ -15,7 +15,7 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 			{
 				if (res != '')
 				{
-					successCallback(JSON.parse(res));
+					successCallback(res);
 				}
 				else
 				{
@@ -23,12 +23,12 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 				}
 			}
 		},
-		error: function(err){
+		error: function(err){			
 			if ($.isDefined(errorCallback))
 			{
 				if (err != '')
 				{
-					errorCallback(JSON.parse(err));
+					errorCallback(err);
 				}
 				else
 				{
@@ -37,4 +37,9 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 			}
 		}
 	});
+};
+
+ServerManager.prototype.requestLevelData = function(levelNumber,successCallback,errorCallback)
+{
+	this.sendRequest('get-level',levelNumber,successCallback,errorCallback);
 };

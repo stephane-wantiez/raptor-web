@@ -1,5 +1,6 @@
 <?php include('header.tpl'); ?>
 <script>
+    var config = <?php echo json_encode($_SESSION['config'],JSON_PRETTY_PRINT ); ?>;
 	var user = <?php echo $_SESSION['user']->toJSON(); ?>;
 	<?php if (isset($_SESSION['score'])) { ?>
 	var score = <?php echo $_SESSION['score']->toJSON(); ?>;

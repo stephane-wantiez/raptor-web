@@ -9,8 +9,8 @@ var MainMenu = function()
 		},	
 		start : {
 			type : "option",
-			caption : "Start Game",
-			clickCallback : function(){ game.start(); }
+			caption : "Launch Level 1",
+			clickCallback : function(){ game.launchLevel(1); }
 		},
 		logout : {
 			type : "option",

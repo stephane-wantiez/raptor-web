@@ -1,4 +1,4 @@
-var Player = function()
+var Player = function(playerConfig)
 {
 	Actor.call(this, "player", Player.WIDTH, Player.HEIGHT);
 	
@@ -8,15 +8,18 @@ var Player = function()
 	this.score = 0;
 	this.secWeapon = "";
 	this.nbBombs = 0;
+	
+	this.maxNbShields = playerConfig.MAX_NB_SHIELDS;
+	this.maxNbBombs = playerConfig.MAX_NB_BOMBS;
 
 	this.killSound = assetManager.getSound("explosion");
 	this.weaponSound = assetManager.getSound("shoot_basic");
-	this.weaponCreateAmmo = function(){ return new Bullet(Player.BULLET_SPEED); };
-	this.weaponShootDelayMs = Player.BULLET_SHOOT_WAIT_TIME_MSEC;
+	this.weaponCreateAmmo = function(){ return new Bullet(-1 * playerConfig.BULLET_SPEED); };
+	this.weaponShootDelayMs = playerConfig.BULLET_SHOOT_WAIT_TIME_MSEC;
 	this.nextAllowedWeaponAttack = 0;
 	this.useAttackPosition1 = true;
 	
-	this.collisionDamage = Player.COLLISION_DAMAGE_ENEMY;
+	this.collisionDamage = playerConfig.COLLISION_DAMAGE_ENEMY;
 	
 	this.healthChanged = true;
 	this.armorChanged = true;
@@ -38,8 +41,8 @@ var Player = function()
     this.maxY = Player.MAX_Y;
 	
 	this.speed = {
-		x: Player.SPEED_X,
-		y: Player.SPEED_Y
+		x: playerConfig.SPEED_X,
+		y: playerConfig.SPEED_Y
 	};
 	
 	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES * Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true );
@@ -62,20 +65,12 @@ Player.SHOOT_REL_POSITION_1_X = -20;
 Player.SHOOT_REL_POSITION_2_X =  20;
 Player.SHOOT_REL_POSITION_1_Y = -10;
 Player.SHOOT_REL_POSITION_2_Y = -10;
-Player.BULLET_SPEED = -800;
-Player.BULLET_SHOOT_WAIT_TIME_MSEC = 20;
 Player.INIT_X = Scene.SCREEN_WIDTH / 2;
 Player.INIT_Y = Scene.SCREEN_HEIGHT - 100;
 Player.MIN_X = Player.WIDTH/2 + 20 ;
 Player.MAX_X = Scene.SCREEN_WIDTH - Player.WIDTH/2 - 20 ;
 Player.MIN_Y = Player.WIDTH/2 + 50 ;
 Player.MAX_Y = Scene.SCREEN_HEIGHT - Player.HEIGHT/2 - 30 ;
-Player.SPEED_X = 3000;
-Player.SPEED_Y = 2000;
-Player.MAX_NB_SHIELDS = 10;
-Player.SHIELDS_PERCENT_FACTOR = 100 / Player.MAX_NB_SHIELDS ;
-Player.MAX_NB_BOMBS = 3;
-Player.BOMBS_PERCENT_FACTOR = 100 / Player.MAX_NB_BOMBS ;
 Player.NB_SCORE_DIGITS = 8;
 Player.MOVE_UP_KEY     = 38 ; // up arrow
 Player.MOVE_DOWN_KEY   = 40 ; // down arrow
@@ -83,8 +78,6 @@ Player.MOVE_LEFT_KEY   = 37 ; // left arrow
 Player.MOVE_RIGHT_KEY  = 39 ; // right arrow
 Player.MOVE_ATTACK_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
-Player.COLLISION_DAMAGE_ENEMY = 100;
-Player.COLLISION_DAMAGE_SELF = 50;
 Player.KILL_SPRITE_NB_ROW = 1;
 Player.KILL_SPRITE_NB_COL = 6;
 Player.KILL_SPRITE_WIDTH  = 65;
@@ -143,7 +136,7 @@ Player.prototype.setArmor = function(value)
 
 Player.prototype.setNbShields = function(value)
 {	
-	value = $.clampValue(value,0,Player.MAX_NB_SHIELDS);
+	value = $.clampValue(value,0,this.maxNbShields);
 	
 	if (this.nbShields != value)
 	{
@@ -179,7 +172,7 @@ Player.prototype.setSecWeapon = function(value)
 
 Player.prototype.setNbBombs = function(value)
 {	
-	value = $.clampValue(value,0,Player.MAX_NB_BOMBS);
+	value = $.clampValue(value,0,this.maxNbBombs);
 	
 	if (this.nbBombs != value)
 	{
@@ -204,13 +197,13 @@ Player.prototype.updateHud = function()
 	
 	if (this.nbShieldsChanged)
 	{
-		this.$shields.css("width", (Player.SHIELDS_PERCENT_FACTOR * this.nbShields) + "%" );
+		this.$shields.css("width", (100 / this.maxNbShields * this.nbShields) + "%" );
 		this.nbShieldsChanged = false;
 	}
 	
 	if (this.nbBombsChanged)
 	{
-		this.$bombs.css("width", (Player.BOMBS_PERCENT_FACTOR * this.nbBombs) + "%" );
+		this.$bombs.css("width", (100 / this.maxNbBombs * this.nbBombs) + "%" );
 		this.nbBombsChanged = false;
 	}
 	
@@ -292,10 +285,10 @@ Player.prototype.getAttackPosition = function()
 
 Player.prototype.attack = function()
 {
-	//console.log("Attack command");
+	console.log("Attack command - this.nextAllowedWeaponAttack=" + this.nextAllowedWeaponAttack + " - game.elapsedGameTimeSinceStartup=" + game.elapsedGameTimeSinceStartup);
 	if (this.nextAllowedWeaponAttack < game.elapsedGameTimeSinceStartup)
 	{
-		//console.log("Can attack!");
+		console.log("Can attack!");
 		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
 		this.weaponSound.play();
 		var projectile = this.weaponCreateAmmo();

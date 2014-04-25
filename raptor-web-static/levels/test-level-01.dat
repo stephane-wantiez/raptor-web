@@ -1,9 +1,12 @@
-{ "background" : "background-ocean",
+{ "name" : "LevelTest01",
+  "number" : 1,
+  "background" : "background-ocean",
   "musics" :
     {
         "fight"   : "music-battle1",
         "boss"    : "music-boss1",
-        "victory" : "music-victory"
+        "victory" : "music-victory",
+        "defeat"  : ""
     },
   "boss" :
     [

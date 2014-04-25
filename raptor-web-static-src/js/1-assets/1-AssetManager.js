@@ -1,18 +1,18 @@
 var AssetManager = function()
 {
-	this.levelsProperties = {};
+	//this.levelsProperties = {};
 	this.images = {};
 	this.sounds = {};
-	this.levelsError = {};
+	//this.levelsError = {};
 	this.imagesError = {};
-	this.levelsToLoad = {};
+	//this.levelsToLoad = {};
 	this.imagesToLoad = {};
 	this.soundsToLoad = {};
 	this.loadingStarted = false;
     //this.renderAlpha = 1;
 };
 
-AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
+/*AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
 {
 	var _this = this;
 	var levelProperties = this.levelsProperties[levelName];
@@ -43,7 +43,7 @@ AssetManager.prototype.loadLevelProperties = function(fileName,levelName)
 		this.assetLoaded();
 	}
 	return levelProperties;
-};
+};*/
 
 AssetManager.prototype.loadImage = function(url, id)
 {
@@ -158,16 +158,16 @@ AssetManager.prototype.isDoneLoading = function()
 	return this.totalAssetCount <= this.totalAssetLoaded;
 };
 
-AssetManager.prototype.startLoading = function(levelLoadingList, imgLoadingList, soundLoadingList)
+AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
 {
 	this.loadingStartTime = Date.now();	
 	this.totalAssetLoaded = 0;
 	this.totalAssetCount = 0;
 
-	for(var i in levelLoadingList)
+	/*for(var i in levelLoadingList)
 	{
 		this.totalAssetCount++;
-	}
+	}*/
 	for(var i in imgLoadingList)
 	{
 		this.totalAssetCount++;
@@ -179,10 +179,10 @@ AssetManager.prototype.startLoading = function(levelLoadingList, imgLoadingList,
 	
 	this.loadingStarted = true;
 
-	for(var i in levelLoadingList)
+	/*for(var i in levelLoadingList)
 	{
 		this.loadLevelProperties(levelLoadingList[i], i);
-	}
+	}*/
 	for(var i in imgLoadingList)
 	{
 		this.loadImage(imgLoadingList[i], i);
@@ -205,10 +205,10 @@ AssetManager.prototype.getLoadingProgress = function()
 	}
 };
 
-AssetManager.prototype.getLevelProperties = function(levelName)
+/*AssetManager.prototype.getLevelProperties = function(levelName)
 {
 	return this.levelsProperties[levelName];
-};
+};*/
 
 AssetManager.prototype.getImage = function(id)
 {

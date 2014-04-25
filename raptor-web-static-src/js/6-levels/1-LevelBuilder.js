@@ -1,20 +1,5 @@
 var LevelBuilder =
 {
-	/**
-	 * Reads level data file, and return the level objects (with enemy objects loaded).
-	 * 
-	 * The level data file should be a JSON file with the following content:
-	 * - enemies : array of elements:
-	 *   - type : class name
-	 *   - posX : position on X-axis
-	 *   - posY : position on Y-axis
-	 */
-	loadLevelData : function(levelName)
-	{
-		console.log("Loading data of level " + levelName);
-		var levelData = assetManager.getLevelProperties(levelName);
-		return this.parseLevelData(levelData);
-	},
 	parseLevelData : function(levelData)
 	{
 		//console.log("Parsing level data: " + $.objectToString(levelData));

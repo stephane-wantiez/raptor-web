@@ -66,7 +66,8 @@ class App
     
     public function run()
     {
-    	$_SESSION['locale'] = 'fr_BE';
+    	if (!isset($_SESSION['locale'])) $_SESSION['locale'] = 'fr_BE';
+    	/*if (!isset($_SESSION['config']))*/ $_SESSION['config'] = \raptorWeb\model\Config::read();
     	
     	if(defined('FB_APP_ID'))
     	{
@@ -252,6 +253,10 @@ class App
     				
 		    switch($action)
 		    {
+		    	case 'get-level':
+		    		$res = \raptorWeb\model\Level::readLevel($data);
+		    		break;
+		    		
 		    	case 'game-start':
 		   			UserService::onGameStart($user);
 		   			break;
