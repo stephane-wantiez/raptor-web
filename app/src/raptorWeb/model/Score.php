@@ -12,7 +12,6 @@ class Score extends ActiveRecord
 	public function __construct($id=0,$userId=0,$gameDT=0,$value=0,$gameDone=false)
 	{
 		parent::__construct('score',$id);
-		$this->registerClass('\raptorWeb\model\Score');
 		$this->fillWithData($id,$userId,$gameDT,$value,$gameDone);
 	}
 	
@@ -57,11 +56,11 @@ class Score extends ActiveRecord
 				 'game_dt' => $this->gameDT ];
 	}
 	
-	public static function listForUser($userId,$onlyDone=false)
+	public static function listForUser($userId,$limit=0)
 	{
-		$selectParams = [ 'user_id' => $userId ];
-		if ($onlyDone) $selectParams['game_done'] = true;
-		return Score::select('score', $selectParams, [ 'game_dt' => 'ASC' ]);
+		$selectParams = [ 'user_id' => $userId, 'game_done' => true ];
+		$orderParams = [ 'value' => 'DESC' , 'game_dt' => 'DESC' ];
+		return Score::select('score', $selectParams, $orderParams, $limit);
 	}
 	
 	public static function purgeOrphansForUser($userId)
@@ -87,4 +86,6 @@ class Score extends ActiveRecord
 			'gameDone' => $this->gameDone
 		], JSON_PRETTY_PRINT );
 	}
-}
+};
+
+ActiveRecord::registerClass('score','\raptorWeb\model\Score');

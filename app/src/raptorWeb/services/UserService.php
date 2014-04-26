@@ -19,13 +19,26 @@ class UserService
 		$score->initForUser($user->id);
 		$score->create();
 		$_SESSION['score'] = $score;
+		return $score->id;
 	}
 	
-	public static function onGameScoreUpdate($score,$scoreValue,$gameIsDone)
+	public static function onGameScoreUpdate($score,$scoreIncrement)
 	{
-		$score->value = $scoreValue;
-		$score->gameDone = $gameIsDone;
+		$score->value += $scoreIncrement;
 		$score->update();
+		return $score->value;
+	}
+	
+	public static function onGameEnd($score)
+	{
+		$score->gameDone = true;
+		$score->update();
+		return $score->id;
+	}
+	
+	public static function listTopScores($user)
+	{
+		return \raptorWeb\model\Score::listForUser($user->id, 5);
 	}
 	
 	private static function getPasswordHash($password)

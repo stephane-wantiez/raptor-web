@@ -11,6 +11,11 @@ var MainMenu = function()
 			type : "option",
 			caption : "Launch Level 1",
 			clickCallback : function(){ game.launchLevel(1); }
+		},	
+		top : {
+			type : "option",
+			caption : "Show top scores",
+			clickCallback : function(){ game.showTopScoresMenu(); }
 		},
 		logout : {
 			type : "option",
@@ -39,13 +44,13 @@ MainMenu.prototype.updateState = function(showMenu)
 	
     if(showMenu)
     {
-    	this.music.playLoop();
+    	//this.music.playLoop();
     	this.$menuTitleScreen.addClass("visible");
     	this.$screen.addClass("paused");
     }
     else
     {
-    	this.music.stop();
+    	//this.music.stop();
     	this.$menuTitleScreen.removeClass("visible");
     	this.$screen.removeClass("paused");
     }

@@ -74,6 +74,7 @@ Game.prototype.onAssetsLoaded = function()
 	player = new Player(config.PLAYER);
 	
 	this.mainMenu = new MainMenu();
+	this.topScoresMenu = new TopScoresMenu();
 	this.pauseMenu = new PauseMenu();
 	this.victoryMenu = new VictoryMenu();
 	this.gameOverMenu = new GameOverMenu();
@@ -87,18 +88,26 @@ Game.prototype.launchMainMenu = function()
 	player.reset();
 	
 	this.state = Game.State.MAIN_MENU;
-	this.mainMenu.updateState(true);
+	this.topScoresMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	this.pauseMenu.updateState(false);
+	this.mainMenu.updateState(true);
 	this.pause = true;
 	this.started = false;
+};
+
+Game.prototype.showTopScoresMenu = function()
+{
+	this.mainMenu.updateState(false);
+	this.topScoresMenu.updateState(true);
 };
 
 Game.prototype.launchLevel = function(levelNumber)
 {
 	this.state = Game.State.LEVEL_LOAD;
 	this.mainMenu.updateState(false);
+	this.topScoresMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	levelLoader.loadLevel(levelNumber);
@@ -231,16 +240,21 @@ Game.prototype.mainLoop = function()
     		{
     			var errorMsg = 'Error while loading level ' + levelLoader.getLevelNumber() + ': ' + JSON.stringify(levelLoader.getLevelLoadingError(), null, '\n');
     			alert(errorMsg);
-    			this.state = Game.State.MAIN_MENU;
+    			this.launchMainMenu();
     		}
-    		else if (levelLoader.isLevelLoaded())
+    		else if (levelLoader.isLevelLaunched())
     		{
     			console.log('Switching to state LEVEL_LOAD_END');
     			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.8, 1);
     			//alert(JSON.stringify(levelLoader.getLevelData(), null, '\n'));
+    			//alert(levelLoader.getLevelScoreId());
     			this.startLevel(levelLoader.getLevelData());
             	this.timeSinceLoadingEnd = currentTimeMs;
     			this.state = Game.State.LEVEL_LOAD_END;
+    		}
+    		else if (levelLoader.isLevelLoaded())
+    		{
+    			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.5, 1);
     		}
     		else
     		{

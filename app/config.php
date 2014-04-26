@@ -1,6 +1,6 @@
 <?php 
 /** 
-* Configuration file generated for dev-sa on Fri, 25 Apr 2014 20:47:18 +0200
+* Configuration file generated for dev-sa on Sat, 26 Apr 2014 22:21:57 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\app\config\01-define.php **/
@@ -50,7 +50,7 @@ define('DB_HOST','localhost');
 define('DB_NAME','raptor-web');
 define('DB_USER','root');
 define('DB_PASS','');
-define('DB_DEBUG','true');
+define('DB_DEBUG',false);
 
 define('DB_DSN', DB_DRIVER . ':host=' . DB_HOST . ';dbname=' . DB_NAME );
 

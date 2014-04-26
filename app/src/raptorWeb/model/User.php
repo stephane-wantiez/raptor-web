@@ -21,7 +21,6 @@ class User extends ActiveRecord
 	public function __construct($id=0,$facebookId=0,$userName="",$password="",$firstName="",$lastName="",$email="")
 	{
 		parent::__construct('user',$id);
-		$this->registerClass('\raptorWeb\model\User');
 		$this->fillWithData($id,$facebookId,$userName,$password,$firstName,$lastName,$email);
 	}
 	
@@ -105,4 +104,6 @@ class User extends ActiveRecord
 			}
 		}
 	}
-}
+};
+
+ActiveRecord::registerClass('user','\raptorWeb\model\User');

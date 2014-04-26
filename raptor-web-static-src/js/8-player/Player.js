@@ -158,7 +158,14 @@ Player.prototype.setScore = function(value)
 
 Player.prototype.addScore = function(value)
 {
-	this.setScore( this.score + value );
+	var self = this;
+	serverManager.requestGameScoreUpdate(value,
+	function(data){
+		self.setScore(data);
+	},function(err){
+		alert('Error while updating player score: ' + err);
+		game.launchMainMenu();
+	});
 };
 
 Player.prototype.setSecWeapon = function(value)

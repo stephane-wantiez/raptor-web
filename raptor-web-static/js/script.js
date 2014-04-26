@@ -1,5 +1,5 @@
 /** 
-* Script file generated on Fri, 25 Apr 2014 20:47:18 +0200
+* Script file generated on Sat, 26 Apr 2014 22:21:57 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
@@ -548,29 +548,17 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 			data: ($.isDefined(data)) ? data : ''
 		},
 		success: function(res){
+			//alert('Success for request ' + action);
 			if ($.isDefined(successCallback))
 			{
-				if (res != '')
-				{
-					successCallback(res);
-				}
-				else
-				{
-					successCallback('');
-				}
+				successCallback(res);
 			}
 		},
-		error: function(err){			
+		error: function(err){
+			//alert('Failure for request ' + action);
 			if ($.isDefined(errorCallback))
 			{
-				if (err != '')
-				{
-					errorCallback(err);
-				}
-				else
-				{
-					errorCallback('');
-				}
+				errorCallback(JSON.stringify(err, null, '\n'));
 			}
 		}
 	});
@@ -578,7 +566,32 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 
 ServerManager.prototype.requestLevelData = function(levelNumber,successCallback,errorCallback)
 {
+	// send the request with the level number, receive the level properties if successful
 	this.sendRequest('get-level',levelNumber,successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestGameStart = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the score id if successful
+	this.sendRequest('game-start','',successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestGameScoreUpdate = function(scoreIncrement,successCallback,errorCallback)
+{
+	// send the request with the score increment, receive the new score if successful
+	this.sendRequest('game-score-update',scoreIncrement,successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestGameEnd = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the score id if successful
+	this.sendRequest('game-end','',successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestTopScores = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the array of 5 user's top scores maximum
+	this.sendRequest('user-top-scores','',successCallback,errorCallback);
 };
 
 
@@ -1682,7 +1695,9 @@ var LevelLoader = function()
 {
 	this.levelNumber = 0;
 	this.levelData = false;
+	this.levelScoreId = 0;
 	this.levelLoaded = false;
+	this.levelLaunched = false;
 	this.levelError = false;
 };
 
@@ -1691,7 +1706,9 @@ LevelLoader.prototype.loadLevel = function(levelNumber)
 	var self = this;
 	this.levelNumber = levelNumber;
 	this.levelData = false;
+	this.levelScoreId = 0;
 	this.levelLoaded = false;
+	this.levelLaunched = false;
 	this.levelError = false;
 	
 	serverManager.requestLevelData(levelNumber,
@@ -1708,14 +1725,54 @@ LevelLoader.prototype.loadLevel = function(levelNumber)
 LevelLoader.prototype.onLevelLoaded = function(levelData)
 {
 	this.levelData = levelData;
+	this.levelScoreId = 0;
 	this.levelLoaded = true;
+	this.levelLaunched = false;
 	this.levelError = false;
+	this.launchGame();
 };
 
 LevelLoader.prototype.onLevelLoadingError = function(error)
 {
 	this.levelData = false;
+	this.levelScoreId = 0;
 	this.levelLoaded = false;
+	this.levelLaunched = false;
+	this.levelError = error;
+};
+
+LevelLoader.prototype.launchGame = function()
+{
+	var self = this;
+	serverManager.requestGameStart(function(data)
+	{
+		self.onLevelLaunched(data);
+	},
+	function(error)
+	{
+		self.onLevelLoadingError(error);
+	});	
+	
+};
+
+LevelLoader.prototype.onLevelLaunched = function(levelScoreId)
+{
+	if (levelScoreId == 0)
+	{
+		this.onLevelLaunchError('Invalid score ID');
+	}
+	else
+	{
+		this.levelScoreId = levelScoreId;
+		this.levelLaunched = true;
+		this.levelError = false;
+	}
+};
+
+LevelLoader.prototype.onLevelLaunchError = function(error)
+{
+	this.levelScoreId = 0;
+	this.levelLaunched = false;
 	this.levelError = error;
 };
 
@@ -1729,9 +1786,19 @@ LevelLoader.prototype.getLevelData = function()
 	return this.levelData;
 };
 
+LevelLoader.prototype.getLevelScoreId = function()
+{
+	return this.levelScoreId;
+};
+
 LevelLoader.prototype.isLevelLoaded = function()
 {
 	return this.levelLoaded;
+};
+
+LevelLoader.prototype.isLevelLaunched = function()
+{
+	return this.levelLaunched;
 };
 
 LevelLoader.prototype.isLevelLoadingFailed = function()
@@ -1840,7 +1907,26 @@ Scene.prototype.loadLevel = function(levelProperties)
 
 Scene.prototype.reloadLevel = function()
 {
-	this.loadLevel(this.currentLevel);
+	var self = this;
+	serverManager.requestGameStart(function(data){
+		self.loadLevel(self.currentLevel);
+	},function(err){
+		alert('Error while starting level: ' + err);
+		game.launchMainMenu();
+	});
+};
+
+Scene.prototype.onGameEnd = function(victory)
+{
+	this.timeSinceEndMs = Date.now();
+	this.state = Scene.State.ENDGAME;
+	serverManager.requestGameEnd(function(data){
+		if (victory) game.onVictory();
+		else game.onGameOver();
+	},function(err){
+		alert('Error while ending game: ' + err);
+		game.launchMainMenu();
+	});
 };
 
 Scene.prototype.launchMusic = function(mode,loop)
@@ -2027,17 +2113,13 @@ Scene.prototype.updateState = function()
 			}
 			else
 			{
-				this.timeSinceEndMs = Date.now();
-				game.onVictory();
-				this.state = Scene.State.ENDGAME;
+				this.onGameEnd(true);
 			}
 			break;
 		}
 		case Scene.State.DEAD :
 		{
-			this.timeSinceEndMs = Date.now();
-			game.onGameOver();
-			this.state = Scene.State.ENDGAME;
+			this.onGameEnd(false);
 			break;
 		}
 		case Scene.State.RESTARTING :
@@ -2266,6 +2348,11 @@ var MainMenu = function()
 			type : "option",
 			caption : "Launch Level 1",
 			clickCallback : function(){ game.launchLevel(1); }
+		},	
+		top : {
+			type : "option",
+			caption : "Show top scores",
+			clickCallback : function(){ game.showTopScoresMenu(); }
 		},
 		logout : {
 			type : "option",
@@ -2294,13 +2381,13 @@ MainMenu.prototype.updateState = function(showMenu)
 	
     if(showMenu)
     {
-    	this.music.playLoop();
+    	//this.music.playLoop();
     	this.$menuTitleScreen.addClass("visible");
     	this.$screen.addClass("paused");
     }
     else
     {
-    	this.music.stop();
+    	//this.music.stop();
     	this.$menuTitleScreen.removeClass("visible");
     	this.$screen.removeClass("paused");
     }
@@ -2345,6 +2432,82 @@ PauseMenu.prototype.updateState = function(paused)
     }
     else
     {
+    	this.$screen.removeClass("paused");
+    }
+};
+
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\TopScoresMenu.js **/
+
+var TopScoresMenu = function()
+{
+	this.music = assetManager.getSound("music-menu");
+	this.scores = [];
+	var self = this;
+	
+	var items = {
+		list : {
+			type : "text",
+			captionCallback : function(){ return self.getTopScores(); }
+		},
+		back : {
+			type : "option",
+			caption : "Back",
+			clickCallback : function(){ game.launchMainMenu(); }
+		}
+	};
+	
+	MenuFrame.call(this,"top-scores","Top Scores",items);	
+	this.$screen = $("#screen");
+};
+
+TopScoresMenu.prototype = new MenuFrame();
+
+TopScoresMenu.prototype.getTopScores = function()
+{
+	var scoresDiv = $('<div/>');
+	var scoreList = $('<table/>').addClass("top-scores-table");
+	scoresDiv.append(scoreList);
+	
+	for(var scoreIndex in this.scores)
+	{
+		var score = this.scores[scoreIndex];
+		var scoreItem = $('<tr/>').addClass("top-score-item");
+		var scoreValue = $('<td/>').addClass("top-score-value").append(score.value);
+		var scoreDate = $('<td/>').addClass("top-score-date");
+		var scoreDT = new Date(score.gameDT * 1000).toLocaleDateString(LOCALE.replace('_','-'));
+		scoreDate.append(scoreDT);
+		scoreItem.append(scoreValue);
+		scoreItem.append(scoreDate);
+		scoreList.append(scoreItem);
+	}
+
+	return scoresDiv.html();
+};
+
+TopScoresMenu.prototype.updateState = function(showMenu)
+{	
+	var self = this;
+	
+    if(showMenu)
+    {
+    	serverManager.requestTopScores(function(data)
+    	{
+    		self.scores = data;
+    		MenuFrame.prototype.updateState.call(self,showMenu);
+    		//self.music.playLoop();
+    		self.$screen.addClass("paused");
+    	}
+    	,function(err)
+    	{
+    		alert("Can't get top scores from server: " + err);
+    		game.launchMainMenu();
+    	});
+    }
+    else
+    {
+		MenuFrame.prototype.updateState.call(self,false);
+    	//this.music.stop();
     	this.$screen.removeClass("paused");
     }
 };
@@ -2522,7 +2685,14 @@ Player.prototype.setScore = function(value)
 
 Player.prototype.addScore = function(value)
 {
-	this.setScore( this.score + value );
+	var self = this;
+	serverManager.requestGameScoreUpdate(value,
+	function(data){
+		self.setScore(data);
+	},function(err){
+		alert('Error while updating player score: ' + err);
+		game.launchMainMenu();
+	});
 };
 
 Player.prototype.setSecWeapon = function(value)
@@ -2803,6 +2973,7 @@ Game.prototype.onAssetsLoaded = function()
 	player = new Player(config.PLAYER);
 	
 	this.mainMenu = new MainMenu();
+	this.topScoresMenu = new TopScoresMenu();
 	this.pauseMenu = new PauseMenu();
 	this.victoryMenu = new VictoryMenu();
 	this.gameOverMenu = new GameOverMenu();
@@ -2816,18 +2987,26 @@ Game.prototype.launchMainMenu = function()
 	player.reset();
 	
 	this.state = Game.State.MAIN_MENU;
-	this.mainMenu.updateState(true);
+	this.topScoresMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	this.pauseMenu.updateState(false);
+	this.mainMenu.updateState(true);
 	this.pause = true;
 	this.started = false;
+};
+
+Game.prototype.showTopScoresMenu = function()
+{
+	this.mainMenu.updateState(false);
+	this.topScoresMenu.updateState(true);
 };
 
 Game.prototype.launchLevel = function(levelNumber)
 {
 	this.state = Game.State.LEVEL_LOAD;
 	this.mainMenu.updateState(false);
+	this.topScoresMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	levelLoader.loadLevel(levelNumber);
@@ -2960,16 +3139,21 @@ Game.prototype.mainLoop = function()
     		{
     			var errorMsg = 'Error while loading level ' + levelLoader.getLevelNumber() + ': ' + JSON.stringify(levelLoader.getLevelLoadingError(), null, '\n');
     			alert(errorMsg);
-    			this.state = Game.State.MAIN_MENU;
+    			this.launchMainMenu();
     		}
-    		else if (levelLoader.isLevelLoaded())
+    		else if (levelLoader.isLevelLaunched())
     		{
     			console.log('Switching to state LEVEL_LOAD_END');
     			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.8, 1);
     			//alert(JSON.stringify(levelLoader.getLevelData(), null, '\n'));
+    			//alert(levelLoader.getLevelScoreId());
     			this.startLevel(levelLoader.getLevelData());
             	this.timeSinceLoadingEnd = currentTimeMs;
     			this.state = Game.State.LEVEL_LOAD_END;
+    		}
+    		else if (levelLoader.isLevelLoaded())
+    		{
+    			this.showLoadingScreen(this.graphics, 'Loading level ' + levelLoader.getLevelNumber(), 30, 0.5, 1);
     		}
     		else
     		{

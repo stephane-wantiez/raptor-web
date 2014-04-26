@@ -37,7 +37,26 @@ Scene.prototype.loadLevel = function(levelProperties)
 
 Scene.prototype.reloadLevel = function()
 {
-	this.loadLevel(this.currentLevel);
+	var self = this;
+	serverManager.requestGameStart(function(data){
+		self.loadLevel(self.currentLevel);
+	},function(err){
+		alert('Error while starting level: ' + err);
+		game.launchMainMenu();
+	});
+};
+
+Scene.prototype.onGameEnd = function(victory)
+{
+	this.timeSinceEndMs = Date.now();
+	this.state = Scene.State.ENDGAME;
+	serverManager.requestGameEnd(function(data){
+		if (victory) game.onVictory();
+		else game.onGameOver();
+	},function(err){
+		alert('Error while ending game: ' + err);
+		game.launchMainMenu();
+	});
 };
 
 Scene.prototype.launchMusic = function(mode,loop)
@@ -224,17 +243,13 @@ Scene.prototype.updateState = function()
 			}
 			else
 			{
-				this.timeSinceEndMs = Date.now();
-				game.onVictory();
-				this.state = Scene.State.ENDGAME;
+				this.onGameEnd(true);
 			}
 			break;
 		}
 		case Scene.State.DEAD :
 		{
-			this.timeSinceEndMs = Date.now();
-			game.onGameOver();
-			this.state = Scene.State.ENDGAME;
+			this.onGameEnd(false);
 			break;
 		}
 		case Scene.State.RESTARTING :

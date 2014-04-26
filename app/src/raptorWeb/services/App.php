@@ -258,19 +258,23 @@ class App
 		    		break;
 		    		
 		    	case 'game-start':
-		   			UserService::onGameStart($user);
+		   			$res = UserService::onGameStart($user);
 		   			break;
 		    			
 		   		case 'game-score-update':
 		   			$this->checkSessionScore();
 		   			$score = $_SESSION['score'];
-		   			UserService::onGameScoreUpdate($score, $data, false);
+		   			$res = UserService::onGameScoreUpdate($score, $data);
 		   			break;
 		    			
 		   		case 'game-end':
 		   			$this->checkSessionScore();
 		   			$score = $_SESSION['score'];
-		   			UserService::onGameScoreUpdate($score, $data, true);
+		   			$res = UserService::onGameEnd($score);
+		   			break;
+		   		
+		   		case 'user-top-scores':
+		   			$res = UserService::listTopScores($user);
 		   			break;
 		    }
    		}

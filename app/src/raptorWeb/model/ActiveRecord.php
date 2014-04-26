@@ -14,9 +14,9 @@ abstract class ActiveRecord
 		$this->id = (int) $id;
 	}
 	
-	protected function registerClass($objectName)
+	public static function registerClass($tableName,$objectName)
 	{
-		self::$tableToClass[$this->tableName] = $objectName;
+		self::$tableToClass[$tableName] = $objectName;
 	}
 	
 	protected static function createRecordForTable($tableName)
@@ -159,13 +159,17 @@ abstract class ActiveRecord
 		$this->id = $data->id;
 	}
 	
-	public static function select($tableName,$selectParams,$orderParams=null)
+	public static function select($tableName,$selectParams,$orderParams=null,$limit=0)
 	{		
 		$queryStr = 'SELECT * FROM ' . $tableName ;
 		$queryStr .= ' WHERE ' . self::completeQueryWithParams($selectParams,' AND ') ;
 		if ($orderParams && count($orderParams))
 		{
 			$queryStr .= ' ORDER BY ' . self::completeQueryWithOrderByParams($orderParams);
+		}
+		if ($limit != 0)
+		{
+			$queryStr .= ' LIMIT ' . $limit;
 		}
 		 	
 		$query = self::getDB()->prepare($queryStr);
@@ -176,17 +180,13 @@ abstract class ActiveRecord
 			throw new DbException("Couldn't load ' . $this->tableName . ' with keys ' . $dbParams . ' from DB");
 		}
 		
-		$tuples = $query->fetchAll();
 		$res = [];
 		
-		if ($tuples)
+		while($tuple = $query->fetch())
 		{
-			foreach( $tuples as $tuple )
-			{
-				$record = self::createRecordForTable($tableName);
-				$record->fillWithDbTuple($tuple);
-				$res[] = $record;
-			}
+			$record = self::createRecordForTable($tableName);
+			$record->fillWithDbTuple($tuple);
+			$res[] = $record;
 		}
 		
 		return $res;

@@ -2,9 +2,6 @@
 <script>
     var config = <?php echo json_encode($_SESSION['config'],JSON_PRETTY_PRINT ); ?>;
 	var user = <?php echo $_SESSION['user']->toJSON(); ?>;
-	<?php if (isset($_SESSION['score'])) { ?>
-	var score = <?php echo $_SESSION['score']->toJSON(); ?>;
-	<?php } ?>
 	var nofblogin = <?php echo ( isset($_SESSION['nofb']) && $_SESSION['nofb'] ? 'true' : 'false' ); ?>;
 	var ENCRYPT_ENABLED = <?php echo (ENCRYPT_ENABLED ? 'true' : 'false'); ?>;
 	var FB_APP_ID = "<?php if (defined('FB_APP_ID')) { echo FB_APP_ID; } ?>";
