@@ -19,8 +19,8 @@ SET time_zone = "+00:00";
 --
 -- Base de données: `raptor-web`
 --
-CREATE DATABASE IF NOT EXISTS `raptor-web` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `raptor-web`;
+CREATE DATABASE IF NOT EXISTS `swantiez_raptor_web` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `swantiez_raptor_web`;
 
 -- --------------------------------------------------------
 
@@ -169,18 +169,6 @@ INSERT INTO `enemy_type` (`id`, `name`, `type`, `boss`) VALUES
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `enemy_type_boss`
---
-DROP VIEW IF EXISTS `enemy_type_boss`;
-CREATE TABLE IF NOT EXISTS `enemy_type_boss` (
-`id` int(10) unsigned
-,`name` varchar(32)
-,`type` varchar(64)
-,`boss` tinyint(1)
-);
--- --------------------------------------------------------
-
---
 -- Structure de la table `level`
 --
 
@@ -243,13 +231,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=14 ;
 
 -- --------------------------------------------------------
-
---
--- Structure de la vue `enemy_type_boss`
---
-DROP TABLE IF EXISTS `enemy_type_boss`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `enemy_type_boss` AS select `enemy_type`.`id` AS `id`,`enemy_type`.`name` AS `name`,`enemy_type`.`type` AS `type`,`enemy_type`.`boss` AS `boss` from `enemy_type` where (`enemy_type`.`boss` = 1);
 
 --
 -- Contraintes pour les tables exportées

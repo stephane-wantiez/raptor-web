@@ -1,6 +1,6 @@
 <?php 
 /** 
-* Configuration file generated for dev-sa on Sun, 27 Apr 2014 17:45:52 +0200
+* Configuration file generated for prod-sa on Sun, 27 Apr 2014 20:18:09 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\app\config\01-define.php **/
@@ -43,19 +43,19 @@ session_name('RAPTOR_WEB_SESSID');
 session_start();
 
 
-/** From file D:\GitHub\raptor-web\app\config\dev-sa\10-database.php **/
+/** From file D:\GitHub\raptor-web\app\config\prod-sa\10-database.php **/
 
 define('DB_DRIVER','mysql');
 define('DB_HOST','localhost');
-define('DB_NAME','raptor-web');
-define('DB_USER','root');
-define('DB_PASS','');
+define('DB_NAME','swantiez_raptor_web');
+define('DB_USER','swantiez_test');
+define('DB_PASS','QmuI2A75lovf');
 define('DB_DEBUG',false);
 
 define('DB_DSN', DB_DRIVER . ':host=' . DB_HOST . ';dbname=' . DB_NAME );
 
 
-/** From file D:\GitHub\raptor-web\app\config\dev-sa\10-uri.php **/
+/** From file D:\GitHub\raptor-web\app\config\prod-sa\10-uri.php **/
 
-define( 'WEB_STATIC_URI', '/raptor-web-static/' );
+define( 'WEB_STATIC_URI', '/raptor-web/raptor-web-static/' );
 
