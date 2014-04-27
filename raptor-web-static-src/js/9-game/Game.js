@@ -38,9 +38,7 @@ Game.SUBTITLE = "a game by Stephane Wantiez";
 
 Game.prototype.initAssets = function()
 {
-    var assetsPath = "/raptor-web-static/";
-    
-    var imagesPath = assetsPath + "img/";
+    var imagesPath = webStaticUri + "img/";
     var imageList = {
         "title"            : imagesPath +            "title.png",
         "background-ocean" : imagesPath + "background-ocean.png",
@@ -54,7 +52,7 @@ Game.prototype.initAssets = function()
         "boss1"            : imagesPath +     "sprite_boss1.png"
     };
 
-    var soundsPath = assetsPath + "sounds/";
+    var soundsPath = webStaticUri + "sounds/";
     var soundList = {
         "shoot_basic"   : soundsPath +   "shoot_basic.wav",
         "bullet_hit"    : soundsPath +    "bullet_hit.wav",

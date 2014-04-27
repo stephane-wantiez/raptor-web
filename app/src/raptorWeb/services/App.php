@@ -75,6 +75,7 @@ class App
     	}
     	else
     	{
+    		$_SESSION['nofb'] = true;
     		$this->runStandalone();
     	}
     }

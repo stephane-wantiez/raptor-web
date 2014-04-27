@@ -84,7 +84,7 @@ class User extends ActiveRecord
 			'firstname' => $this->firstName,
 			'lastname'  => $this->lastName,
 			'friends'   => $this->friends
-		), JSON_PRETTY_PRINT );
+		));
 	}
 	
 	public function setFriendsFromFacebookIds($friendsFacebookId)

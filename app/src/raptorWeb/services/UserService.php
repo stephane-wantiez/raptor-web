@@ -92,7 +92,6 @@ class UserService
 		if ($userFound && self::validatePassword($password, $user->password))
 		{
 			$_SESSION['user'] = $user;
-			$_SESSION['nofb'] = true;
 			return $user;
 		}
 		else
