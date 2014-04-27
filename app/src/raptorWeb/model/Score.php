@@ -44,34 +44,34 @@ class Score extends ActiveRecord
 	
 	protected function getDbParamsForSaving()
 	{
-		return [ 'user_id'   => $this->userId,
-				 'game_dt'   => $this->gameDT,
-				 'value'     => $this->value,
-				 'game_done' => $this->gameDone ];
+		return array( 'user_id'   => $this->userId,
+				      'game_dt'   => $this->gameDT,
+				      'value'     => $this->value,
+				      'game_done' => $this->gameDone );
 	}
 	
 	protected function getDbParamsForReading()
 	{
-		return [ 'user_id' => $this->userId,
-				 'game_dt' => $this->gameDT ];
+		return array( 'user_id' => $this->userId,
+				      'game_dt' => $this->gameDT );
 	}
 	
 	public static function listForUser($userId,$limit=0)
 	{
-		$selectParams = [ 'score.game_dt game_dt', 'score.value value', 'user.username user' ];
+		$selectParams = array( 'score.game_dt game_dt', 'score.value value', 'user.username user' );
 		$customQueryPart = 'LEFT JOIN user ON user.id=score.user_id';
-		$whereParams = [ 'game_done' => true ];
+		$whereParams = array( 'game_done' => true );
 		if ($userId)
 		{
 			$whereParams['user_id'] = $userId;
 		}
-		$orderParams = [ 'score.value' => 'DESC' , 'score.game_dt' => 'DESC' ];
+		$orderParams = array( 'score.value' => 'DESC' , 'score.game_dt' => 'DESC' );
 		return Score::select('score', $selectParams, $customQueryPart, $whereParams, $orderParams, $limit, false);
 	}
 	
 	public static function purgeOrphansForUser($userId)
 	{
-		Score::bulkDelete('score', [ 'user_id' => $userId, 'game_done' => false ]);
+		Score::bulkDelete('score', array( 'user_id' => $userId, 'game_done' => false ));
 	}
 	
 	public function initForUser($userId)
@@ -84,13 +84,13 @@ class Score extends ActiveRecord
 	
 	public function toJSON()
 	{
-		return json_encode([
+		return json_encode(array(
 			'id'       => $this->id,
 			'userId'   => $this->userId,
 			'gameDT'   => $this->gameDT,
 			'value'    => $this->value,
 			'gameDone' => $this->gameDone
-		], JSON_PRETTY_PRINT );
+		), JSON_PRETTY_PRINT );
 	}
 };
 

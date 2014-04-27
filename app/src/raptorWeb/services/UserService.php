@@ -40,7 +40,7 @@ class UserService
 	{
 		$userScores = \raptorWeb\model\Score::listForUser($user->id, 5);
 		$allScores  = \raptorWeb\model\Score::listForUser(0, 5);
-		$topScores = [];
+		$topScores = array();
 		$topScores['user'] = $userScores;
 		$topScores['all' ] = $allScores;
 		return $topScores;
@@ -85,7 +85,7 @@ class UserService
 	public static function loginUser($userName,$password)
 	{		
 		$user = new \raptorWeb\model\User();
-		$userFound = $user->read([ 'username' => $userName ]);
+		$userFound = $user->read(array( 'username' => $userName ));
 		
 		//if (!$userFound) throw new UserException('No such user found');
 	
@@ -114,7 +114,7 @@ class UserService
 		$fbUser = $fb->api('/me');
 		
 		$user = new \raptorWeb\model\User();
-		$userFound = $user->read([ 'fb_id' => $fbUserId ]);
+		$userFound = $user->read(array( 'fb_id' => $fbUserId ));
 		
 		// if none, register FB user
 		if (!$userFound)
@@ -136,7 +136,7 @@ class UserService
 		
 		if ($friends && isset($friends["data"]))
 		{
-			$friendsId = [];
+			$friendsId = array();
 			
 			foreach($friends['data'] as $friend)
 			{

@@ -6,7 +6,7 @@ abstract class ActiveRecord
 {	
 	protected $tableName;
 	public $id;
-	protected static $tableToClass = [];
+	protected static $tableToClass = array();
 	
 	protected function __construct($tableName,$id=0)
 	{
@@ -35,7 +35,7 @@ abstract class ActiveRecord
 		if (DB_DEBUG) echo $info;
 	}
 	
-	protected static function debugQuery($queryName,$query,$params=[])
+	protected static function debugQuery($queryName,$query,$params=array())
 	{
 		if (DB_DEBUG)
 		{
@@ -198,7 +198,7 @@ abstract class ActiveRecord
 			throw new DbException("Couldn't load ' . $this->tableName . ' with keys ' . $dbParams . ' from DB");
 		}
 		
-		$res = [];
+		$res = array();
 		
 		while($tuple = $query->fetch())
 		{
@@ -219,7 +219,7 @@ abstract class ActiveRecord
 	
 	public function read($readParams=null)
 	{
-		if ($readParams == null) $readParams = [ 'id' => $this->id ];
+		if ($readParams == null) $readParams = array( 'id' => $this->id );
 		
 		$res = self::select( $this->tableName, null, '', $readParams, null, 1 );
 		
@@ -236,13 +236,13 @@ abstract class ActiveRecord
 	
 	public function readWithId($id)
 	{
-		return $this->read([ 'id' => $id ]);
+		return $this->read(array( 'id' => $id ));
 	}
 	
 	public function update($updateParams=null,$selectParams=null)
 	{
 		if ($updateParams == null) $updateParams = $this->getDbParamsForSaving();
-		if ($selectParams == null) $selectParams = [ 'id' => $this->id ];
+		if ($selectParams == null) $selectParams = array( 'id' => $this->id );
 		
 		$updateQueryParams = self::completeQueryWithParams($updateParams) ;
 		$selectQueryParams = self::completeQueryWithParams($selectParams, ' AND ') ;
@@ -274,7 +274,7 @@ abstract class ActiveRecord
 	
 	public function delete($deleteParams=null)
 	{
-		if ($deleteParams == null) $deleteParams = [ 'id' => $this->id ];
+		if ($deleteParams == null) $deleteParams = array( 'id' => $this->id );
 		self::bulkDelete($this->tableName, $deleteParams);
 	}
 }

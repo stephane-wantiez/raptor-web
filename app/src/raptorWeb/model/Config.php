@@ -21,7 +21,7 @@ class Config
 		}
 		
 		$configTuples = $query->fetchAll();
-		$config = [];
+		$config = array();
 		
 		if ($configTuples)
 		{
@@ -29,7 +29,7 @@ class Config
 			{
 				if (!isset($config[$configTuple->type]))
 				{
-					$config[$configTuple->type] = [];
+					$config[$configTuple->type] = array();
 				}
 				
 				$config[$configTuple->type][$configTuple->id] = (double) $configTuple->value;

@@ -14,7 +14,7 @@ class Level
 		
 		$query = $db->prepare($queryStr);
 		
-		if (!$query->execute([ 'number' => $levelNumber ]))
+		if (!$query->execute(array( 'number' => $levelNumber )))
 		{
 			throw new DbException("Couldn't load level with number ' . $levelNumber . ' from DB");
 		}
@@ -26,7 +26,7 @@ class Level
 		$level['number'] = $levelNumber;
 		$level['name'] = $levelTuple->name;
 		$level['background'] = $levelTuple->background;
-		$level['musics'] = [];
+		$level['musics'] = array();
 		$level['musics']['fight'  ] = $levelTuple->music_fight;
 		$level['musics']['boss'   ] = $levelTuple->music_boss;
 		$level['musics']['victory'] = $levelTuple->music_victory;
@@ -45,7 +45,7 @@ class Level
 	
 		$query = $db->prepare($queryStr);
 	
-		if (!$query->execute([ 'number' => $levelNumber ]))
+		if (!$query->execute(array( 'number' => $levelNumber )))
 		{
 			throw new DbException("Couldn't load level with number ' . $levelNumber . ' from DB");
 		}
@@ -70,17 +70,17 @@ class Level
 		
 		$query = $db->prepare($queryStr);
 		
-		if (!$query->execute([ 'level' => $level['id'] ]))
+		if (!$query->execute(array( 'level' => $level['id'] )))
 		{
 			throw new DbException("Couldn't load enemies of level with id ' . $level->id . ' from DB");
 		}
 		
-		$level['boss'] = [];
-		$level['enemies'] = [];
+		$level['boss'] = array();
+		$level['enemies'] = array();
 		
 		while($enemyTuple = $query->fetch())
 		{
-			$enemy = [];
+			$enemy = array();
 			$enemy['type'] = $enemyTuple->type;
 			$enemy['posX'] = (int) $enemyTuple->posX;
 			$enemy['posY'] = (int) $enemyTuple->posY;
@@ -98,7 +98,7 @@ class Level
 	
 	public static function readLevel($levelNumber)
 	{
-		$level = [];		
+		$level = array();		
 		$levelFound = self::readLevelProperties($levelNumber, $level);
 		
 		if ($levelFound)
@@ -119,7 +119,7 @@ class Level
 		$queryStr .= ' VALUES';
 		$queryStr .= ' ( :name, :number, :background, :music_boss, :music_defeat, :music_fight, :music_victory )';
 		
-		$levelParams = [];
+		$levelParams = array();
 		$levelParams['name'         ] = $level['name'      ];
 		$levelParams['number'       ] = $level['number'    ];
 		$levelParams['background'   ] = $level['background'];
@@ -146,7 +146,7 @@ class Level
 		
 		$query = $db->prepare($queryStr);
 		
-		if (!$query->execute([ 'type' => $enemyType ]))
+		if (!$query->execute(array( 'type' => $enemyType )))
 		{
 			throw new DbException("Couldn't load enemy type with type ' . $enemyType . ' from DB");
 		}
@@ -168,7 +168,7 @@ class Level
 		$queryStr .= ' VALUES';
 		$queryStr .= ' ( :name, :type, :boss )';
 		
-		$enemyTypeParams = [];
+		$enemyTypeParams = array();
 		$enemyTypeParams['name'] = $enemyType;
 		$enemyTypeParams['type'] = $enemyType;
 		$enemyTypeParams['boss'] = $boss;
@@ -206,7 +206,7 @@ class Level
 		$queryStr .= ' VALUES';
 		$queryStr .= ' ( :type, :level, :pos_x, :pos_y )';
 		
-		$enemyParams = [];
+		$enemyParams = array();
 		$enemyParams['type' ] = $enemyTypeId;
 		$enemyParams['level'] = $levelId;
 		$enemyParams['pos_x'] = $enemy['posX'];
@@ -222,7 +222,7 @@ class Level
 	
 	private static function insertLevelEnemies($levelId, &$level)
 	{		
-		$enemyTypeIdCache = [];
+		$enemyTypeIdCache = array();
 		
 		foreach ($level['boss'] as $boss)
 		{

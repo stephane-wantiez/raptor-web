@@ -52,10 +52,10 @@ class App
 	
 	public static function authentifyOnFacebook(\Facebook $fb)
 	{
-		$fbLoginUrl = $fb->getLoginUrl([
+		$fbLoginUrl = $fb->getLoginUrl(array(
 			'scope'        => 'email,user_likes,publish_actions',
 			'redirect_uri' => 'https://apps.facebook.com' . FB_APP_NAMESPACE
-		]);
+		));
 		
 		die('<!doctype html><html><body>
 			 	<script>
@@ -81,10 +81,10 @@ class App
     
     private function runFacebook()
     {
-    	$this->fb = new \Facebook([
+    	$this->fb = new \Facebook(array(
 			'appId'  => FB_APP_ID,
     		'secret' => FB_APP_SECRET	
-    	]);
+    	));
         
     	// received requests from other users in app
         if (isset($_SESSION['request_ids']))
@@ -136,7 +136,7 @@ class App
 	        {
 	        	$_SESSION['user']->delete();
 	        	session_destroy();
-				$this->reloadPageWithParams(['user-deleted' => 1]);
+				$this->reloadPageWithParams(array( 'user-deleted' => 1 ));
 	        }
 	        else if (isset($_REQUEST['action-login']) || isset($_REQUEST['action-register']))
 	        {
@@ -175,7 +175,7 @@ class App
 		                		try
 		                		{
 		                			UserService::registerUser($userName, $password, $firstName, $lastName, $email, 0, true);
-		                			$this->reloadPageWithParams(['user-created' => $userName]);
+		                			$this->reloadPageWithParams(array( 'user-created' => $userName ));
 		                		}
 		                		catch(Exception $e)
 		                		{
@@ -280,7 +280,7 @@ class App
    		}
    		catch(UserException $e)
    		{
-   			$res = [ 'error' => $e->getMessage(), 'reload' => true ];
+   			$res = array( 'error' => $e->getMessage(), 'reload' => true );
    		}
    		
 		if ($res) echo json_encode($res);

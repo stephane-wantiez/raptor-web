@@ -33,7 +33,7 @@ class User extends ActiveRecord
 		$this->firstName  = $firstName;
 		$this->lastName   = $lastName;
 		$this->email      = $email;
-		$this->friends    = [];
+		$this->friends    = array();
 	}
 	
 	protected function fillWithRecord($record)
@@ -61,30 +61,30 @@ class User extends ActiveRecord
 	
 	protected function getDbParamsForSaving()
 	{
-		return [ 'fb_id'      => $this->facebookId,
-		         'username'   => $this->userName,
-		         'password'   => $this->password,
-		         'firstname'  => $this->firstName,
-		         'lastname'   => $this->lastName,
-		         'email'      => $this->email ];
+		return array( 'fb_id'      => $this->facebookId,
+		              'username'   => $this->userName,
+		              'password'   => $this->password,
+		              'firstname'  => $this->firstName,
+		              'lastname'   => $this->lastName,
+		              'email'      => $this->email );
 	}
 	
 	protected function getDbParamsForReading()
 	{
-		return [ 'username' => $this->userName,
-				 'fb_id'    => $this->facebookId,
-				 'email'    => $this->email ];
+		return array( 'username' => $this->userName,
+				      'fb_id'    => $this->facebookId,
+				      'email'    => $this->email );
 	}
 	
 	public function toJSON()
 	{
-		return json_encode([
+		return json_encode(array(
 			'id'        => $this->id,
 			'username'  => $this->userName,
 			'firstname' => $this->firstName,
 			'lastname'  => $this->lastName,
 			'friends'   => $this->friends
-		], JSON_PRETTY_PRINT );
+		), JSON_PRETTY_PRINT );
 	}
 	
 	public function setFriendsFromFacebookIds($friendsFacebookId)
@@ -92,7 +92,7 @@ class User extends ActiveRecord
 		foreach ( $friendsFacebookId as $friendFacebookId )
 		{
 			$friendUser = new User();
-			$friendUserFound = $friendUser->read([ 'fb_id' => $friendFacebookId ]);
+			$friendUserFound = $friendUser->read(array( 'fb_id' => $friendFacebookId ));
 			
 			if ($friendUserFound)
 			{

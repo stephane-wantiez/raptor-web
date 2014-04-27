@@ -21,7 +21,7 @@ function buildConfig( $configType = 'dev' )
 	$secPath = $mainPath . $configType . '/';
 	$outputFileName = '../config.php';
 	
-	$filesContent = [];
+	$filesContent = array();
 	browseDir($mainPath,'.php',$filesContent, false);
 	browseDir($secPath ,'.php',$filesContent, false);
 	ksort($filesContent);

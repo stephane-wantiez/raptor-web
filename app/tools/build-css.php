@@ -7,7 +7,7 @@ function buildCss()
 	$basePath = '../../';
 	$sourcePath = $basePath . 'raptor-web-static-src/css';
 	$targetFile = $basePath . 'raptor-web-static/css/style.css';
-	$filesContent = [];
+	$filesContent = array();
 	
 	echo NL . NL . "Building CSS style file..." . NL;
 	echo "Source path: " . realpath($sourcePath) . NL;

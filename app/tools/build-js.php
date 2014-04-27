@@ -7,7 +7,7 @@ function buildJs()
 	$basePath = '../../';
 	$sourcePath = $basePath . 'raptor-web-static-src/js';
 	$targetFile = $basePath . 'raptor-web-static/js/script.js';
-	$filesContent = [];
+	$filesContent = array();
 	
 	echo NL . NL . "Building JavaScript script file..." . NL;
 	echo "Source path: " . realpath($sourcePath) . NL;
