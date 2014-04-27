@@ -223,17 +223,6 @@ CREATE TABLE IF NOT EXISTS `score` (
   KEY `game_done` (`game_done`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=39 ;
 
---
--- Contenu de la table `score`
---
-
-INSERT INTO `score` (`id`, `user_id`, `game_dt`, `value`, `game_done`) VALUES
-(33, 10, 1398536515, 79, 1),
-(34, 10, 1398536535, 710, 1),
-(35, 10, 1398543780, 626, 1),
-(36, 10, 1398543925, 0, 0),
-(38, 13, 1398613268, 12345, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -252,14 +241,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `fb_id` (`fb_id`,`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=14 ;
-
---
--- Contenu de la table `user`
---
-
-INSERT INTO `user` (`id`, `fb_id`, `username`, `password`, `firstname`, `lastname`, `email`) VALUES
-(10, 0, 'Lord W', 'sha256:1000:jHfBjE7+N8xGBS4yvmq24+N4yWehlMrc:e4i5++F0J4VryT3AcH7+gp3sSX55oyVu', 'Stéphane', 'Wantiez', 'stephane.wantiez@gmail.com'),
-(13, 42, 'robert_mitchum', '42', 'Robert', 'Mitchum', 'robert.mitchum@mymail.com');
 
 -- --------------------------------------------------------
 
