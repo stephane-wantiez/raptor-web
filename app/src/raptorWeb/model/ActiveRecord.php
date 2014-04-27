@@ -159,10 +159,26 @@ abstract class ActiveRecord
 		$this->id = $data->id;
 	}
 	
-	public static function select($tableName,$selectParams,$orderParams=null,$limit=0)
+	public static function select($tableName,$selectParams=null,$customQueryPart='',$whereParams=null,$orderParams=null,$limit=0,$returnObjects=true)
 	{		
-		$queryStr = 'SELECT * FROM ' . $tableName ;
-		$queryStr .= ' WHERE ' . self::completeQueryWithParams($selectParams,' AND ') ;
+		$queryStr = 'SELECT ';
+		if ($selectParams && count($selectParams))
+		{
+			$queryStr .= join(', ', $selectParams);
+		}
+		else
+		{
+			$queryStr .= '*';
+		}
+		$queryStr .= ' FROM ' . $tableName ;
+		if ($customQueryPart != '')
+		{
+			$queryStr .= ' ' . $customQueryPart;
+		}
+		if ($whereParams && count($whereParams))
+		{
+			$queryStr .= ' WHERE ' . self::completeQueryWithParams($whereParams,' AND ') ;
+		}
 		if ($orderParams && count($orderParams))
 		{
 			$queryStr .= ' ORDER BY ' . self::completeQueryWithOrderByParams($orderParams);
@@ -171,11 +187,13 @@ abstract class ActiveRecord
 		{
 			$queryStr .= ' LIMIT ' . $limit;
 		}
-		 	
+		 
+		//die("Query: " . $queryStr);
 		$query = self::getDB()->prepare($queryStr);
 		self::debugQuery('select', $queryStr, $selectParams);
+		
 	
-		if (!$query->execute($selectParams))
+		if (!$query->execute($whereParams))
 		{
 			throw new DbException("Couldn't load ' . $this->tableName . ' with keys ' . $dbParams . ' from DB");
 		}
@@ -184,9 +202,16 @@ abstract class ActiveRecord
 		
 		while($tuple = $query->fetch())
 		{
-			$record = self::createRecordForTable($tableName);
-			$record->fillWithDbTuple($tuple);
-			$res[] = $record;
+			if ($returnObjects)
+			{
+				$record = self::createRecordForTable($tableName);
+				$record->fillWithDbTuple($tuple);
+				$res[] = $record;
+			}
+			else
+			{
+				$res[] = $tuple;
+			}
 		}
 		
 		return $res;
@@ -196,7 +221,7 @@ abstract class ActiveRecord
 	{
 		if ($readParams == null) $readParams = [ 'id' => $this->id ];
 		
-		$res = self::select($this->tableName,$readParams);
+		$res = self::select( $this->tableName, null, '', $readParams, null, 1 );
 		
 		if ($res && count($res))
 		{

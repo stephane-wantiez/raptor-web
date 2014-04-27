@@ -38,7 +38,12 @@ class UserService
 	
 	public static function listTopScores($user)
 	{
-		return \raptorWeb\model\Score::listForUser($user->id, 5);
+		$userScores = \raptorWeb\model\Score::listForUser($user->id, 5);
+		$allScores  = \raptorWeb\model\Score::listForUser(0, 5);
+		$topScores = [];
+		$topScores['user'] = $userScores;
+		$topScores['all' ] = $allScores;
+		return $topScores;
 	}
 	
 	private static function getPasswordHash($password)

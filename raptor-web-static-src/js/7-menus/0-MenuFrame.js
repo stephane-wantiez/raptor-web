@@ -9,8 +9,18 @@ var MenuFrame = function(menuId,title,items,menuExtraClass,menuTitleExtraClass)
 		this.$menuFrame.addClass(menuExtraClass);
 	}
 	
-	this.$title = $("<div/>").addClass("menu-frame-title").attr("id",menuId + "-title").append(title);
+	this.$title = $("<div/>").addClass("menu-frame-title").attr("id",menuId + "-title");
 	this.$menuFrame.append(this.$title);
+	
+	this.titleCallback = false;
+	var titleStr = title;
+	if ($.isFunction(title))
+	{
+		titleStr = title();
+		this.titleCallback = title;
+	}
+	this.$title.html(titleStr);
+	
 	if ($.isDefined(menuTitleExtraClass))
 	{
 		this.$title.addClass(menuTitleExtraClass);
@@ -63,6 +73,11 @@ var MenuFrame = function(menuId,title,items,menuExtraClass,menuTitleExtraClass)
 
 MenuFrame.prototype.refreshCaptions = function()
 {
+	if (this.titleCallback)
+	{
+		this.$title.html(this.titleCallback());
+	}
+	
 	for (var itemId in this.$itemCaptionCallbacks)
 	{
 		var div = this.$itemDivs[itemId];

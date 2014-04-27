@@ -98,6 +98,11 @@ $.isDefined = function(value)
 	return (typeof(value) != "undefined");
 };
 
+$.isFunction = function(item)
+{
+	return (item instanceof Function);
+};
+
 $.clampValue = function(value, min, max)
 {
 	if (value < min)

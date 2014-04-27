@@ -147,10 +147,11 @@
     top: 50%;
     left: 50%;
     margin-top: -250px;
-    margin-left: -50px;
-    width: 100px;
+    margin-left: -150px;
+    width: 300px;
     font-family: CutOutsFLF;
     text-align:center;
+    text-decoration: underline;
 }
 #top-scores-list{
     font-size: 14px;
@@ -160,11 +161,21 @@
     width: 200px;
     height:400px;
 }
+#top-scores-change{
+    top: 50%;
+    margin-top: 250px;
+    margin-left: -160px;
+    width: 150px;
+    height:40px;
+    vertical-align: middle;
+}
 #top-scores-back{
     top: 50%;
     margin-top: 250px;
-    margin-left: -50px;
+    margin-left: 20px;
     width: 100px;
+    height:40px;
+    vertical-align: middle;
 }
 
 #pause-menu{

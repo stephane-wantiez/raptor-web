@@ -58,9 +58,15 @@ class Score extends ActiveRecord
 	
 	public static function listForUser($userId,$limit=0)
 	{
-		$selectParams = [ 'user_id' => $userId, 'game_done' => true ];
-		$orderParams = [ 'value' => 'DESC' , 'game_dt' => 'DESC' ];
-		return Score::select('score', $selectParams, $orderParams, $limit);
+		$selectParams = [ 'score.game_dt game_dt', 'score.value value', 'user.username user' ];
+		$customQueryPart = 'LEFT JOIN user ON user.id=score.user_id';
+		$whereParams = [ 'game_done' => true ];
+		if ($userId)
+		{
+			$whereParams['user_id'] = $userId;
+		}
+		$orderParams = [ 'score.value' => 'DESC' , 'score.game_dt' => 'DESC' ];
+		return Score::select('score', $selectParams, $customQueryPart, $whereParams, $orderParams, $limit, false);
 	}
 	
 	public static function purgeOrphansForUser($userId)
