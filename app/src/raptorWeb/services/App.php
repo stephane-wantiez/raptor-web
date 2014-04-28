@@ -49,20 +49,6 @@ class App
     	header($loc);
     	exit;
     }
-	
-	public static function authentifyOnFacebook(\Facebook $fb)
-	{
-		$fbLoginUrl = $fb->getLoginUrl(array(
-			'scope'        => 'email,user_likes,publish_actions',
-			'redirect_uri' => 'https://apps.facebook.com' . FB_APP_NAMESPACE
-		));
-		
-		die('<!doctype html><html><body>
-			 	<script>
-					top.location.href="' . $fbLoginUrl . '"
-				</script>
-			 </body></html>');
-	}
     
     public function run()
     {
