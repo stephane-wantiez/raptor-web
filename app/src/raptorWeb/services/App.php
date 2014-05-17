@@ -259,6 +259,10 @@ class App
 		   			$score = $_SESSION['score'];
 		   			$res = UserService::onGameEnd($score);
 		   			break;
+		   			
+		   		case 'use-bomb':
+		   			$res = UserService::useBomb($user);
+		   			break;
 		   		
 		   		case 'user-top-scores':
 		   			$res = UserService::listTopScores($user);

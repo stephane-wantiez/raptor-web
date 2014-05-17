@@ -7,19 +7,21 @@ var Player = function(playerConfig)
 	this.nbShields = 0;
 	this.score = 0;
 	this.secWeapon = "";
-	this.nbBombs = 0;
+	this.nbBombs = user.nbBombs;
 	
-	this.maxNbShields = playerConfig.MAX_NB_SHIELDS;
-	this.maxNbBombs = playerConfig.MAX_NB_BOMBS;
+	this.maxNbShields = parseInt(playerConfig.MAX_NB_SHIELDS);
+	this.maxNbBombs = parseInt(playerConfig.MAX_NB_BOMBS);
 
 	this.killSound = assetManager.getSound("explosion");
 	this.weaponSound = assetManager.getSound("shoot_basic");
-	this.weaponCreateAmmo = function(){ return new Bullet(-1 * playerConfig.BULLET_SPEED); };
-	this.weaponShootDelayMs = playerConfig.BULLET_SHOOT_WAIT_TIME_MSEC;
+	this.weaponCreateAmmo = function(){ return new Bullet(-1 * parseFloat(playerConfig.BULLET_SPEED)); };
+	this.weaponShootDelayMs = parseInt(playerConfig.BULLET_SHOOT_WAIT_TIME_MSEC);
+	this.bombDropDelayMs = parseInt(playerConfig.BOMB_DROP_WAIT_TIME_MSEC);
 	this.nextAllowedWeaponAttack = 0;
+	this.nextAllowedBombDrop = 0;
 	this.useAttackPosition1 = true;
 	
-	this.collisionDamage = playerConfig.COLLISION_DAMAGE_ENEMY;
+	this.collisionDamage = parseInt(playerConfig.COLLISION_DAMAGE_ENEMY);
 	
 	this.healthChanged = true;
 	this.armorChanged = true;
@@ -41,12 +43,12 @@ var Player = function(playerConfig)
     this.maxY = Player.MAX_Y;
 	
 	this.speed = {
-		x: playerConfig.SPEED_X,
-		y: playerConfig.SPEED_Y
+		x: parseFloat(playerConfig.SPEED_X),
+		y: parseFloat(playerConfig.SPEED_Y)
 	};
 	
-	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES * Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true );
-	this.createSpriteWithUrl("explosion", "explosion2", Player.KILL_SPRITE_WIDTH * Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_HEIGHT * Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_FPS, false);
+	this.createSpriteWithUrl("move",      "player-move", parseInt(Player.NB_MOVE_SPRITES)   * parseInt(Player.WIDTH),              parseInt(Player.HEIGHT),                                                   parseInt(Player.NB_MOVE_SPRITES),    1,                                   20,                               true );
+	this.createSpriteWithUrl("explosion", "explosion2",  parseInt(Player.KILL_SPRITE_WIDTH) * parseInt(Player.KILL_SPRITE_NB_COL), parseInt(Player.KILL_SPRITE_HEIGHT) * parseInt(Player.KILL_SPRITE_NB_ROW), parseInt(Player.KILL_SPRITE_NB_COL), parseInt(Player.KILL_SPRITE_NB_ROW), parseInt(Player.KILL_SPRITE_FPS), false);
 
 	this.idleSpriteName = "move";
 	this.deadSpriteName = "explosion";
@@ -76,7 +78,8 @@ Player.MOVE_UP_KEY     = 38 ; // up arrow
 Player.MOVE_DOWN_KEY   = 40 ; // down arrow
 Player.MOVE_LEFT_KEY   = 37 ; // left arrow
 Player.MOVE_RIGHT_KEY  = 39 ; // right arrow
-Player.MOVE_ATTACK_KEY = 32 ; // Space
+Player.MOVE_ATTACK_KEY = 17 ; // Right control key
+Player.MOVE_BOMB_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
 Player.KILL_SPRITE_NB_ROW = 1;
 Player.KILL_SPRITE_NB_COL = 6;
@@ -241,7 +244,8 @@ Player.prototype.updateState = function(deltaTimeSec)
     //console.log(this.keyList);
     
 	var move = {x: 0, y: 0};
-	var isAttacking = false;
+	var attack = false;
+	var dropBomb = false;
 	
 	if (inputManager.playerControlsEnabled && inputManager.mouseEnabled)
 	{	
@@ -250,7 +254,7 @@ Player.prototype.updateState = function(deltaTimeSec)
 
 		//console.log("Mouse moved: mouseX=" + inputManager.mouseX + " , mouseY=" + inputManager.mouseY + " - x=" + this.x + " , y=" + this.y + " -> move.x=" + move.x + " , move.y=" + move.y);
 		
-		isAttacking = inputManager.isMouseDown(Player.MOUSE_ATTACK_BUTTON);
+		attack = inputManager.isMouseDown(Player.MOUSE_ATTACK_BUTTON);
 	}
 	
 	if (inputManager.playerControlsEnabled)
@@ -260,7 +264,8 @@ Player.prototype.updateState = function(deltaTimeSec)
 	    if (inputManager.isKeyDown(Player.MOVE_UP_KEY   )) move.y = -this.speed.y * deltaTimeSec ;
 	    if (inputManager.isKeyDown(Player.MOVE_DOWN_KEY )) move.y =  this.speed.y * deltaTimeSec ;
 	    
-	    isAttacking = isAttacking || inputManager.isKeyDown(Player.MOVE_ATTACK_KEY);
+	    attack = attack || inputManager.isKeyDown(Player.MOVE_ATTACK_KEY);
+	    dropBomb = inputManager.isKeyDown(Player.MOVE_BOMB_KEY);
 	}
     
     var isMoving = move.x || move.y;
@@ -272,12 +277,16 @@ Player.prototype.updateState = function(deltaTimeSec)
     	this.move(move.x, move.y);
     }
         
-	//this.setSprite(isAttacking?"attack":(isMoving?"move":"idle"));
+	//this.setSprite(attack?"attack":(isMoving?"move":"idle"));
     this.setSprite("move");
     
-    if (isAttacking)
+    if (attack)
     {
     	this.attack();
+    }
+    if (dropBomb)
+    {
+    	this.dropBomb();
     }
 };
 
@@ -309,6 +318,18 @@ Player.prototype.attackWith = function(projectile)
 	projectile.setPosition(attackPos.x,attackPos.y);
 	projectile.speedY += scene.speedY;
 	scene.playerActors.add(projectile);
+};
+
+Player.prototype.dropBomb = function()
+{
+	if ((this.nbBombs > 0) && (this.nextAllowedBombDrop < game.elapsedGameTimeSinceStartup))
+	{
+		console.log("Drop bomb");
+		this.nextAllowedBombDrop = game.elapsedGameTimeSinceStartup + this.bombDropDelayMs;
+		this.setNbBombs(this.nbBombs-1);
+		scene.flash();
+		scene.killActiveActors();
+	}
 };
 
 Player.prototype.getTotalArmor = function()

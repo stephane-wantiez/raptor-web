@@ -1,5 +1,5 @@
 /** 
-* Script file generated on Mon, 28 Apr 2014 17:02:49 +0200
+* Script file generated on Sat, 17 May 2014 19:26:03 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
@@ -1873,14 +1873,17 @@ var LevelBuilder =
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\Scene.js **/
 
-var Scene = function()
+var Scene = function(sceneConfig)
 {
 	this.actors = new ActorsContainer();
 	this.playerActors = new ActorsContainer();
 	this.boss = false;
 	this.currentLevel = "";
 	this.currentMusic = "";
-	this.loaded = false;
+	this.loaded = false; 
+	this.flashEnd = 0;
+	this.explosionFlashPeriod = parseInt(sceneConfig.EXPLOSION_FLASH_PERIOD_MSEC);
+	this.flashColor = sceneConfig.EXPLOSION_FLASH_COLOR;
 };
 
 Scene.State = { STARTING : 0, PLAYING : 1, BOSS_FIGHT : 2, VICTORY : 3, DEAD : 4, RESTARTING : 5, ENDGAME : 6 };
@@ -1892,6 +1895,7 @@ Scene.prototype.reset = function()
 	this.speedY = Scene.CAMERA_SPEED;
 	this.state = Scene.State.STARTING;
 	this.loaded = false;
+	this.flashEnd = 0;
 	this.stopMusic();
 };
 
@@ -1919,6 +1923,11 @@ Scene.prototype.reloadLevel = function()
 		alert('Error while starting level: ' + err);
 		game.launchMainMenu();
 	});
+};
+
+Scene.prototype.flash = function()
+{
+	this.flashEnd = game.elapsedGameTimeSinceStartup + this.explosionFlashPeriod;
 };
 
 Scene.prototype.onGameEnd = function(victory)
@@ -2033,6 +2042,19 @@ Scene.prototype.checkActorsPosition = function()
 	{
 		var actor = this.playerActors.list[actorId];
 		this.checkActorPosition(actor);
+	}
+};
+
+Scene.prototype.killActiveActors = function()
+{
+	for (var actorId in this.actors.list)
+	{
+		var actor = this.actors.list[actorId];
+		
+		if (actor.state == Actor.State.ACTIVE)
+		{
+			actor.kill();
+		}
 	}
 };
 
@@ -2170,11 +2192,19 @@ Scene.prototype.render = function(g)
 	
 	g.save();
 	
-	// go to the origin of the scene, and draw the scene actors from there
-    g.translate(0,-this.cameraY);
-    g.drawImage(this.backgroundImage,0,0);
-    this.actors.render(g);
-    this.playerActors.render(g);
+	if (game.elapsedGameTimeSinceStartup < this.flashEnd)
+	{
+		g.fillStyle = this.flashColor;
+		g.fillRect(0,0,g.canvas.width,g.canvas.height);
+	}
+	else
+	{
+		// go to the origin of the scene, and draw the scene actors from there
+	    g.translate(0,-this.cameraY);
+	    g.drawImage(this.backgroundImage,0,0);
+	    this.actors.render(g);
+	    this.playerActors.render(g);
+	}
     
     g.restore();
 };
@@ -2571,19 +2601,21 @@ var Player = function(playerConfig)
 	this.nbShields = 0;
 	this.score = 0;
 	this.secWeapon = "";
-	this.nbBombs = 0;
+	this.nbBombs = user.nbBombs;
 	
-	this.maxNbShields = playerConfig.MAX_NB_SHIELDS;
-	this.maxNbBombs = playerConfig.MAX_NB_BOMBS;
+	this.maxNbShields = parseInt(playerConfig.MAX_NB_SHIELDS);
+	this.maxNbBombs = parseInt(playerConfig.MAX_NB_BOMBS);
 
 	this.killSound = assetManager.getSound("explosion");
 	this.weaponSound = assetManager.getSound("shoot_basic");
-	this.weaponCreateAmmo = function(){ return new Bullet(-1 * playerConfig.BULLET_SPEED); };
-	this.weaponShootDelayMs = playerConfig.BULLET_SHOOT_WAIT_TIME_MSEC;
+	this.weaponCreateAmmo = function(){ return new Bullet(-1 * parseFloat(playerConfig.BULLET_SPEED)); };
+	this.weaponShootDelayMs = parseInt(playerConfig.BULLET_SHOOT_WAIT_TIME_MSEC);
+	this.bombDropDelayMs = parseInt(playerConfig.BOMB_DROP_WAIT_TIME_MSEC);
 	this.nextAllowedWeaponAttack = 0;
+	this.nextAllowedBombDrop = 0;
 	this.useAttackPosition1 = true;
 	
-	this.collisionDamage = playerConfig.COLLISION_DAMAGE_ENEMY;
+	this.collisionDamage = parseInt(playerConfig.COLLISION_DAMAGE_ENEMY);
 	
 	this.healthChanged = true;
 	this.armorChanged = true;
@@ -2605,12 +2637,12 @@ var Player = function(playerConfig)
     this.maxY = Player.MAX_Y;
 	
 	this.speed = {
-		x: playerConfig.SPEED_X,
-		y: playerConfig.SPEED_Y
+		x: parseFloat(playerConfig.SPEED_X),
+		y: parseFloat(playerConfig.SPEED_Y)
 	};
 	
-	this.createSpriteWithUrl("move", "player-move", Player.NB_MOVE_SPRITES * Player.WIDTH, Player.HEIGHT, Player.NB_MOVE_SPRITES, 1, 20, true );
-	this.createSpriteWithUrl("explosion", "explosion2", Player.KILL_SPRITE_WIDTH * Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_HEIGHT * Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_NB_COL, Player.KILL_SPRITE_NB_ROW, Player.KILL_SPRITE_FPS, false);
+	this.createSpriteWithUrl("move",      "player-move", parseInt(Player.NB_MOVE_SPRITES)   * parseInt(Player.WIDTH),              parseInt(Player.HEIGHT),                                                   parseInt(Player.NB_MOVE_SPRITES),    1,                                   20,                               true );
+	this.createSpriteWithUrl("explosion", "explosion2",  parseInt(Player.KILL_SPRITE_WIDTH) * parseInt(Player.KILL_SPRITE_NB_COL), parseInt(Player.KILL_SPRITE_HEIGHT) * parseInt(Player.KILL_SPRITE_NB_ROW), parseInt(Player.KILL_SPRITE_NB_COL), parseInt(Player.KILL_SPRITE_NB_ROW), parseInt(Player.KILL_SPRITE_FPS), false);
 
 	this.idleSpriteName = "move";
 	this.deadSpriteName = "explosion";
@@ -2640,7 +2672,8 @@ Player.MOVE_UP_KEY     = 38 ; // up arrow
 Player.MOVE_DOWN_KEY   = 40 ; // down arrow
 Player.MOVE_LEFT_KEY   = 37 ; // left arrow
 Player.MOVE_RIGHT_KEY  = 39 ; // right arrow
-Player.MOVE_ATTACK_KEY = 32 ; // Space
+Player.MOVE_ATTACK_KEY = 17 ; // Right control key
+Player.MOVE_BOMB_KEY = 32 ; // Space
 Player.MOUSE_ATTACK_BUTTON = 1 ; // left button
 Player.KILL_SPRITE_NB_ROW = 1;
 Player.KILL_SPRITE_NB_COL = 6;
@@ -2805,7 +2838,8 @@ Player.prototype.updateState = function(deltaTimeSec)
     //console.log(this.keyList);
     
 	var move = {x: 0, y: 0};
-	var isAttacking = false;
+	var attack = false;
+	var dropBomb = false;
 	
 	if (inputManager.playerControlsEnabled && inputManager.mouseEnabled)
 	{	
@@ -2814,7 +2848,7 @@ Player.prototype.updateState = function(deltaTimeSec)
 
 		//console.log("Mouse moved: mouseX=" + inputManager.mouseX + " , mouseY=" + inputManager.mouseY + " - x=" + this.x + " , y=" + this.y + " -> move.x=" + move.x + " , move.y=" + move.y);
 		
-		isAttacking = inputManager.isMouseDown(Player.MOUSE_ATTACK_BUTTON);
+		attack = inputManager.isMouseDown(Player.MOUSE_ATTACK_BUTTON);
 	}
 	
 	if (inputManager.playerControlsEnabled)
@@ -2824,7 +2858,8 @@ Player.prototype.updateState = function(deltaTimeSec)
 	    if (inputManager.isKeyDown(Player.MOVE_UP_KEY   )) move.y = -this.speed.y * deltaTimeSec ;
 	    if (inputManager.isKeyDown(Player.MOVE_DOWN_KEY )) move.y =  this.speed.y * deltaTimeSec ;
 	    
-	    isAttacking = isAttacking || inputManager.isKeyDown(Player.MOVE_ATTACK_KEY);
+	    attack = attack || inputManager.isKeyDown(Player.MOVE_ATTACK_KEY);
+	    dropBomb = inputManager.isKeyDown(Player.MOVE_BOMB_KEY);
 	}
     
     var isMoving = move.x || move.y;
@@ -2836,12 +2871,16 @@ Player.prototype.updateState = function(deltaTimeSec)
     	this.move(move.x, move.y);
     }
         
-	//this.setSprite(isAttacking?"attack":(isMoving?"move":"idle"));
+	//this.setSprite(attack?"attack":(isMoving?"move":"idle"));
     this.setSprite("move");
     
-    if (isAttacking)
+    if (attack)
     {
     	this.attack();
+    }
+    if (dropBomb)
+    {
+    	this.dropBomb();
     }
 };
 
@@ -2873,6 +2912,18 @@ Player.prototype.attackWith = function(projectile)
 	projectile.setPosition(attackPos.x,attackPos.y);
 	projectile.speedY += scene.speedY;
 	scene.playerActors.add(projectile);
+};
+
+Player.prototype.dropBomb = function()
+{
+	if ((this.nbBombs > 0) && (this.nextAllowedBombDrop < game.elapsedGameTimeSinceStartup))
+	{
+		console.log("Drop bomb");
+		this.nextAllowedBombDrop = game.elapsedGameTimeSinceStartup + this.bombDropDelayMs;
+		this.setNbBombs(this.nbBombs-1);
+		scene.flash();
+		scene.killActiveActors();
+	}
 };
 
 Player.prototype.getTotalArmor = function()
@@ -3004,7 +3055,7 @@ Game.prototype.initAssets = function()
 
 Game.prototype.onAssetsLoaded = function()
 {	
-	scene = new Scene();
+	scene = new Scene(config.SCENE);
 	player = new Player(config.PLAYER);
 	
 	this.mainMenu = new MainMenu();

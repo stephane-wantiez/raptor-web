@@ -1,11 +1,14 @@
-var Scene = function()
+var Scene = function(sceneConfig)
 {
 	this.actors = new ActorsContainer();
 	this.playerActors = new ActorsContainer();
 	this.boss = false;
 	this.currentLevel = "";
 	this.currentMusic = "";
-	this.loaded = false;
+	this.loaded = false; 
+	this.flashEnd = 0;
+	this.explosionFlashPeriod = parseInt(sceneConfig.EXPLOSION_FLASH_PERIOD_MSEC);
+	this.flashColor = sceneConfig.EXPLOSION_FLASH_COLOR;
 };
 
 Scene.State = { STARTING : 0, PLAYING : 1, BOSS_FIGHT : 2, VICTORY : 3, DEAD : 4, RESTARTING : 5, ENDGAME : 6 };
@@ -17,6 +20,7 @@ Scene.prototype.reset = function()
 	this.speedY = Scene.CAMERA_SPEED;
 	this.state = Scene.State.STARTING;
 	this.loaded = false;
+	this.flashEnd = 0;
 	this.stopMusic();
 };
 
@@ -44,6 +48,11 @@ Scene.prototype.reloadLevel = function()
 		alert('Error while starting level: ' + err);
 		game.launchMainMenu();
 	});
+};
+
+Scene.prototype.flash = function()
+{
+	this.flashEnd = game.elapsedGameTimeSinceStartup + this.explosionFlashPeriod;
 };
 
 Scene.prototype.onGameEnd = function(victory)
@@ -158,6 +167,19 @@ Scene.prototype.checkActorsPosition = function()
 	{
 		var actor = this.playerActors.list[actorId];
 		this.checkActorPosition(actor);
+	}
+};
+
+Scene.prototype.killActiveActors = function()
+{
+	for (var actorId in this.actors.list)
+	{
+		var actor = this.actors.list[actorId];
+		
+		if (actor.state == Actor.State.ACTIVE)
+		{
+			actor.kill();
+		}
 	}
 };
 
@@ -295,11 +317,19 @@ Scene.prototype.render = function(g)
 	
 	g.save();
 	
-	// go to the origin of the scene, and draw the scene actors from there
-    g.translate(0,-this.cameraY);
-    g.drawImage(this.backgroundImage,0,0);
-    this.actors.render(g);
-    this.playerActors.render(g);
+	if (game.elapsedGameTimeSinceStartup < this.flashEnd)
+	{
+		g.fillStyle = this.flashColor;
+		g.fillRect(0,0,g.canvas.width,g.canvas.height);
+	}
+	else
+	{
+		// go to the origin of the scene, and draw the scene actors from there
+	    g.translate(0,-this.cameraY);
+	    g.drawImage(this.backgroundImage,0,0);
+	    this.actors.render(g);
+	    this.playerActors.render(g);
+	}
     
     g.restore();
 };

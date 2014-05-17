@@ -1,6 +1,6 @@
 <?php 
 /** 
-* Configuration file generated for prod-fb on Mon, 28 Apr 2014 17:02:49 +0200
+* Configuration file generated for dev-sa on Sat, 17 May 2014 19:26:03 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\app\config\01-define.php **/
@@ -43,26 +43,19 @@ session_name('RAPTOR_WEB_SESSID');
 session_start();
 
 
-/** From file D:\GitHub\raptor-web\app\config\prod-fb\10-database.php **/
+/** From file D:\GitHub\raptor-web\app\config\dev-sa\10-database.php **/
 
 define('DB_DRIVER','mysql');
 define('DB_HOST','localhost');
 define('DB_NAME','swantiez_raptor_web');
-define('DB_USER','swantiez_test');
-define('DB_PASS','QmuI2A75lovf');
+define('DB_USER','root');
+define('DB_PASS','');
 define('DB_DEBUG',false);
 
 define('DB_DSN', DB_DRIVER . ':host=' . DB_HOST . ';dbname=' . DB_NAME );
 
 
-/** From file D:\GitHub\raptor-web\app\config\prod-fb\10-uri.php **/
+/** From file D:\GitHub\raptor-web\app\config\dev-sa\10-uri.php **/
 
-define( 'WEB_STATIC_URI', '/raptor-web/raptor-web-static/' );
-
-
-/** From file D:\GitHub\raptor-web\app\config\prod-fb\20-facebook.php **/
-
-define('FB_APP_ID','634106776658263');
-define('FB_APP_SECRET','bc16658316bbab7a776c0d9bccbc07b8');
-define('FB_APP_NAMESPACE','raptor-web');
+define( 'WEB_STATIC_URI', '/raptor-web-static/' );
 

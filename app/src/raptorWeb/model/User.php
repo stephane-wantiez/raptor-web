@@ -14,17 +14,18 @@ class User extends ActiveRecord
 	public $firstName;
 	public $lastName;
 	public $email;
+	public $nbBombs;
 	
 	// transient data
 	public $friends;
 	
-	public function __construct($id=0,$facebookId=0,$userName="",$password="",$firstName="",$lastName="",$email="")
+	public function __construct($id=0,$facebookId=0,$userName="",$password="",$firstName="",$lastName="",$email="",$nbBombs=0)
 	{
 		parent::__construct('user',$id);
-		$this->fillWithData($id,$facebookId,$userName,$password,$firstName,$lastName,$email);
+		$this->fillWithData($id,$facebookId,$userName,$password,$firstName,$lastName,$email,$nbBombs);
 	}
 	
-	public function fillWithData($id=0,$facebookId=0,$userName="",$password="",$firstName="",$lastName="",$email="")
+	public function fillWithData($id=0,$facebookId=0,$userName="",$password="",$firstName="",$lastName="",$email="",$nbBombs=0)
 	{
 		$this->id         = (int) $id;
 		$this->facebookId = (int) $facebookId;
@@ -33,6 +34,7 @@ class User extends ActiveRecord
 		$this->firstName  = $firstName;
 		$this->lastName   = $lastName;
 		$this->email      = $email;
+		$this->nbBombs    = $nbBombs;
 		$this->friends    = array();
 	}
 	
@@ -45,6 +47,7 @@ class User extends ActiveRecord
 		$this->firstName  = $record->firstName;
 		$this->lastName   = $record->lastName;
 		$this->email      = $record->email;
+		$this->nbBombs    = (int) $record->nbBombs;
 		$this->friends    = $record->friends;
 	}
 	
@@ -56,7 +59,8 @@ class User extends ActiveRecord
 							$userData->password,
 							$userData->firstname,
 							$userData->lastname,
-							$userData->email);
+							$userData->email,
+							$userData->nb_bombs);
 	}
 	
 	protected function getDbParamsForSaving()
@@ -66,7 +70,8 @@ class User extends ActiveRecord
 		              'password'   => $this->password,
 		              'firstname'  => $this->firstName,
 		              'lastname'   => $this->lastName,
-		              'email'      => $this->email );
+		              'email'      => $this->email,
+					  'nb_bombs'   => $this->nbBombs );
 	}
 	
 	protected function getDbParamsForReading()
@@ -83,6 +88,7 @@ class User extends ActiveRecord
 			'username'  => $this->userName,
 			'firstname' => $this->firstName,
 			'lastname'  => $this->lastName,
+			'nbBombs'   => $this->nbBombs,
 			'friends'   => $this->friends
 		));
 	}

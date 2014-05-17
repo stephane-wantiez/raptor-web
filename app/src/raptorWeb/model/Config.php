@@ -32,7 +32,7 @@ class Config
 					$config[$configTuple->type] = array();
 				}
 				
-				$config[$configTuple->type][$configTuple->id] = (double) $configTuple->value;
+				$config[$configTuple->type][$configTuple->id] = $configTuple->value;
 			}
 		}
 		

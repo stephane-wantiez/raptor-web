@@ -36,6 +36,17 @@ class UserService
 		return $score->id;
 	}
 	
+	public static function useBomb($user)
+	{
+		if ($user->nbBombs > 0)
+		{
+			$user->nbBombs--;
+			$user->update();
+			return array( 'nbBombs' => $user->nbBombs );
+		}
+		return 0;
+	}
+	
 	public static function listTopScores($user)
 	{
 		$userScores = \raptorWeb\model\Score::listForUser($user->id, 5);

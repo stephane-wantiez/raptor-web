@@ -68,7 +68,7 @@ Game.prototype.initAssets = function()
 
 Game.prototype.onAssetsLoaded = function()
 {	
-	scene = new Scene();
+	scene = new Scene(config.SCENE);
 	player = new Player(config.PLAYER);
 	
 	this.mainMenu = new MainMenu();
