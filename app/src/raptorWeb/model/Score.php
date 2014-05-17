@@ -2,8 +2,9 @@
 
 namespace raptorWeb\model;
 
+use raptorWeb\services\App;
 class Score extends ActiveRecord
-{
+{	
 	public $userId;
 	public $gameDT;
 	public $value;
@@ -72,6 +73,17 @@ class Score extends ActiveRecord
 	public static function purgeOrphansForUser($userId)
 	{
 		Score::bulkDelete('score', array( 'user_id' => $userId, 'game_done' => false ));
+	}
+	
+	public static function purgeSmallestScores($userId)
+	{
+		$gameConfig = App::getInstance()->getGameConfig();
+		$maxNbScores = $gameConfig['MAX_NB_SCORES_PER_USER'];
+		$selectBestScoreQuery1 = 'SELECT id FROM score WHERE user_id=:user_id ORDER BY value DESC LIMIT ' . $maxNbScores;
+		$selectBestScoreQuery2 = 'SELECT * FROM (' . $selectBestScoreQuery1 . ') user_scores_tmp'; // needed due to MySQL limitations...
+		$deleteCondition = 'id NOT IN (' . $selectBestScoreQuery2 . ')';
+		$deleteParams = array( 'user_id' => $userId, 'game_done' => true );
+		Score::bulkDelete('score', $deleteParams, $deleteCondition);
 	}
 	
 	public function initForUser($userId)

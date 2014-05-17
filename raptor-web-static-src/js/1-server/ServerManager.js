@@ -21,7 +21,10 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 			//alert('Failure for request ' + action);
 			if ($.isDefined(errorCallback))
 			{
-				errorCallback(JSON.stringify(err, null, '\n'));
+				var errStr = JSON.stringify(err, null, '\n');
+				errorCallback(errStr);
+				console.log('API error:');
+				console.log(errStr);
 			}
 		}
 	});
@@ -49,6 +52,12 @@ ServerManager.prototype.requestGameEnd = function(successCallback,errorCallback)
 {
 	// send the request w/o any data, receive the score id if successful
 	this.sendRequest('game-end','',successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestDropBomb = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the nb of remaining bombs if successful
+	this.sendRequest('drop-bomb','',successCallback,errorCallback);
 };
 
 ServerManager.prototype.requestTopScores = function(successCallback,errorCallback)

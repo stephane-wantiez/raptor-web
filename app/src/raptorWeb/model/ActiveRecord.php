@@ -258,11 +258,21 @@ abstract class ActiveRecord
 		}
 	}
 	
-	public static function bulkDelete($tableName,$deleteParams)
-	{			
-		$deleteQueryParams = self::completeQueryWithParams($deleteParams, ' AND ') ;
+	public static function bulkDelete($tableName,$deleteParams,$specialDeleteCondition='')
+	{
+		$deleteQueryParams = '';
+		if ($deleteParams != null)
+		{
+			$deleteQueryParams = self::completeQueryWithParams($deleteParams, ' AND ') ;
+		}
+		if ($specialDeleteCondition != '')
+		{
+			if ($deleteQueryParams != '') $deleteQueryParams .= ' AND '; 
+			$deleteQueryParams .= $specialDeleteCondition;
+		}
 	
 		$queryStr = 'DELETE FROM ' . $tableName . ' WHERE ' . $deleteQueryParams ;
+		
 		$query = self::getDB()->prepare($queryStr);
 		self::debugQuery('delete', $queryStr, $deleteParams);
 	

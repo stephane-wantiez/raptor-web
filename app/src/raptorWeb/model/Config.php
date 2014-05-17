@@ -4,11 +4,9 @@ namespace raptorWeb\model;
 
 class Config
 {
-	public static function read()
-	{
-		$db = \raptorWeb\services\App::getInstance()->getDb();
-		
-		$queryStr = 'SELECT c.identifier id, c.value value, ct.identifier type';
+	public static function read($db)
+	{		
+		$queryStr = 'SELECT c.identifier identifier, c.value value, ct.identifier type';
 		$queryStr .= ' FROM config c';
 		$queryStr .= ' LEFT JOIN config_type ct';
 		$queryStr .= ' ON c.type=ct.id';
@@ -32,7 +30,7 @@ class Config
 					$config[$configTuple->type] = array();
 				}
 				
-				$config[$configTuple->type][$configTuple->id] = $configTuple->value;
+				$config[$configTuple->type][$configTuple->identifier] = $configTuple->value;
 			}
 		}
 		

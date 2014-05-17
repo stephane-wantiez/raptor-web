@@ -1,5 +1,5 @@
 /** 
-* Script file generated on Sat, 17 May 2014 19:26:03 +0200
+* Script file generated on Sat, 17 May 2014 23:09:57 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
@@ -563,7 +563,10 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 			//alert('Failure for request ' + action);
 			if ($.isDefined(errorCallback))
 			{
-				errorCallback(JSON.stringify(err, null, '\n'));
+				var errStr = JSON.stringify(err, null, '\n');
+				errorCallback(errStr);
+				console.log('API error:');
+				console.log(errStr);
 			}
 		}
 	});
@@ -591,6 +594,12 @@ ServerManager.prototype.requestGameEnd = function(successCallback,errorCallback)
 {
 	// send the request w/o any data, receive the score id if successful
 	this.sendRequest('game-end','',successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestDropBomb = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the nb of remaining bombs if successful
+	this.sendRequest('drop-bomb','',successCallback,errorCallback);
 };
 
 ServerManager.prototype.requestTopScores = function(successCallback,errorCallback)
@@ -2895,10 +2904,10 @@ Player.prototype.getAttackPosition = function()
 
 Player.prototype.attack = function()
 {
-	console.log("Attack command - this.nextAllowedWeaponAttack=" + this.nextAllowedWeaponAttack + " - game.elapsedGameTimeSinceStartup=" + game.elapsedGameTimeSinceStartup);
+	//console.log("Attack command - this.nextAllowedWeaponAttack=" + this.nextAllowedWeaponAttack + " - game.elapsedGameTimeSinceStartup=" + game.elapsedGameTimeSinceStartup);
 	if (this.nextAllowedWeaponAttack < game.elapsedGameTimeSinceStartup)
 	{
-		console.log("Can attack!");
+		//console.log("Can attack!");
 		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
 		this.weaponSound.play();
 		var projectile = this.weaponCreateAmmo();
@@ -2914,15 +2923,27 @@ Player.prototype.attackWith = function(projectile)
 	scene.playerActors.add(projectile);
 };
 
+Player.prototype.doDropBomb = function(nbRemainingBombs)
+{
+	//console.log("Drop bomb");
+	this.setNbBombs(nbRemainingBombs);
+	scene.flash();
+	scene.killActiveActors();
+};
+
 Player.prototype.dropBomb = function()
 {
 	if ((this.nbBombs > 0) && (this.nextAllowedBombDrop < game.elapsedGameTimeSinceStartup))
 	{
-		console.log("Drop bomb");
 		this.nextAllowedBombDrop = game.elapsedGameTimeSinceStartup + this.bombDropDelayMs;
-		this.setNbBombs(this.nbBombs-1);
-		scene.flash();
-		scene.killActiveActors();
+		var self = this;
+		serverManager.requestDropBomb(
+			function(data){
+				self.doDropBomb(data["nbBombs"]);
+			},function(err){
+				alert('Error while sending command to drop bomb: ' + err);
+				game.launchMainMenu();
+			});
 	}
 };
 

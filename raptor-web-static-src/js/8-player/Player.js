@@ -301,10 +301,10 @@ Player.prototype.getAttackPosition = function()
 
 Player.prototype.attack = function()
 {
-	console.log("Attack command - this.nextAllowedWeaponAttack=" + this.nextAllowedWeaponAttack + " - game.elapsedGameTimeSinceStartup=" + game.elapsedGameTimeSinceStartup);
+	//console.log("Attack command - this.nextAllowedWeaponAttack=" + this.nextAllowedWeaponAttack + " - game.elapsedGameTimeSinceStartup=" + game.elapsedGameTimeSinceStartup);
 	if (this.nextAllowedWeaponAttack < game.elapsedGameTimeSinceStartup)
 	{
-		console.log("Can attack!");
+		//console.log("Can attack!");
 		this.nextAllowedWeaponAttack = game.elapsedGameTimeSinceStartup + this.weaponShootDelayMs;
 		this.weaponSound.play();
 		var projectile = this.weaponCreateAmmo();
@@ -320,15 +320,27 @@ Player.prototype.attackWith = function(projectile)
 	scene.playerActors.add(projectile);
 };
 
+Player.prototype.doDropBomb = function(nbRemainingBombs)
+{
+	//console.log("Drop bomb");
+	this.setNbBombs(nbRemainingBombs);
+	scene.flash();
+	scene.killActiveActors();
+};
+
 Player.prototype.dropBomb = function()
 {
 	if ((this.nbBombs > 0) && (this.nextAllowedBombDrop < game.elapsedGameTimeSinceStartup))
 	{
-		console.log("Drop bomb");
 		this.nextAllowedBombDrop = game.elapsedGameTimeSinceStartup + this.bombDropDelayMs;
-		this.setNbBombs(this.nbBombs-1);
-		scene.flash();
-		scene.killActiveActors();
+		var self = this;
+		serverManager.requestDropBomb(
+			function(data){
+				self.doDropBomb(data["nbBombs"]);
+			},function(err){
+				alert('Error while sending command to drop bomb: ' + err);
+				game.launchMainMenu();
+			});
 	}
 };
 

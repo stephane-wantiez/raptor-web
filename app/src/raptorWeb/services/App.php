@@ -8,6 +8,7 @@ class App
     private static $instance = null;
     private $fb;
     private $db;
+    private $config;
     
     private function __construct()
     {
@@ -15,6 +16,7 @@ class App
         $this->db->setAttribute( \PDO::ATTR_ERRMODE,            \PDO::ERRMODE_WARNING );
         $this->db->setAttribute( \PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ );
         $this->db->exec('SET CHARACTER SET utf8');
+        $this->config = \raptorWeb\model\Config::read($this->db);
     }
     
     public static function getInstance()
@@ -29,6 +31,11 @@ class App
     public function getDb()
     {
     	return $this->db;
+    }
+    
+    public function getGameConfig()
+    {
+    	return $this->config['GAME'];
     }
     
     private function reloadPage()
@@ -53,7 +60,7 @@ class App
     public function run()
     {
     	if (!isset($_SESSION['locale'])) $_SESSION['locale'] = 'fr_BE';
-    	/*if (!isset($_SESSION['config']))*/ $_SESSION['config'] = \raptorWeb\model\Config::read();
+    	if (!isset($_SESSION['config'])) $_SESSION['config'] = $this->config;
     	
     	if(defined('FB_APP_ID'))
     	{
@@ -260,8 +267,8 @@ class App
 		   			$res = UserService::onGameEnd($score);
 		   			break;
 		   			
-		   		case 'use-bomb':
-		   			$res = UserService::useBomb($user);
+		   		case 'drop-bomb':
+		   			$res = UserService::dropBomb($user);
 		   			break;
 		   		
 		   		case 'user-top-scores':

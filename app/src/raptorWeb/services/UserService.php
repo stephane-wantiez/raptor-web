@@ -33,10 +33,11 @@ class UserService
 	{
 		$score->gameDone = true;
 		$score->update();
+		\raptorWeb\model\Score::purgeSmallestScores($score->userId);
 		return $score->id;
 	}
 	
-	public static function useBomb($user)
+	public static function dropBomb($user)
 	{
 		if ($user->nbBombs > 0)
 		{
