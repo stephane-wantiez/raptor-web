@@ -101,15 +101,21 @@
     margin-left: -70px;
     width: 140px;
 }
-#main-menu-top{
+#main-menu-top_scores{
     top: 50%;
     margin-top: 130px;
     margin-left: -70px;
     width: 140px;
 }
-#main-menu-logout{
+#main-menu-friends{
     top: 50%;
     margin-top: 160px;
+    margin-left: -70px;
+    width: 140px;
+}
+#main-menu-logout{
+    top: 50%;
+    margin-top: 190px;
 }
 #menu-title-screen{
     position: absolute;
@@ -161,7 +167,7 @@
     width: 200px;
     height:400px;
 }
-#top-scores-change{
+#top-scores-change1{
     top: 50%;
     margin-top: 250px;
     margin-left: -160px;
@@ -169,7 +175,68 @@
     height:40px;
     vertical-align: middle;
 }
+#top-scores-change2{
+    top: 50%;
+    margin-top: 250px;
+    margin-left: 20px;
+    width: 150px;
+    height:40px;
+    vertical-align: middle;
+}
 #top-scores-back{
+    top: 50%;
+    margin-top: 250px;
+    margin-left: 180px;
+    width: 100px;
+    height:40px;
+    vertical-align: middle;
+}
+
+#friends{
+    width: 100%;
+    height:100%;
+    top: 0px;
+    left: 0px;
+    margin-top: 0px;
+    margin-left: 0px;
+    border: none;
+    opacity:1;
+    background: rgba(0, 99, 191, 1);
+    cursor: none;
+    -webkit-transform:none;
+}
+#friends.visible{
+    opacity:1;
+    cursor: auto;
+}
+#friends-title{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -250px;
+    margin-left: -150px;
+    width: 300px;
+    font-family: CutOutsFLF;
+    text-align:center;
+    text-decoration: underline;
+}
+#friends-list{
+    font-size: 14px;
+    top: 50%;
+    margin-top: -200px;
+    margin-left: -100px;
+    width: 200px;
+    height:400px;
+}
+#friends-change{
+    top: 50%;
+    margin-top: 250px;
+    margin-left: -200px;
+    width: 190px;
+    height:40px;
+    vertical-align: middle;
+}
+#friends-back{
     top: 50%;
     margin-top: 250px;
     margin-left: 20px;
@@ -177,6 +244,38 @@
     height:40px;
     vertical-align: middle;
 }
+/*.friends-controls{
+    top: 50%;
+    margin-top: 200px;
+    margin-left: -200px;
+    width: 300px;
+    height:40px;
+    vertical-align: middle;
+}
+.friends-previous{
+    top: 50%;
+    margin-top: 200px;
+    margin-left: -200px;
+    width: 100px;
+    height:40px;
+    vertical-align: middle;
+}
+.friends-page-nb{
+    top: 50%;
+    margin-top: 200px;
+    margin-left: -100px;
+    width: 100px;
+    height:40px;
+    vertical-align: middle;
+}
+.friends-next{
+    top: 50%;
+    margin-top: 200px;
+    margin-left: 0px;
+    width: 100px;
+    height:40px;
+    vertical-align: middle;
+}*/
 
 #pause-menu{
 	height:140px;

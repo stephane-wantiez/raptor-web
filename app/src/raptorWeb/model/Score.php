@@ -57,17 +57,23 @@ class Score extends ActiveRecord
 				      'game_dt' => $this->gameDT );
 	}
 	
-	public static function listForUser($userId,$limit=0)
+	public static function listForUser($userId,$friendsFb=null,$limit=0)
 	{
-		$selectParams = array( 'score.game_dt game_dt', 'score.value value', 'user.username user' );
+		$selectParams = array( 'score.game_dt game_dt', 'score.value value', 'user.firstname firstname, user.lastname lastname' );
 		$customQueryPart = 'LEFT JOIN user ON user.id=score.user_id';
 		$whereParams = array( 'game_done' => true );
+		$whereCond = '';
 		if ($userId)
 		{
 			$whereParams['user_id'] = $userId;
 		}
+		else if ($friendsFb != null)
+		{
+			$friendsList = join(',',array_values($friendsFb));
+			$whereCond = 'fb_id IN (' . $friendsList . ')';
+		}
 		$orderParams = array( 'score.value' => 'DESC' , 'score.game_dt' => 'DESC' );
-		return Score::select('score', $selectParams, $customQueryPart, $whereParams, $orderParams, $limit, false);
+		return Score::select('score', $selectParams, $customQueryPart, $whereParams, $whereCond, $orderParams, $limit, false);
 	}
 	
 	public static function purgeOrphansForUser($userId)

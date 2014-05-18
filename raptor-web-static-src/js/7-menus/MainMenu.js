@@ -11,11 +11,16 @@ var MainMenu = function()
 			type : "option",
 			caption : "Launch Level 1",
 			clickCallback : function(){ game.launchLevel(1); }
-		},	
-		top : {
+		},
+		top_scores : {
 			type : "option",
 			caption : "Show top scores",
 			clickCallback : function(){ game.showTopScoresMenu(); }
+		},
+		friends : {
+			type : "option",
+			caption : "Show friends",
+			clickCallback : function(){ game.showFriendsMenu(); }
 		},
 		logout : {
 			type : "option",

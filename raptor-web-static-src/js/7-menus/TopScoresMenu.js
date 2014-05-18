@@ -2,13 +2,18 @@ var TopScoresMenu = function()
 {
 	this.music = assetManager.getSound("music-menu");
 	this.userScores = [];
+	this.friendsScores = [];
 	this.allScores = [];
-	this.showAllScores = false;
+	this.type = TopScoresMenu.TYPE.USER;
+	this.captionPerType = [];
+	this.captionPerType[TopScoresMenu.TYPE.USER   ] = "Show player's scores";
+	this.captionPerType[TopScoresMenu.TYPE.FRIENDS] = "Show friends' scores";
+	this.captionPerType[TopScoresMenu.TYPE.ALL    ] = "Show all scores";
 	var self = this;
 	
 	var titleCallback = function()
 	{
-		return self.showAllScores ? "Top scores for all players" : "Top scores for current player";
+		return self.getCaptionForTypeOffset(0);
 	};
 	
 	var items = {
@@ -16,10 +21,15 @@ var TopScoresMenu = function()
 			type : "text",
 			captionCallback : function(){ return self.getTopScores(); }
 		},
-		change : {
+		change1 : {
 			type : "option",
-			captionCallback : function(){ return self.showAllScores ? "Show player's scores only" : "Show all scores"; },
-			clickCallback : function(){ self.showAllScores = !self.showAllScores; self.refreshCaptions(); }
+			captionCallback : function(){ return self.getCaptionForTypeOffset(1); },
+			clickCallback : function(){ self.setNewTypeWithOffset(1); }
+		},
+		change2 : {
+			type : "option",
+			captionCallback : function(){ return self.getCaptionForTypeOffset(2); },
+			clickCallback : function(){ self.setNewTypeWithOffset(2); }
 		},
 		back : {
 			type : "option",
@@ -34,9 +44,43 @@ var TopScoresMenu = function()
 
 TopScoresMenu.prototype = new MenuFrame();
 
+TopScoresMenu.TYPE = { USER : 0, FRIENDS : 1, ALL : 2, NB_TYPES : 3 };
+
+TopScoresMenu.prototype.getCaptionForTypeOffset = function(typeOffset)
+{
+	var type = ( this.type + typeOffset ) % TopScoresMenu.TYPE.NB_TYPES;
+	return this.captionPerType[type];
+};
+
+TopScoresMenu.prototype.setNewTypeWithOffset = function(typeOffset)
+{
+	this.type = ( this.type + typeOffset ) % TopScoresMenu.TYPE.NB_TYPES;
+	this.refreshCaptions();
+};
+
+TopScoresMenu.prototype.getCurrentOption1Caption = function()
+{
+	switch(this.type)
+	{
+		case TopScoresMenu.TYPE.USER    : return "Show player's scores";
+		case TopScoresMenu.TYPE.FRIENDS : return "Show friends' scores";
+		case TopScoresMenu.TYPE.ALL     : return "Show all scores";
+	}
+};
+
+TopScoresMenu.prototype.getCurrentScoresList = function()
+{
+	switch(this.type)
+	{
+		case TopScoresMenu.TYPE.USER    : return this.userScores;
+		case TopScoresMenu.TYPE.FRIENDS : return this.friendsScores;
+		case TopScoresMenu.TYPE.ALL     : return this.allScores;
+	}
+};
+
 TopScoresMenu.prototype.getTopScores = function()
 {
-	var topScores = this.showAllScores ? this.allScores : this.userScores;
+	var topScores = this.getCurrentScoresList();
 	
 	var scoresDiv = $('<div/>');
 	var scoreList = $('<table/>').addClass("top-scores-table");
@@ -46,7 +90,7 @@ TopScoresMenu.prototype.getTopScores = function()
 	{
 		var score = topScores[scoreIndex];
 		var scoreItem = $('<tr/>').addClass("top-score-item");
-		var scoreUser = $('<td/>').addClass("top-score-user").append(score.user);
+		var scoreUser = $('<td/>').addClass("top-score-user").append(score.firstname + " " + score.lastname);
 		var scoreValue = $('<td/>').addClass("top-score-value").append(score.value);
 		var scoreDate = $('<td/>').addClass("top-score-date");
 		var scoreDT = new Date(score.game_dt * 1000).toLocaleDateString(LOCALE.replace('_','-'));
@@ -69,6 +113,7 @@ TopScoresMenu.prototype.updateState = function(showMenu)
     	serverManager.requestTopScores(function(data)
     	{
     		self.userScores = data['user'];
+    		self.friendsScores = data['friends'];
     		self.allScores = data['all'];
     		MenuFrame.prototype.updateState.call(self,showMenu);
     		//self.music.playLoop();

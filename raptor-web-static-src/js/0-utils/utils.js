@@ -22,6 +22,10 @@ if (!Object.keys) {
     };
 }
 
+$.getNbKeysInObject = function(obj){
+	return Object.keys(obj).length;
+};
+
 $.getTimeMillis = function(){
 	return new Date().getTime();
 };

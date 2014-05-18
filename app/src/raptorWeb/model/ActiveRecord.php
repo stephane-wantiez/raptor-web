@@ -159,8 +159,9 @@ abstract class ActiveRecord
 		$this->id = $data->id;
 	}
 	
-	public static function select($tableName,$selectParams=null,$customQueryPart='',$whereParams=null,$orderParams=null,$limit=0,$returnObjects=true)
-	{		
+	public static function select($tableName,$selectParams=null,$customQueryPart='',$whereParams=null,$specialWhereCondition='',$orderParams=null,$limit=0,$returnObjects=true)
+	{	
+		$whereStarted = false;
 		$queryStr = 'SELECT ';
 		if ($selectParams && count($selectParams))
 		{
@@ -178,7 +179,23 @@ abstract class ActiveRecord
 		if ($whereParams && count($whereParams))
 		{
 			$queryStr .= ' WHERE ' . self::completeQueryWithParams($whereParams,' AND ') ;
+			$whereStarted = true;
 		}
+		if ($specialWhereCondition != '')
+		{
+			if ($whereStarted)
+			{
+				$queryStr .= ' AND ';
+			}
+			else
+			{
+				$queryStr .= ' WHERE ';
+			}
+			$queryStr .= $specialWhereCondition;
+		}
+		
+		
+		
 		if ($orderParams && count($orderParams))
 		{
 			$queryStr .= ' ORDER BY ' . self::completeQueryWithOrderByParams($orderParams);
@@ -189,6 +206,7 @@ abstract class ActiveRecord
 		}
 		 
 		//die("Query: " . $queryStr);
+		//echo "Query: " . $queryStr;
 		$query = self::getDB()->prepare($queryStr);
 		self::debugQuery('select', $queryStr, $selectParams);
 		
@@ -221,7 +239,7 @@ abstract class ActiveRecord
 	{
 		if ($readParams == null) $readParams = array( 'id' => $this->id );
 		
-		$res = self::select( $this->tableName, null, '', $readParams, null, 1 );
+		$res = self::select( $this->tableName, null, '', $readParams, '', null, 1 );
 		
 		if ($res && count($res))
 		{

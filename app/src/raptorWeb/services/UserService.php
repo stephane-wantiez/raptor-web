@@ -12,7 +12,7 @@ class UserService
 		return $user;
 	}
 	
-	public static function onGameStart($user)
+	public static function onGameStart(\raptorWeb\model\User $user)
 	{
 		\raptorWeb\model\Score::purgeOrphansForUser($user->id);
 		$score = new \raptorWeb\model\Score();
@@ -22,14 +22,14 @@ class UserService
 		return $score->id;
 	}
 	
-	public static function onGameScoreUpdate($score,$scoreIncrement)
+	public static function onGameScoreUpdate(\raptorWeb\model\Score $score,$scoreIncrement)
 	{
 		$score->value += $scoreIncrement;
 		$score->update();
 		return $score->value;
 	}
 	
-	public static function onGameEnd($score)
+	public static function onGameEnd(\raptorWeb\model\Score $score)
 	{
 		$score->gameDone = true;
 		$score->update();
@@ -37,7 +37,7 @@ class UserService
 		return $score->id;
 	}
 	
-	public static function dropBomb($user)
+	public static function dropBomb(\raptorWeb\model\User $user)
 	{
 		if ($user->nbBombs > 0)
 		{
@@ -48,14 +48,21 @@ class UserService
 		return 0;
 	}
 	
-	public static function listTopScores($user)
+	public static function listTopScores(\raptorWeb\model\User $user)
 	{
-		$userScores = \raptorWeb\model\Score::listForUser($user->id, 5);
-		$allScores  = \raptorWeb\model\Score::listForUser(0, 5);
+		$userScores    = \raptorWeb\model\Score::listForUser($user->id, null, 5);
+		$friendsScores = \raptorWeb\model\Score::listForUser(0, $user->friends, 5);
+		$allScores     = \raptorWeb\model\Score::listForUser(0, null, 5);
 		$topScores = array();
-		$topScores['user'] = $userScores;
-		$topScores['all' ] = $allScores;
+		$topScores['user'   ] = $userScores;
+		$topScores['friends'] = $friendsScores;
+		$topScores['all'    ] = $allScores;
 		return $topScores;
+	}
+	
+	public static function getFriendsToInvite(\Facebook $fb, \raptorWeb\model\User $user)
+	{
+		return self::listFacebookFriends($fb, false, true);
 	}
 	
 	private static function getPasswordHash($password)
@@ -83,7 +90,7 @@ class UserService
 			 </body></html>');
 	}
 	
-	public static function registerUser($userName,$password,$firstName,$lastName,$email,$facebookId=0,$checkCredentials=true)
+	public static function registerUser($userName,$password,$firstName,$lastName,$email,$facebookId="",$checkCredentials=true)
 	{
 		if ( $checkCredentials && (strlen($userName) < \raptorWeb\model\User::USERNAME_MIN_LENGTH))
 		{
@@ -117,6 +124,7 @@ class UserService
 	
 		if ($userFound && self::validatePassword($password, $user->password))
 		{
+			$user->storeConnectionTime();
 			$_SESSION['user'] = $user;
 			return $user;
 		}
@@ -147,31 +155,36 @@ class UserService
 			$user = self::registerFacebookUser($fbUser);
 		}
 		
+		$user->storeConnectionTime();
+		$user->friends = self::listFacebookFriends($fb, true, false);
 		$_SESSION['user'] = $user;
 		
 		return true;
 	}
 	
-	public static function loadFacebookFriendsList(\Facebook $fb, $userId)
+	public static function listFacebookFriends(\Facebook $fb, $onlyInstalled, $notInstalled)
 	{
-		$user = self::getUser($userId);
-		
-		$friends = $fb->api('/me/friends?fields=installed,first_name');
-		//var_dump($friends);
+		$friends = $fb->api('/me/friends?fields=installed,first_name,last_name');
+		//die(json_encode($friends));
+		$friendsIds = array();
 		
 		if ($friends && isset($friends["data"]))
 		{
-			$friendsId = array();
-			
 			foreach($friends['data'] as $friend)
 			{
-				if (isset($friend['installed']) && $friend['installed'])
+				$installed = isset($friend['installed']) && $friend['installed'];
+				$friend_ok = $onlyInstalled ? $installed : ( $notInstalled ? !$installed : true ); 
+				
+				if ($friend_ok)
 				{
-					$friendsId[] = $friend['id'];				
+					$friendName = $friend['first_name'] . ' ' . $friend['last_name'];
+					$friendsIds[$friendName] = $friend['id'];
 				}
 			}
-			
-			$user->setFriendsFromFacebookIds($friendsId);
 		}
+		
+		ksort($friendsIds);
+		//die(json_encode($friendsIds));
+		return $friendsIds;
 	}
 }

@@ -73,6 +73,7 @@ Game.prototype.onAssetsLoaded = function()
 	
 	this.mainMenu = new MainMenu();
 	this.topScoresMenu = new TopScoresMenu();
+	this.friendsMenu = new FriendsMenu();
 	this.pauseMenu = new PauseMenu();
 	this.victoryMenu = new VictoryMenu();
 	this.gameOverMenu = new GameOverMenu();
@@ -87,6 +88,7 @@ Game.prototype.launchMainMenu = function()
 	
 	this.state = Game.State.MAIN_MENU;
 	this.topScoresMenu.updateState(false);
+	this.friendsMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	this.pauseMenu.updateState(false);
@@ -101,11 +103,18 @@ Game.prototype.showTopScoresMenu = function()
 	this.topScoresMenu.updateState(true);
 };
 
+Game.prototype.showFriendsMenu = function()
+{
+	this.mainMenu.updateState(false);
+	this.friendsMenu.updateState(true);
+};
+
 Game.prototype.launchLevel = function(levelNumber)
 {
 	this.state = Game.State.LEVEL_LOAD;
 	this.mainMenu.updateState(false);
 	this.topScoresMenu.updateState(false);
+	this.friendsMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	levelLoader.loadLevel(levelNumber);

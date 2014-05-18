@@ -1,5 +1,5 @@
 /** 
-* Script file generated on Sat, 17 May 2014 23:09:57 +0200
+* Script file generated on Mon, 19 May 2014 01:07:55 +0200
 **/
 
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
@@ -27,6 +27,10 @@ if (!Object.keys) {
         return keys;
     };
 }
+
+$.getNbKeysInObject = function(obj){
+	return Object.keys(obj).length;
+};
 
 $.getTimeMillis = function(){
 	return new Date().getTime();
@@ -545,6 +549,17 @@ var ServerManager = function()
 
 ServerManager.prototype.sendRequest = function(action,data,successCallback,errorCallback)
 {
+	var errorFunction = function(err){
+		//alert('Failure for request ' + action);
+		if ($.isDefined(errorCallback))
+		{
+			var errStr = JSON.stringify(err, null, '\n');
+			errorCallback(errStr);
+			console.log('API error:');
+			console.log(errStr);
+		}
+	}
+	
 	$.ajax({
 		url: 'api.php',
 		method: 'POST',
@@ -554,21 +569,16 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 		},
 		success: function(res){
 			//alert('Success for request ' + action);
-			if ($.isDefined(successCallback))
+			if ($.isDefined(res) && ($.isDefined(res['error'])))
+			{
+				errorFunction(res);
+			}
+			else if ($.isDefined(successCallback))
 			{
 				successCallback(res);
 			}
 		},
-		error: function(err){
-			//alert('Failure for request ' + action);
-			if ($.isDefined(errorCallback))
-			{
-				var errStr = JSON.stringify(err, null, '\n');
-				errorCallback(errStr);
-				console.log('API error:');
-				console.log(errStr);
-			}
-		}
+		error: errorFunction
 	});
 };
 
@@ -606,6 +616,12 @@ ServerManager.prototype.requestTopScores = function(successCallback,errorCallbac
 {
 	// send the request w/o any data, receive the array of 5 user's top scores maximum
 	this.sendRequest('user-top-scores','',successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestFriendsToInvite = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the list of FB friends the player can invite
+	this.sendRequest('get-friends-to-invite','',successCallback,errorCallback);
 };
 
 
@@ -1291,7 +1307,7 @@ ActorsContainer.prototype.render = function(g)
 
 ActorsContainer.prototype.size = function()
 {
-	return Object.keys(this.list).length;
+	return $.getNbKeysInObject(this.list);
 };
 
 ActorsContainer.prototype.removeAll = function()
@@ -2382,6 +2398,162 @@ EndGameMenu.prototype.updateState = function(gameEnd)
 };
 
 
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\FriendsMenu.js **/
+
+var FriendsMenu = function()
+{
+	// TODO: change to allow buttons to be pressed -> list should not be of text type, but JQuery div updated when captions updated
+	
+	this.music = assetManager.getSound("music-menu");
+	this.showFriendsToInvite = false;
+	this.friendsToInvite = [];
+	this.nbFriendsToInvite = 0;
+	this.nbPlayingFriends = $.getNbKeysInObject(user.friends);
+	this.maxNbFriendsPerPage = parseInt(config.GAME.MAX_NB_FRIENDS_PER_PAGE);
+	this.currentPageNb = 0;
+	this.nbPagesForFriendsToInvite = 0;
+	this.nbPagesForPlayingFriends = this.computeNbPages(this.nbPlayingFriends);
+	var self = this;
+	
+	var titleCallback = function()
+	{
+		return self.showFriendsToInvite ? "Friends to invite" : "Friends playing to the game";
+	};
+	
+	var items = {
+		list : {
+			type : "text",
+			captionCallback : function(){ return self.getFriendsList(); }
+		},
+		change : {
+			type : "option",
+			captionCallback : function(){ return self.showFriendsToInvite ? "Show friends playing to the game" : "Show friends to invite"; },
+			clickCallback : function(){ self.changeList(); }
+		},
+		back : {
+			type : "option",
+			caption : "Back",
+			clickCallback : function(){ game.launchMainMenu(); }
+		}
+	};
+	
+	MenuFrame.call(this,"friends",titleCallback,items);	
+	this.$screen = $("#screen");
+};
+
+FriendsMenu.prototype = new MenuFrame();
+
+FriendsMenu.prototype.computeNbPages = function(nbFriends)
+{
+	return Math.ceil( nbFriends / this.maxNbFriendsPerPage );
+};
+
+FriendsMenu.prototype.changeList = function()
+{
+	this.showFriendsToInvite = !this.showFriendsToInvite;
+	this.currentPageNb = 0;
+	this.refreshCaptions();
+};
+
+FriendsMenu.prototype.getFriendsList = function()
+{
+	var self = this;
+	var   friends = this.showFriendsToInvite ? this.friendsToInvite : user.friends;
+	var nbFriends = this.showFriendsToInvite ? this.nbFriendsToInvite : this.nbPlayingFriends;
+	var nbPages   = this.showFriendsToInvite ? this.nbPagesForFriendsToInvite : this.nbPagesForPlayingFriends;
+	
+	var friendsDiv = $('<div/>');
+	var friendList = $('<table/>').addClass("friends-table");
+	friendsDiv.append(friendList);
+	
+	var indexStart = this.currentPageNb * this.maxNbFriendsPerPage;
+	var indexEnd = ( this.currentPageNb + 1 ) * this.maxNbFriendsPerPage;
+	indexEnd = Math.min( indexEnd, nbFriends );
+	var currentIndex = -1;
+	
+	for(var friendName in friends)
+	{
+		++currentIndex;
+		
+		if ((indexStart <= currentIndex) && (currentIndex < indexEnd))
+		{
+			var friendFbId = friends[friendName];
+			var friendItem = $('<tr/>').addClass("friend-item");
+			var friendPictureUrl = "//graph.facebook.com/" + friendFbId + "/picture";
+			var friendPicture = $("<img/>").addClass("friend-picture").attr("src",friendPictureUrl);
+			var friendPictureCell = $('<td/>').addClass("friend-picture-cell").append(friendPicture);
+			var friendNameCell = $('<td/>').addClass("friend-name").append(friendName);
+			friendItem.append(friendPictureCell);
+			friendItem.append(friendNameCell);
+			friendList.append(friendItem);
+		}
+	}
+	
+	var friendsControls = $('<table/>').addClass('friends-controls');
+	var friendsControlsRow = $('<tr/>').addClass('friends-controls-row');
+	friendsControls.append(friendsControlsRow);
+	friendsDiv.append(friendsControls);
+	
+	if (this.currentPageNb > 0) 
+	{
+		var friendsPrevious = $('<td/>')
+		.addClass('friends-button').addClass('friends-previous')
+		.append('<- Page ' + this.currentPageNb + ' - ')
+		.click(function(){ self.changePage(this.currentPageNb-1); });
+		friendsControlsRow.append(friendsPrevious);
+	}
+	
+	var friendsPageNb = friendsPrevious = $('<td/>').addClass('friends-page-nb').append('Page ' + (this.currentPageNb+1));
+	friendsControlsRow.append(friendsPageNb);
+	
+	if (this.currentPageNb < (nbPages-1)) 
+	{
+		var friendsNext = $('<td/>')
+		.addClass('friends-button').addClass('friends-next')
+		.append(' - Page ' + (this.currentPageNb+2) + ' ->')
+		.click(function(){ self.changePage(this.currentPageNb+1); });
+		friendsControlsRow.append(friendsNext);
+	}
+
+	return friendsDiv.html();
+};
+
+FriendsMenu.prototype.changePage = function(pageNb)
+{
+	this.currentPageNb = pageNb;
+	this.refreshCaptions();
+};
+
+FriendsMenu.prototype.updateState = function(showMenu)
+{	
+	var self = this;
+	
+    if(showMenu)
+    {
+    	serverManager.requestFriendsToInvite(function(data)
+    	{
+    		self.friendsToInvite = data;
+    		self.nbFriendsToInvite = $.getNbKeysInObject(data);
+    		self.nbPagesForFriendsToInvite = self.computeNbPages(self.nbFriendsToInvite);
+    		MenuFrame.prototype.updateState.call(self,showMenu);
+    		//self.music.playLoop();
+    		self.$screen.addClass("paused");
+    	}
+    	,function(err)
+    	{
+    		alert("Can't get friends to invite from server: " + err);
+    		game.launchMainMenu();
+    	});
+    }
+    else
+    {
+		MenuFrame.prototype.updateState.call(self,false);
+    	//this.music.stop();
+    	this.$screen.removeClass("paused");
+    }
+};
+
+
 /** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\GameOverMenu.js **/
 
 var GameOverMenu = function()
@@ -2407,11 +2579,16 @@ var MainMenu = function()
 			type : "option",
 			caption : "Launch Level 1",
 			clickCallback : function(){ game.launchLevel(1); }
-		},	
-		top : {
+		},
+		top_scores : {
 			type : "option",
 			caption : "Show top scores",
 			clickCallback : function(){ game.showTopScoresMenu(); }
+		},
+		friends : {
+			type : "option",
+			caption : "Show friends",
+			clickCallback : function(){ game.showFriendsMenu(); }
 		},
 		logout : {
 			type : "option",
@@ -2502,13 +2679,18 @@ var TopScoresMenu = function()
 {
 	this.music = assetManager.getSound("music-menu");
 	this.userScores = [];
+	this.friendsScores = [];
 	this.allScores = [];
-	this.showAllScores = false;
+	this.type = TopScoresMenu.TYPE.USER;
+	this.captionPerType = [];
+	this.captionPerType[TopScoresMenu.TYPE.USER   ] = "Show player's scores";
+	this.captionPerType[TopScoresMenu.TYPE.FRIENDS] = "Show friends' scores";
+	this.captionPerType[TopScoresMenu.TYPE.ALL    ] = "Show all scores";
 	var self = this;
 	
 	var titleCallback = function()
 	{
-		return self.showAllScores ? "Top scores for all players" : "Top scores for current player";
+		return self.getCaptionForTypeOffset(0);
 	};
 	
 	var items = {
@@ -2516,10 +2698,15 @@ var TopScoresMenu = function()
 			type : "text",
 			captionCallback : function(){ return self.getTopScores(); }
 		},
-		change : {
+		change1 : {
 			type : "option",
-			captionCallback : function(){ return self.showAllScores ? "Show player's scores only" : "Show all scores"; },
-			clickCallback : function(){ self.showAllScores = !self.showAllScores; self.refreshCaptions(); }
+			captionCallback : function(){ return self.getCaptionForTypeOffset(1); },
+			clickCallback : function(){ self.setNewTypeWithOffset(1); }
+		},
+		change2 : {
+			type : "option",
+			captionCallback : function(){ return self.getCaptionForTypeOffset(2); },
+			clickCallback : function(){ self.setNewTypeWithOffset(2); }
 		},
 		back : {
 			type : "option",
@@ -2534,9 +2721,43 @@ var TopScoresMenu = function()
 
 TopScoresMenu.prototype = new MenuFrame();
 
+TopScoresMenu.TYPE = { USER : 0, FRIENDS : 1, ALL : 2, NB_TYPES : 3 };
+
+TopScoresMenu.prototype.getCaptionForTypeOffset = function(typeOffset)
+{
+	var type = ( this.type + typeOffset ) % TopScoresMenu.TYPE.NB_TYPES;
+	return this.captionPerType[type];
+};
+
+TopScoresMenu.prototype.setNewTypeWithOffset = function(typeOffset)
+{
+	this.type = ( this.type + typeOffset ) % TopScoresMenu.TYPE.NB_TYPES;
+	this.refreshCaptions();
+};
+
+TopScoresMenu.prototype.getCurrentOption1Caption = function()
+{
+	switch(this.type)
+	{
+		case TopScoresMenu.TYPE.USER    : return "Show player's scores";
+		case TopScoresMenu.TYPE.FRIENDS : return "Show friends' scores";
+		case TopScoresMenu.TYPE.ALL     : return "Show all scores";
+	}
+};
+
+TopScoresMenu.prototype.getCurrentScoresList = function()
+{
+	switch(this.type)
+	{
+		case TopScoresMenu.TYPE.USER    : return this.userScores;
+		case TopScoresMenu.TYPE.FRIENDS : return this.friendsScores;
+		case TopScoresMenu.TYPE.ALL     : return this.allScores;
+	}
+};
+
 TopScoresMenu.prototype.getTopScores = function()
 {
-	var topScores = this.showAllScores ? this.allScores : this.userScores;
+	var topScores = this.getCurrentScoresList();
 	
 	var scoresDiv = $('<div/>');
 	var scoreList = $('<table/>').addClass("top-scores-table");
@@ -2546,7 +2767,7 @@ TopScoresMenu.prototype.getTopScores = function()
 	{
 		var score = topScores[scoreIndex];
 		var scoreItem = $('<tr/>').addClass("top-score-item");
-		var scoreUser = $('<td/>').addClass("top-score-user").append(score.user);
+		var scoreUser = $('<td/>').addClass("top-score-user").append(score.firstname + " " + score.lastname);
 		var scoreValue = $('<td/>').addClass("top-score-value").append(score.value);
 		var scoreDate = $('<td/>').addClass("top-score-date");
 		var scoreDT = new Date(score.game_dt * 1000).toLocaleDateString(LOCALE.replace('_','-'));
@@ -2569,6 +2790,7 @@ TopScoresMenu.prototype.updateState = function(showMenu)
     	serverManager.requestTopScores(function(data)
     	{
     		self.userScores = data['user'];
+    		self.friendsScores = data['friends'];
     		self.allScores = data['all'];
     		MenuFrame.prototype.updateState.call(self,showMenu);
     		//self.music.playLoop();
@@ -3081,6 +3303,7 @@ Game.prototype.onAssetsLoaded = function()
 	
 	this.mainMenu = new MainMenu();
 	this.topScoresMenu = new TopScoresMenu();
+	this.friendsMenu = new FriendsMenu();
 	this.pauseMenu = new PauseMenu();
 	this.victoryMenu = new VictoryMenu();
 	this.gameOverMenu = new GameOverMenu();
@@ -3095,6 +3318,7 @@ Game.prototype.launchMainMenu = function()
 	
 	this.state = Game.State.MAIN_MENU;
 	this.topScoresMenu.updateState(false);
+	this.friendsMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	this.pauseMenu.updateState(false);
@@ -3109,11 +3333,18 @@ Game.prototype.showTopScoresMenu = function()
 	this.topScoresMenu.updateState(true);
 };
 
+Game.prototype.showFriendsMenu = function()
+{
+	this.mainMenu.updateState(false);
+	this.friendsMenu.updateState(true);
+};
+
 Game.prototype.launchLevel = function(levelNumber)
 {
 	this.state = Game.State.LEVEL_LOAD;
 	this.mainMenu.updateState(false);
 	this.topScoresMenu.updateState(false);
+	this.friendsMenu.updateState(false);
 	this.victoryMenu.updateState(false);
 	this.gameOverMenu.updateState(false);
 	levelLoader.loadLevel(levelNumber);

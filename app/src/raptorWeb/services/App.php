@@ -17,6 +17,7 @@ class App
         $this->db->setAttribute( \PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ );
         $this->db->exec('SET CHARACTER SET utf8');
         $this->config = \raptorWeb\model\Config::read($this->db);
+        $this->connectFacebook();
     }
     
     public static function getInstance()
@@ -57,6 +58,17 @@ class App
     	exit;
     }
     
+    private function connectFacebook()
+    {
+    	if(defined('FB_APP_ID'))
+    	{
+	    	$this->fb = new \Facebook(array(
+	    			'appId'  => FB_APP_ID,
+	    			'secret' => FB_APP_SECRET
+	    	));
+    	}
+    }
+    
     public function run()
     {
     	if (!isset($_SESSION['locale'])) $_SESSION['locale'] = 'fr_BE';
@@ -75,10 +87,11 @@ class App
     
     private function runFacebook()
     {
-    	$this->fb = new \Facebook(array(
-			'appId'  => FB_APP_ID,
-    		'secret' => FB_APP_SECRET	
-    	));
+    	if (isset($_REQUEST['logout']))
+    	{
+    		session_destroy();
+    		$this->reloadPage();
+    	}
         
     	// received requests from other users in app
         if (isset($_SESSION['request_ids']))
@@ -273,6 +286,10 @@ class App
 		   		
 		   		case 'user-top-scores':
 		   			$res = UserService::listTopScores($user);
+		   			break;
+		   			
+		   		case 'get-friends-to-invite':
+		   			$res = UserService::getFriendsToInvite($this->fb,$user);
 		   			break;
 		    }
    		}

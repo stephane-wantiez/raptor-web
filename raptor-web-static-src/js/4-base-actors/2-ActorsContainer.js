@@ -55,7 +55,7 @@ ActorsContainer.prototype.render = function(g)
 
 ActorsContainer.prototype.size = function()
 {
-	return Object.keys(this.list).length;
+	return $.getNbKeysInObject(this.list);
 };
 
 ActorsContainer.prototype.removeAll = function()

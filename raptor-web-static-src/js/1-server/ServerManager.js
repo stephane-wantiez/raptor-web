@@ -3,6 +3,17 @@ var ServerManager = function()
 
 ServerManager.prototype.sendRequest = function(action,data,successCallback,errorCallback)
 {
+	var errorFunction = function(err){
+		//alert('Failure for request ' + action);
+		if ($.isDefined(errorCallback))
+		{
+			var errStr = JSON.stringify(err, null, '\n');
+			errorCallback(errStr);
+			console.log('API error:');
+			console.log(errStr);
+		}
+	}
+	
 	$.ajax({
 		url: 'api.php',
 		method: 'POST',
@@ -12,21 +23,16 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 		},
 		success: function(res){
 			//alert('Success for request ' + action);
-			if ($.isDefined(successCallback))
+			if ($.isDefined(res) && ($.isDefined(res['error'])))
+			{
+				errorFunction(res);
+			}
+			else if ($.isDefined(successCallback))
 			{
 				successCallback(res);
 			}
 		},
-		error: function(err){
-			//alert('Failure for request ' + action);
-			if ($.isDefined(errorCallback))
-			{
-				var errStr = JSON.stringify(err, null, '\n');
-				errorCallback(errStr);
-				console.log('API error:');
-				console.log(errStr);
-			}
-		}
+		error: errorFunction
 	});
 };
 
@@ -64,4 +70,10 @@ ServerManager.prototype.requestTopScores = function(successCallback,errorCallbac
 {
 	// send the request w/o any data, receive the array of 5 user's top scores maximum
 	this.sendRequest('user-top-scores','',successCallback,errorCallback);
+};
+
+ServerManager.prototype.requestFriendsToInvite = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the list of FB friends the player can invite
+	this.sendRequest('get-friends-to-invite','',successCallback,errorCallback);
 };
