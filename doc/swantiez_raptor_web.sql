@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Dim 27 Avril 2014 à 16:52
+-- Généré le: Dim 18 Mai 2014 à 23:10
 -- Version du serveur: 5.6.12-log
 -- Version de PHP: 5.4.12
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Base de données: `raptor-web`
+-- Base de données: `swantiez_raptor_web`
 --
 CREATE DATABASE IF NOT EXISTS `swantiez_raptor_web` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `swantiez_raptor_web`;
@@ -34,23 +34,28 @@ CREATE TABLE IF NOT EXISTS `config` (
   `name` varchar(100) NOT NULL,
   `identifier` varchar(32) NOT NULL,
   `type` int(10) unsigned NOT NULL,
-  `value` double NOT NULL,
+  `value` varchar(32) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `type` (`type`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
 
 --
 -- Contenu de la table `config`
 --
 
 INSERT INTO `config` (`id`, `name`, `identifier`, `type`, `value`) VALUES
-(1, 'Player''s bullets speed', 'BULLET_SPEED', 1, 800),
-(2, 'Delay between player''s bullets', 'BULLET_SHOOT_WAIT_TIME_MSEC', 1, 20),
-(3, 'Max player speed on X', 'SPEED_X', 1, 3000),
-(4, 'Max player speed on Y', 'SPEED_Y', 1, 2000),
-(5, 'Max nb of shields for player', 'MAX_NB_SHIELDS', 1, 10),
-(6, 'Max nb of bombs for player', 'MAX_NB_BOMBS', 1, 3),
-(7, 'Collision damage on enemies', 'COLLISION_DAMAGE_ENEMY', 1, 100);
+(1, 'Player''s bullets speed', 'BULLET_SPEED', 1, '800'),
+(2, 'Delay between player''s bullets', 'BULLET_SHOOT_WAIT_TIME_MSEC', 1, '20'),
+(3, 'Max player speed on X', 'SPEED_X', 1, '3000'),
+(4, 'Max player speed on Y', 'SPEED_Y', 1, '2000'),
+(5, 'Max nb of shields for player', 'MAX_NB_SHIELDS', 1, '10'),
+(6, 'Max nb of bombs for player', 'MAX_NB_BOMBS', 1, '3'),
+(7, 'Collision damage on enemies', 'COLLISION_DAMAGE_ENEMY', 1, '100'),
+(8, 'Min delay between bomb drops', 'BOMB_DROP_WAIT_TIME_MSEC', 1, '5000'),
+(9, 'Explosion flash period (in msec)', 'EXPLOSION_FLASH_PERIOD_MSEC', 2, '100'),
+(10, 'Explosion flash color (RGB)', 'EXPLOSION_FLASH_COLOR', 2, '#FFFFB0'),
+(11, 'Max nb of score tuples per user', 'MAX_NB_SCORES_PER_USER', 3, '5'),
+(12, 'Max nb of friends per page', 'MAX_NB_FRIENDS_PER_PAGE', 3, '5');
 
 -- --------------------------------------------------------
 
@@ -65,14 +70,16 @@ CREATE TABLE IF NOT EXISTS `config_type` (
   `identifier` varchar(32) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `identifier` (`identifier`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 --
 -- Contenu de la table `config_type`
 --
 
 INSERT INTO `config_type` (`id`, `name`, `identifier`) VALUES
-(1, 'Player settings', 'PLAYER');
+(1, 'Player settings', 'PLAYER'),
+(2, 'Scene settings', 'SCENE'),
+(3, 'Basic game settings', 'GAME');
 
 -- --------------------------------------------------------
 
@@ -111,7 +118,7 @@ INSERT INTO `enemy` (`id`, `type`, `level`, `pos_x`, `pos_y`) VALUES
 (12, 20, 10, 600, 1700),
 (13, 21, 10, 200, 2000),
 (14, 22, 10, 600, 2000),
-(15, 20, 10, 450, 2150),
+(15, 22, 10, 450, 2150),
 (16, 20, 10, 300, 2200),
 (17, 21, 10, 100, 2400),
 (18, 21, 10, 600, 2400),
@@ -134,7 +141,7 @@ INSERT INTO `enemy` (`id`, `type`, `level`, `pos_x`, `pos_y`) VALUES
 (35, 20, 10, 500, 4300),
 (36, 22, 10, 700, 4500),
 (37, 20, 10, 200, 4700),
-(38, 20, 10, 600, 4800),
+(38, 22, 10, 600, 4800),
 (39, 21, 10, 400, 5000),
 (40, 22, 10, 300, 5200);
 
@@ -166,6 +173,18 @@ INSERT INTO `enemy_type` (`id`, `name`, `type`, `boss`) VALUES
 (21, 'FlyingEnemy2', 'FlyingEnemy2', 0),
 (22, 'FlyingEnemy3', 'FlyingEnemy3', 0);
 
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `enemy_type_boss`
+--
+DROP VIEW IF EXISTS `enemy_type_boss`;
+CREATE TABLE IF NOT EXISTS `enemy_type_boss` (
+`id` int(10) unsigned
+,`name` varchar(32)
+,`type` varchar(64)
+,`boss` tinyint(1)
+);
 -- --------------------------------------------------------
 
 --
@@ -209,7 +228,21 @@ CREATE TABLE IF NOT EXISTS `score` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `game_done` (`game_done`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=39 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=80 ;
+
+--
+-- Contenu de la table `score`
+--
+
+INSERT INTO `score` (`id`, `user_id`, `game_dt`, `value`, `game_done`) VALUES
+(34, 10, 1398536535, 710, 1),
+(35, 10, 1398543780, 626, 1),
+(38, 13, 1398613268, 12345, 1),
+(67, 10, 1400359876, 110, 1),
+(76, 10, 1400360897, 169, 1),
+(77, 10, 1400361000, 310, 1),
+(78, 14, 1400369233, 124, 1),
+(79, 21, 1400427269, 124, 1);
 
 -- --------------------------------------------------------
 
@@ -220,17 +253,36 @@ CREATE TABLE IF NOT EXISTS `score` (
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `fb_id` int(10) unsigned NOT NULL,
-  `username` varchar(32) NOT NULL,
+  `fb_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
   `password` varchar(100) NOT NULL,
   `firstname` varchar(64) NOT NULL,
   `lastname` varchar(64) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
+  `last_cnx_dt` int(10) unsigned NOT NULL,
+  `nb_bombs` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `fb_id` (`fb_id`,`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=22 ;
+
+--
+-- Contenu de la table `user`
+--
+
+INSERT INTO `user` (`id`, `fb_id`, `username`, `password`, `firstname`, `lastname`, `email`, `last_cnx_dt`, `nb_bombs`) VALUES
+(10, '0', 'Lord W', 'sha256:1000:jHfBjE7+N8xGBS4yvmq24+N4yWehlMrc:e4i5++F0J4VryT3AcH7+gp3sSX55oyVu', 'Stéphane', 'Wantiez', 'stephane.wantiez@gmail.com', 0, 0),
+(13, '42', 'robert_mitchum', '42', 'Robert', 'Mitchum', 'robert.mitchum@mymail.com', 0, 0),
+(14, '698421819', 'Stéphane_Wantiez_698421819', '', 'Stéphane', 'Wantiez', 'stephane.wantiez@gmail.com', 1400454480, 0),
+(21, '100008364579710', 'Test-Stéphane_Wantiez_100008364579710', '', 'Test-Stéphane', 'Wantiez', 's.wantiez@rubika-edu.com', 1400432180, 0);
 
 -- --------------------------------------------------------
+
+--
+-- Structure de la vue `enemy_type_boss`
+--
+DROP TABLE IF EXISTS `enemy_type_boss`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `enemy_type_boss` AS select `enemy_type`.`id` AS `id`,`enemy_type`.`name` AS `name`,`enemy_type`.`type` AS `type`,`enemy_type`.`boss` AS `boss` from `enemy_type` where (`enemy_type`.`boss` = 1);
 
 --
 -- Contraintes pour les tables exportées
