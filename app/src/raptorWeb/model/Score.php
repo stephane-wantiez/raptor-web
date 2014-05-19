@@ -69,7 +69,12 @@ class Score extends ActiveRecord
 		}
 		else if ($friendsFb != null)
 		{
-			$friendsList = join(',',array_values($friendsFb));
+			$friendsList = '';
+			foreach ($friendsFb as $friend)
+			{
+				if ($friendsList != '') $friendsList .= ',';
+				$friendsList .= $friend['id'];
+			}
 			$whereCond = 'fb_id IN (' . $friendsList . ')';
 		}
 		$orderParams = array( 'score.value' => 'DESC' , 'score.game_dt' => 'DESC' );

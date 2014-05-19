@@ -92,17 +92,6 @@ class App
     		session_destroy();
     		$this->reloadPage();
     	}
-        
-    	// received requests from other users in app
-        if (isset($_SESSION['request_ids']))
-        {
-        	$requestList = explode(",", $_SESSION['request_ids']);
-        	foreach($requestList as $req)
-        	{
-        		var_dump($this->fb->api('/'.$req));
-        	}
-            exit;
-        }
     	
     	$signedRequest = $this->fb->getSignedRequest();
     	if (isset($signedRequest['user']['locale']))
@@ -110,12 +99,55 @@ class App
     		$_SESSION['locale'] = $signedRequest['user']['locale'];
     	}
     	
-    	UserService::loginFacebookUser($this->fb);
+    	UserService::loginFacebookUser($this->fb,$this->config['GAME']);
         
         if (isset($_SESSION['user']))
         {
+			$this->manageFacebookRequests();        
         	include( TEMPLATES_PATH . 'main.tpl' );
         }    	
+    }
+    
+    private function manageFacebookRequests()
+    {
+    	$reqIds = '';
+    	 
+    	// received requests from other users in app
+    	if (isset($_REQUEST['request_ids']))
+    	{
+    		$reqIds = $_REQUEST['request_ids'];
+    	}
+    	else if (isset($_SESSION['request_ids']))
+    	{
+    		$reqIds = $_SESSION['request_ids'];
+    	}
+    	 
+    	if ($reqIds != '')
+    	{
+    		$requestList = explode(",",$reqIds);
+    		foreach($requestList as $req)
+    		{
+    			$this->manageFacebookRequest($this->fb->api('/'.$req));
+    		}
+    	}
+    }
+    
+    private function manageFacebookRequest($request)
+    {
+    	$from = $request['from']['name'];
+    	$data = $request['data'];
+    	$message = $request['message'];
+    	$time = new \DateTime($request['created_time']);
+	    $time = $time->getTimestamp();
+	    $user = $_SESSION['user'];
+	    
+	    switch($data)
+	    {
+	    	case 'gift-bomb': UserService::receiveGift($user); break;
+	    }
+	    
+	    if (!isset($_SESSION['friendsRequests'])) $_SESSION['friendsRequests'] = array();
+	    $_SESSION['friendsRequests'][] = array( 'from' => $from, 'data' => $data, 'message' => $message, 'time' => $time );
     }
 
     private function runStandalone()
@@ -285,11 +317,16 @@ class App
 		   			break;
 		   		
 		   		case 'user-top-scores':
-		   			$res = UserService::listTopScores($user);
+		   			$maxNbScores = (int) $this->config['GAME']['MAX_NB_SCORES_PER_USER'];
+		   			$res = UserService::listTopScores($user,$maxNbScores);
 		   			break;
 		   			
 		   		case 'get-friends-to-invite':
 		   			$res = UserService::getFriendsToInvite($this->fb,$user);
+		   			break;
+		   			
+		   		case 'consume-gift':
+		   			$res = UserService::consumeGift($user);
 		   			break;
 		    }
    		}

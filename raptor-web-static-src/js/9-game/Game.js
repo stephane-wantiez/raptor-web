@@ -10,6 +10,7 @@ var Game = function()
 	this.timeSinceLoadingEnd = 0;
 	this.started = false;
 	this.paused = false;
+	this.friendsRequestsMessagesDone = false;
 	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
@@ -179,6 +180,22 @@ Game.prototype.logout = function()
 	location.href = location.href + '?logout';
 };
 
+Game.prototype.checkFriendsRequests = function()
+{
+	if (!this.friendsRequestsMessagesDone && $.isDefined(friendsRequests) && (friendsRequests.length != null))
+	{
+		for(var friendRequestIndex in friendsRequests)
+		{
+			var friendRequest = friendsRequests[friendRequestIndex];
+			var friendRequestStr = friendRequest.message
+			+ "\nFrom " + friendRequest.from
+			+ "\nOn " + $.timestampToLocaleDate(friendRequest.time);
+			alert(friendRequestStr);
+		}
+	}
+	this.friendsRequestsMessagesDone = true;
+};
+
 Game.prototype.showLoadingScreen = function(g,text,textPosX,progress,alpha)
 {
     //console.log("Progress: " + this.getLoadingProgress());
@@ -306,6 +323,7 @@ Game.prototype.mainLoop = function()
     	{
             this.gameRender(this.graphics);
             this.gameUpdate(deltaTimeSec);
+			this.checkFriendsRequests();
             break;
     	}
     }
@@ -330,9 +348,11 @@ Game.prototype.gameRender = function(g)
 $(document).ready(function()
 {
 	console.log("Game started");
+	
 	assetManager = new AssetManager();
 	inputManager = new InputManager();
 	serverManager = new ServerManager();
+	fbManager = new FacebookManager();
 	levelLoader = new LevelLoader();
 	game = new Game();
 });

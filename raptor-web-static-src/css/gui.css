@@ -220,13 +220,13 @@
     text-align:center;
     text-decoration: underline;
 }
-#friends-list{
+#friends-bombs{
     font-size: 14px;
     top: 50%;
-    margin-top: -200px;
-    margin-left: -100px;
-    width: 200px;
-    height:400px;
+    margin-top: 180px;
+    margin-left: -300px;
+    width: 600px;
+    height:40px;
 }
 #friends-change{
     top: 50%;
@@ -244,38 +244,35 @@
     height:40px;
     vertical-align: middle;
 }
-/*.friends-controls{
+.friends-list{
+	position: absolute;
     top: 50%;
-    margin-top: 200px;
-    margin-left: -200px;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -150px;
     width: 300px;
-    height:40px;
     vertical-align: middle;
 }
-.friends-previous{
-    top: 50%;
-    margin-top: 200px;
-    margin-left: -200px;
-    width: 100px;
-    height:40px;
-    vertical-align: middle;
+.friend-name{
+	width:200px;
+    font-family: CutOutsFLF;
+    text-align:center;
 }
 .friends-page-nb{
-    top: 50%;
-    margin-top: 200px;
-    margin-left: -100px;
-    width: 100px;
-    height:40px;
-    vertical-align: middle;
+	width:100px;
+    font-family: CutOutsFLF;
+    text-align:center;
 }
-.friends-next{
-    top: 50%;
-    margin-top: 200px;
-    margin-left: 0px;
-    width: 100px;
-    height:40px;
-    vertical-align: middle;
-}*/
+.friends-button{
+    font-family: CutOutsFLF;
+    text-align:center;
+	border: 1px;
+	background-color: navy;
+	color: white;
+	cursor: pointer;
+	margin-left: 10px;
+	margin-right: 10px;
+}
 
 #pause-menu{
 	height:140px;

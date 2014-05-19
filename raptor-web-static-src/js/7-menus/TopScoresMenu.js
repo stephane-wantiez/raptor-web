@@ -93,7 +93,7 @@ TopScoresMenu.prototype.getTopScores = function()
 		var scoreUser = $('<td/>').addClass("top-score-user").append(score.firstname + " " + score.lastname);
 		var scoreValue = $('<td/>').addClass("top-score-value").append(score.value);
 		var scoreDate = $('<td/>').addClass("top-score-date");
-		var scoreDT = new Date(score.game_dt * 1000).toLocaleDateString(LOCALE.replace('_','-'));
+		var scoreDT = $.timestampToLocaleDate(score.game_dt);
 		scoreDate.append(scoreDT);
 		scoreItem.append(scoreUser);
 		scoreItem.append(scoreDate);

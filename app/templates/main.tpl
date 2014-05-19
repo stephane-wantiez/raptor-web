@@ -7,6 +7,7 @@
 	var FB_APP_ID = "<?php if (defined('FB_APP_ID')) { echo FB_APP_ID; } ?>";
 	var LOCALE = "<?php echo $_SESSION['locale']; ?>";
 	var webStaticUri = '<?php echo WEB_STATIC_URI; ?>';
+	var friendsRequests = <?php echo json_encode($_SESSION['friendsRequests']); $_SESSION['friendsRequests'] = array(); ?>;
 </script>
 <script type="text/javascript" src="<?php echo WEB_STATIC_URI; ?>js/script.js"></script>
 

@@ -1,8 +1,8 @@
 /** 
-* Script file generated on Mon, 19 May 2014 01:07:55 +0200
+* Script file generated on Mon, 19 May 2014 19:55:57 +0200
 **/
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
 
 window.requestAnimFrame = (function() {
   return window.requestAnimationFrame ||
@@ -17,9 +17,8 @@ window.requestAnimFrame = (function() {
 
 if (!Object.keys) {
     Object.keys = function (obj) {
-        var keys = [],
-            k;
-        for (k in obj) {
+        var keys = [];
+        for (var k in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, k)) {
                 keys.push(k);
             }
@@ -241,7 +240,12 @@ $.showEase = function(g,rect,ease)
 
 $.objectToString = function(objectToShow)
 {
-	return JSON.stringify(objectToShow, null, 4);
+	return JSON.stringify(objectToShow, null, 3);
+};
+
+$.timestampToLocaleDate = function(timestamp)
+{
+	return new Date(parseInt(timestamp) * 1000).toLocaleDateString(LOCALE.replace('_','-'));
 };
 
 // UNIT TESTS
@@ -257,7 +261,7 @@ if (testValue != "00001234") console.error("$.expandValueDigits is WRONG: " + te
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-assets\0-Sound.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\0-Sound.js **/
 
 var Sound = function(url)
 {
@@ -316,7 +320,7 @@ Sound.prototype.stop = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-assets\1-AssetManager.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\1-AssetManager.js **/
 
 var AssetManager = function()
 {
@@ -542,7 +546,7 @@ AssetManager.prototype.getSound = function(id)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-server\ServerManager.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\2-ServerManager.js **/
 
 var ServerManager = function()
 {};
@@ -551,14 +555,11 @@ ServerManager.prototype.sendRequest = function(action,data,successCallback,error
 {
 	var errorFunction = function(err){
 		//alert('Failure for request ' + action);
-		if ($.isDefined(errorCallback))
-		{
-			var errStr = JSON.stringify(err, null, '\n');
-			errorCallback(errStr);
-			console.log('API error:');
-			console.log(errStr);
-		}
-	}
+		var errStr = $.objectToString(err);
+		console.log('Server API error:');
+		console.log(errStr);
+		if ($.isDefined(errorCallback)) errorCallback(errStr);
+	};
 	
 	$.ajax({
 		url: 'api.php',
@@ -612,6 +613,12 @@ ServerManager.prototype.requestDropBomb = function(successCallback,errorCallback
 	this.sendRequest('drop-bomb','',successCallback,errorCallback);
 };
 
+ServerManager.prototype.requestConsumeGift = function(successCallback,errorCallback)
+{
+	// send the request w/o any data, receive the nb of remaining gift bombs if successful
+	this.sendRequest('consume-gift','',successCallback,errorCallback);
+};
+
 ServerManager.prototype.requestTopScores = function(successCallback,errorCallback)
 {
 	// send the request w/o any data, receive the array of 5 user's top scores maximum
@@ -626,7 +633,68 @@ ServerManager.prototype.requestFriendsToInvite = function(successCallback,errorC
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\2-inputs\InputManager.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\3-FacebookManager.js **/
+
+var FacebookManager = function()
+{
+	this.available = false;
+	var self = this;
+	
+	if (FB_APP_ID != '')
+	{
+		console.log('Initializing facebook API...');
+		$.getScript('//connect.facebook.net/' + LOCALE + '/all.js', function()
+		{
+			console.log('Facebook initialized');
+			self.available = true;
+			FB.init({
+				appId: FB_APP_ID
+			});
+			FB.getLoginStatus(function(result){
+				console.log('Facebook login status: ' + $.objectToString(result));
+			});
+		});
+	}
+};
+
+FacebookManager.prototype.sendData = function(friendId,title,message,data,successCallback,errorCallback)
+{
+	friendId = parseInt(friendId);
+	
+	if (this.available)
+	{
+		FB.ui({
+			method: 'apprequests',
+			title: title,
+			message: message,
+			to: friendId,
+			data : data
+		}, function(response) {
+		    if (response && !response.error_code) {
+		    	if ($.isDefined(successCallback)) successCallback(response);
+		    } else {
+				var responseStr = $.objectToString(response);
+				console.log('Facebook API error:');
+				console.log(responseStr);
+		    	if ($.isDefined(errorCallback)) errorCallback(response);
+		    }
+		});
+	}
+};
+
+FacebookManager.prototype.inviteFriend = function(friendId,successCallback,errorCallback)
+{
+	this.sendData( friendId, 'Invitation for ' + Game.TITLE, 'Enter the battle!', null, successCallback, errorCallback );
+};
+
+FacebookManager.prototype.sendGiftBombToFriend = function(friendId,successCallback,errorCallback)
+{
+	this.sendData( friendId, 'Gift bomb received for ' + Game.TITLE, 'Gift bomb received!', 'gift-bomb', successCallback, errorCallback );
+};
+
+
+
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\2-inputs\InputManager.js **/
 
 var InputManager = function()
 {
@@ -729,7 +797,7 @@ InputManager.P_KEY_CODE = 80;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\3-graphics\Sprite.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\3-graphics\Sprite.js **/
 
 var Sprite = function(id, img, width, height, colCount, rowCount, frameRate, loop)
 {
@@ -881,7 +949,7 @@ Sprite.prototype.render = function(g)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\0-PositionChanger.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\0-PositionChanger.js **/
 
 var PositionChanger = function()
 {	
@@ -916,7 +984,7 @@ PositionChanger.prototype.setPosition = function(x, y)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\1-Actor.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\1-Actor.js **/
 
 var Actor = function(id,width,height)
 {
@@ -1248,7 +1316,7 @@ Actor.prototype.remove = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\2-ActorsContainer.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\2-ActorsContainer.js **/
 
 var ActorsContainer = function()
 {
@@ -1320,7 +1388,7 @@ ActorsContainer.prototype.removeAll = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\3-MovingActor.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\3-MovingActor.js **/
 
 var MovingActor = function(id,width,height)
 {
@@ -1371,7 +1439,7 @@ MovingActor.prototype.doUpdate = function(deltaTimeSec)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\0-Projectile.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\0-Projectile.js **/
 
 var Projectile = function(id,speedX,speedY,width,height,radius)
 {
@@ -1390,7 +1458,7 @@ Projectile.prototype = new MovingActor();
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\1-Bullet.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\1-Bullet.js **/
 
 var Bullet = function(speedY,speedX)
 {
@@ -1415,7 +1483,7 @@ Bullet.DAMAGE = 5;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\2-FlyingEnemy.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\2-FlyingEnemy.js **/
 
 var FlyingEnemy = function(id,width,height,x,y)
 {
@@ -1506,7 +1574,7 @@ FlyingEnemy.prototype.doShoot = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingBoss1.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingBoss1.js **/
 
 var FlyingBoss1 = function(id,x,y)
 {
@@ -1579,7 +1647,7 @@ FlyingBoss1.SHOOT_MAX_VAR_Y = 10;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy1.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy1.js **/
 
 var FlyingEnemy1 = function(id,x,y)
 {
@@ -1612,7 +1680,7 @@ FlyingEnemy1.KILL_SCORE = 14;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy2.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy2.js **/
 
 var FlyingEnemy2 = function(id,x,y)
 {
@@ -1633,7 +1701,7 @@ FlyingEnemy2.SPRITE_FPS = 20;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy3.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy3.js **/
 
 var FlyingEnemy3 = function(id,x,y)
 {
@@ -1673,7 +1741,7 @@ FlyingEnemy3.SHOOT_SPEED = 1200;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\ScoreFeedback.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\ScoreFeedback.js **/
 
 var ScoreFeedback = function(sourceActor,scoreText)
 {
@@ -1719,7 +1787,7 @@ ScoreFeedback.prototype.doRender = function(g)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\0-LevelLoader.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\0-LevelLoader.js **/
 
 var LevelLoader = function()
 {
@@ -1843,7 +1911,7 @@ LevelLoader.prototype.getLevelLoadingError = function()
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\1-LevelBuilder.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\1-LevelBuilder.js **/
 
 var LevelBuilder =
 {
@@ -1896,7 +1964,7 @@ var LevelBuilder =
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\Scene.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\Scene.js **/
 
 var Scene = function(sceneConfig)
 {
@@ -2242,7 +2310,7 @@ Scene.WAIT_BEFORE_RESTART_MS = 4000;
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\0-MenuFrame.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\0-MenuFrame.js **/
 
 var MenuFrame = function(menuId,title,items,menuExtraClass,menuTitleExtraClass)
 {	
@@ -2346,7 +2414,7 @@ MenuFrame.prototype.updateState = function(openMenu)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\1-EndGameMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\1-EndGameMenu.js **/
 
 var EndGameMenu = function(menuId,title)
 {
@@ -2398,7 +2466,7 @@ EndGameMenu.prototype.updateState = function(gameEnd)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\FriendsMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\FriendsMenu.js **/
 
 var FriendsMenu = function()
 {
@@ -2413,7 +2481,9 @@ var FriendsMenu = function()
 	this.currentPageNb = 0;
 	this.nbPagesForFriendsToInvite = 0;
 	this.nbPagesForPlayingFriends = this.computeNbPages(this.nbPlayingFriends);
+	this.friendsList = $('<div/>');
 	var self = this;
+	user.canSendGiftBombs = true;
 	
 	var titleCallback = function()
 	{
@@ -2421,71 +2491,165 @@ var FriendsMenu = function()
 	};
 	
 	var items = {
-		list : {
-			type : "text",
-			captionCallback : function(){ return self.getFriendsList(); }
+		bombs : {
+			type : 'text',
+			captionCallback : function(){ return self.getBombsCaption(); }
 		},
 		change : {
-			type : "option",
-			captionCallback : function(){ return self.showFriendsToInvite ? "Show friends playing to the game" : "Show friends to invite"; },
-			clickCallback : function(){ self.changeList(); }
+			type : 'option',
+			captionCallback : function(){ return self.showFriendsToInvite ? 'Show friends playing to the game' : 'Show friends to invite'; },
+			clickCallback : function(){ self.showFriendsToInvite = !self.showFriendsToInvite; self.updateFriendsList(0); }
 		},
 		back : {
-			type : "option",
-			caption : "Back",
+			type : 'option',
+			caption : 'Back',
 			clickCallback : function(){ game.launchMainMenu(); }
 		}
 	};
 	
 	MenuFrame.call(this,"friends",titleCallback,items);	
 	this.$screen = $("#screen");
+	
+	this.$menuFrame.append(this.friendsList);
+	this.updateFriendsList();
 };
 
 FriendsMenu.prototype = new MenuFrame();
+
+FriendsMenu.prototype.getBombsCaption = function()
+{
+	if (this.showFriendsToInvite) return '';
+	return 'Number of bombs: ' + user.nbBombs +
+	         ' - gift bombs: ' + user.nbGiftBombs +
+	     ' - next gift bomb: ' + $.timestampToLocaleDate(user.nextGiftBombDT);
+};
 
 FriendsMenu.prototype.computeNbPages = function(nbFriends)
 {
 	return Math.ceil( nbFriends / this.maxNbFriendsPerPage );
 };
 
-FriendsMenu.prototype.changeList = function()
+FriendsMenu.prototype.updateFriendsList = function(pageNb)
 {
-	this.showFriendsToInvite = !this.showFriendsToInvite;
-	this.currentPageNb = 0;
+	if ($.isDefined(pageNb)) this.currentPageNb = pageNb;
+	var currentListOfFriends = this.getFriendsList(this.showFriendsToInvite,this.currentPageNb);
+	this.friendsList.empty();
+	this.friendsList.append(currentListOfFriends);
 	this.refreshCaptions();
 };
 
-FriendsMenu.prototype.getFriendsList = function()
+FriendsMenu.prototype.createFriendRow = function(friend,showFriendsToInvite)
 {
 	var self = this;
-	var   friends = this.showFriendsToInvite ? this.friendsToInvite : user.friends;
-	var nbFriends = this.showFriendsToInvite ? this.nbFriendsToInvite : this.nbPlayingFriends;
-	var nbPages   = this.showFriendsToInvite ? this.nbPagesForFriendsToInvite : this.nbPagesForPlayingFriends;
+	var friendFbId = friend.id;
+	var friendName = friend.firstName + ' ' + friend.lastName;
+	var friendItem = $('<tr/>').addClass("friend-item");
+	var friendPictureUrl = "//graph.facebook.com/" + friendFbId + "/picture";
+	var friendPicture = $("<img/>").addClass("friend-picture").attr("src",friendPictureUrl);
+	var friendPictureCell = $('<td/>').addClass("friend-picture-cell").append(friendPicture);
+	var friendNameCell = $('<td/>').addClass("friend-name").append(friendName);
+	var friendButtonCell = $('<td/>');
+	friendItem.append(friendPictureCell);
+	friendItem.append(friendNameCell);
+	friendItem.append(friendButtonCell);
 	
-	var friendsDiv = $('<div/>');
+	if (showFriendsToInvite)
+	{
+		if (!$.isDefined(friend.invited) || !friend.invited)
+		{
+			var friendInviteButton = $('<div/>');
+			friendInviteButton.append('Invite')
+			.addClass('friend-invite').addClass('friends-button')
+			.click(function(){
+				friend.invited = true;
+				fbManager.inviteFriend(friendFbId);
+				self.updateFriendsList();
+			});
+			friendButtonCell.append(friendInviteButton);
+		}
+	}
+	else if (user.canSendGiftBombs && (user.nbGiftBombs > 0))
+	{
+		var friendGiftButton = $('<div/>');
+		friendGiftButton.append('Send gift bomb')
+		.addClass('friend-gift').addClass('friends-button')
+		.click(function(){
+			user.canSendGiftBombs = false;
+    		self.updateFriendsList();
+			fbManager.sendGiftBombToFriend(friendFbId,function(resp){
+		    	serverManager.requestConsumeGift(function(resp){
+		    		user.nbGiftBombs = resp.nbGiftBombs;
+		    		user.canSendGiftBombs = true;
+		    		self.updateFriendsList();
+		    		self.refreshCaptions();
+		    	},function(err){
+		    		user.canSendGiftBombs = true;
+		    		self.updateFriendsList();
+		    		self.refreshCaptions();
+		    		alert("Can't send gift bomb to friend (server error)");
+		    	});
+			},function(err){
+	    		user.canSendGiftBombs = true;
+	    		self.updateFriendsList();		
+	    		self.refreshCaptions();		
+	    		alert("Can't send gift bomb to friend (facebook error)");
+			});
+
+		});
+		friendButtonCell.append(friendGiftButton);
+	}
+	
+	return friendItem;
+};
+
+FriendsMenu.prototype.getFriendsList = function(showFriendsToInvite,pageNb)
+{
+	var self = this;
+	var   friends = showFriendsToInvite ? this.friendsToInvite : user.friends;
+	var nbFriends = showFriendsToInvite ? this.nbFriendsToInvite : this.nbPlayingFriends;
+	var nbPages   = showFriendsToInvite ? this.nbPagesForFriendsToInvite : this.nbPagesForPlayingFriends;
+	
+	var friendsDiv = $('<div/>').addClass("friends-list");
 	var friendList = $('<table/>').addClass("friends-table");
 	friendsDiv.append(friendList);
 	
-	var indexStart = this.currentPageNb * this.maxNbFriendsPerPage;
-	var indexEnd = ( this.currentPageNb + 1 ) * this.maxNbFriendsPerPage;
+	var indexStart = pageNb * this.maxNbFriendsPerPage;
+	var indexEnd = ( pageNb + 1 ) * this.maxNbFriendsPerPage;
 	indexEnd = Math.min( indexEnd, nbFriends );
 	var currentIndex = -1;
 	
-	for(var friendName in friends)
+	for(var friendKey in friends)
 	{
 		++currentIndex;
 		
 		if ((indexStart <= currentIndex) && (currentIndex < indexEnd))
 		{
-			var friendFbId = friends[friendName];
+			var friend = friends[friendKey];
+			var friendItem = this.createFriendRow(friend,showFriendsToInvite);
+			friendList.append(friendItem);
+			/*var friendFbId = friend.id;
+			var friendName = friend.firstName + ' ' + friend.lastName;
 			var friendItem = $('<tr/>').addClass("friend-item");
 			var friendPictureUrl = "//graph.facebook.com/" + friendFbId + "/picture";
 			var friendPicture = $("<img/>").addClass("friend-picture").attr("src",friendPictureUrl);
 			var friendPictureCell = $('<td/>').addClass("friend-picture-cell").append(friendPicture);
 			var friendNameCell = $('<td/>').addClass("friend-name").append(friendName);
+			var friendInviteButton = $('<td/>');
 			friendItem.append(friendPictureCell);
 			friendItem.append(friendNameCell);
+			friendItem.append(friendInviteButton);
 			friendList.append(friendItem);
+			
+			if ( showFriendsToInvite && (!$.isDefined(friend.invited) || !friend.invited))
+			{
+				friendInviteButton.append('Invite')
+				.addClass('friend-invite').addClass('friends-button')
+				.click(function(){
+					friend.invited = true;
+					friendInviteButton.empty();
+					self.inviteFriend(friend.id);
+				});
+			}*/
 		}
 	}
 	
@@ -2494,34 +2658,31 @@ FriendsMenu.prototype.getFriendsList = function()
 	friendsControls.append(friendsControlsRow);
 	friendsDiv.append(friendsControls);
 	
-	if (this.currentPageNb > 0) 
+	if (pageNb > 0) 
 	{
 		var friendsPrevious = $('<td/>')
 		.addClass('friends-button').addClass('friends-previous')
-		.append('<- Page ' + this.currentPageNb + ' - ')
-		.click(function(){ self.changePage(this.currentPageNb-1); });
+		.append('<- Page ' + pageNb)
+		.click(function(){ self.updateFriendsList(pageNb-1); });
 		friendsControlsRow.append(friendsPrevious);
 	}
 	
-	var friendsPageNb = friendsPrevious = $('<td/>').addClass('friends-page-nb').append('Page ' + (this.currentPageNb+1));
-	friendsControlsRow.append(friendsPageNb);
+	if (nbPages > 1)
+	{
+		var friendsPageNb = friendsPrevious = $('<td/>').addClass('friends-page-nb').append('Page ' + (pageNb+1));
+		friendsControlsRow.append(friendsPageNb);
+	}
 	
-	if (this.currentPageNb < (nbPages-1)) 
+	if (pageNb < (nbPages-1)) 
 	{
 		var friendsNext = $('<td/>')
 		.addClass('friends-button').addClass('friends-next')
-		.append(' - Page ' + (this.currentPageNb+2) + ' ->')
-		.click(function(){ self.changePage(this.currentPageNb+1); });
+		.append('Page ' + (pageNb+2) + ' ->')
+		.click(function(){ self.updateFriendsList(pageNb+1); });
 		friendsControlsRow.append(friendsNext);
 	}
 
-	return friendsDiv.html();
-};
-
-FriendsMenu.prototype.changePage = function(pageNb)
-{
-	this.currentPageNb = pageNb;
-	this.refreshCaptions();
+	return friendsDiv;
 };
 
 FriendsMenu.prototype.updateState = function(showMenu)
@@ -2532,9 +2693,10 @@ FriendsMenu.prototype.updateState = function(showMenu)
     {
     	serverManager.requestFriendsToInvite(function(data)
     	{
-    		self.friendsToInvite = data;
-    		self.nbFriendsToInvite = $.getNbKeysInObject(data);
+    		self.friendsToInvite = $.isDefined(data) && $.isDefined(data.friends) ? data.friends : [];
+    		self.nbFriendsToInvite = $.getNbKeysInObject(self.friendsToInvite);
     		self.nbPagesForFriendsToInvite = self.computeNbPages(self.nbFriendsToInvite);
+    		self.listOfFriendsToInvite = self.getFriendsList(true,0);
     		MenuFrame.prototype.updateState.call(self,showMenu);
     		//self.music.playLoop();
     		self.$screen.addClass("paused");
@@ -2554,7 +2716,7 @@ FriendsMenu.prototype.updateState = function(showMenu)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\GameOverMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\GameOverMenu.js **/
 
 var GameOverMenu = function()
 {
@@ -2564,7 +2726,7 @@ var GameOverMenu = function()
 GameOverMenu.prototype = new EndGameMenu();
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\MainMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\MainMenu.js **/
 
 var MainMenu = function()
 {
@@ -2630,7 +2792,7 @@ MainMenu.prototype.updateState = function(showMenu)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\PauseMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\PauseMenu.js **/
 
 var PauseMenu = function()
 {
@@ -2673,7 +2835,7 @@ PauseMenu.prototype.updateState = function(paused)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\TopScoresMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\TopScoresMenu.js **/
 
 var TopScoresMenu = function()
 {
@@ -2770,7 +2932,7 @@ TopScoresMenu.prototype.getTopScores = function()
 		var scoreUser = $('<td/>').addClass("top-score-user").append(score.firstname + " " + score.lastname);
 		var scoreValue = $('<td/>').addClass("top-score-value").append(score.value);
 		var scoreDate = $('<td/>').addClass("top-score-date");
-		var scoreDT = new Date(score.game_dt * 1000).toLocaleDateString(LOCALE.replace('_','-'));
+		var scoreDT = $.timestampToLocaleDate(score.game_dt);
 		scoreDate.append(scoreDT);
 		scoreItem.append(scoreUser);
 		scoreItem.append(scoreDate);
@@ -2811,7 +2973,7 @@ TopScoresMenu.prototype.updateState = function(showMenu)
 };
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\VictoryMenu.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\VictoryMenu.js **/
 
 var VictoryMenu = function()
 {
@@ -2821,7 +2983,7 @@ var VictoryMenu = function()
 VictoryMenu.prototype = new EndGameMenu();
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\8-player\Player.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\8-player\Player.js **/
 
 var Player = function(playerConfig)
 {
@@ -3226,7 +3388,7 @@ Player.prototype.doUpdate = function(deltaTimeSec)
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\9-game\Game.js **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\js\9-game\Game.js **/
 
 var Game = function()
 {
@@ -3240,6 +3402,7 @@ var Game = function()
 	this.timeSinceLoadingEnd = 0;
 	this.started = false;
 	this.paused = false;
+	this.friendsRequestsMessagesDone = false;
 	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
@@ -3409,6 +3572,22 @@ Game.prototype.logout = function()
 	location.href = location.href + '?logout';
 };
 
+Game.prototype.checkFriendsRequests = function()
+{
+	if (!this.friendsRequestsMessagesDone && $.isDefined(friendsRequests) && (friendsRequests.length != null))
+	{
+		for(var friendRequestIndex in friendsRequests)
+		{
+			var friendRequest = friendsRequests[friendRequestIndex];
+			var friendRequestStr = friendRequest.message
+			+ "\nFrom " + friendRequest.from
+			+ "\nOn " + $.timestampToLocaleDate(friendRequest.time);
+			alert(friendRequestStr);
+		}
+	}
+	this.friendsRequestsMessagesDone = true;
+};
+
 Game.prototype.showLoadingScreen = function(g,text,textPosX,progress,alpha)
 {
     //console.log("Progress: " + this.getLoadingProgress());
@@ -3536,6 +3715,7 @@ Game.prototype.mainLoop = function()
     	{
             this.gameRender(this.graphics);
             this.gameUpdate(deltaTimeSec);
+			this.checkFriendsRequests();
             break;
     	}
     }
@@ -3560,9 +3740,11 @@ Game.prototype.gameRender = function(g)
 $(document).ready(function()
 {
 	console.log("Game started");
+	
 	assetManager = new AssetManager();
 	inputManager = new InputManager();
 	serverManager = new ServerManager();
+	fbManager = new FacebookManager();
 	levelLoader = new LevelLoader();
 	game = new Game();
 });

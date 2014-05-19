@@ -1,8 +1,8 @@
 /** 
-* CSS style file generated on Mon, 19 May 2014 01:07:55 +0200
+* CSS style file generated on Mon, 19 May 2014 19:55:57 +0200
 **/
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\0-base.css **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\css\0-base.css **/
 
 @font-face{
     font-family: 5metrik_bold;
@@ -49,7 +49,7 @@ div{
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\1-scene.css **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\css\1-scene.css **/
 
 #scene-view{
     position: absolute;
@@ -61,7 +61,7 @@ div{
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\gui.css **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\css\gui.css **/
 
 .menu{
     z-index: 10;
@@ -285,13 +285,13 @@ div{
     text-align:center;
     text-decoration: underline;
 }
-#friends-list{
+#friends-bombs{
     font-size: 14px;
     top: 50%;
-    margin-top: -200px;
-    margin-left: -100px;
-    width: 200px;
-    height:400px;
+    margin-top: 180px;
+    margin-left: -300px;
+    width: 600px;
+    height:40px;
 }
 #friends-change{
     top: 50%;
@@ -309,38 +309,35 @@ div{
     height:40px;
     vertical-align: middle;
 }
-/*.friends-controls{
+.friends-list{
+	position: absolute;
     top: 50%;
-    margin-top: 200px;
-    margin-left: -200px;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -150px;
     width: 300px;
-    height:40px;
     vertical-align: middle;
 }
-.friends-previous{
-    top: 50%;
-    margin-top: 200px;
-    margin-left: -200px;
-    width: 100px;
-    height:40px;
-    vertical-align: middle;
+.friend-name{
+	width:200px;
+    font-family: CutOutsFLF;
+    text-align:center;
 }
 .friends-page-nb{
-    top: 50%;
-    margin-top: 200px;
-    margin-left: -100px;
-    width: 100px;
-    height:40px;
-    vertical-align: middle;
+	width:100px;
+    font-family: CutOutsFLF;
+    text-align:center;
 }
-.friends-next{
-    top: 50%;
-    margin-top: 200px;
-    margin-left: 0px;
-    width: 100px;
-    height:40px;
-    vertical-align: middle;
-}*/
+.friends-button{
+    font-family: CutOutsFLF;
+    text-align:center;
+	border: 1px;
+	background-color: navy;
+	color: white;
+	cursor: pointer;
+	margin-left: 10px;
+	margin-right: 10px;
+}
 
 #pause-menu{
 	height:140px;
@@ -380,7 +377,7 @@ div{
 
 
 
-/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\hud.css **/
+/** From file C:\workspace\raptor-web\raptor-web-static-src\css\hud.css **/
 
 #hud div {
 	z-index: 5;

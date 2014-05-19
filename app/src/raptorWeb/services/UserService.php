@@ -48,11 +48,28 @@ class UserService
 		return 0;
 	}
 	
-	public static function listTopScores(\raptorWeb\model\User $user)
+	public static function consumeGift(\raptorWeb\model\User $user)
 	{
-		$userScores    = \raptorWeb\model\Score::listForUser($user->id, null, 5);
-		$friendsScores = \raptorWeb\model\Score::listForUser(0, $user->friends, 5);
-		$allScores     = \raptorWeb\model\Score::listForUser(0, null, 5);
+		if ($user->nbGiftBombs > 0)
+		{
+			$user->nbGiftBombs--;
+			$user->update();
+			return array( 'nbGiftBombs' => $user->nbGiftBombs );
+		}
+		return 0;
+	}
+	
+	public static function receiveGift(\raptorWeb\model\User $user)
+	{
+		$user->nbBombs++;
+		$user->update();
+	}
+	
+	public static function listTopScores(\raptorWeb\model\User $user, $maxNbScores)
+	{
+		$userScores    = \raptorWeb\model\Score::listForUser($user->id, null, $maxNbScores);
+		$friendsScores = \raptorWeb\model\Score::listForUser(0, $user->friends, $maxNbScores);
+		$allScores     = \raptorWeb\model\Score::listForUser(0, null, $maxNbScores);
 		$topScores = array();
 		$topScores['user'   ] = $userScores;
 		$topScores['friends'] = $friendsScores;
@@ -134,7 +151,7 @@ class UserService
 		}
 	}
 	
-	public static function loginFacebookUser(\Facebook $fb)
+	public static function loginFacebookUser(\Facebook $fb, $config)
 	{
 		// check logged FB user
 		$fbUserId = $fb->getUser();
@@ -155,8 +172,12 @@ class UserService
 			$user = self::registerFacebookUser($fbUser);
 		}
 		
+		$maxNbGiftBombs = (int) $config['MAX_NB_GIFT_BOMBS_PER_USER'];
+		$timeUntilNextGiftBombInSec = (int) $config['PERIOD_GIFT_BOMBS_SEC'];
+		$user->checkGiftBombs($maxNbGiftBombs, $timeUntilNextGiftBombInSec);
 		$user->storeConnectionTime();
-		$user->friends = self::listFacebookFriends($fb, true, false);
+		$friends = self::listFacebookFriends($fb, true, false);
+		$user->friends = isset($friends) && isset($friends['friends']) ? $friends['friends'] : array();
 		$_SESSION['user'] = $user;
 		
 		return true;
@@ -177,14 +198,15 @@ class UserService
 				
 				if ($friend_ok)
 				{
-					$friendName = $friend['first_name'] . ' ' . $friend['last_name'];
-					$friendsIds[$friendName] = $friend['id'];
+					// key define order of friends in the list
+					$friendName = $friend['first_name'] . '_' . $friend['last_name'] . '_' . $friend['id'];
+					$friendsIds[$friendName] = array ( 'id' => $friend['id'], 'firstName' => $friend['first_name'], 'lastName' => $friend['last_name'] );
 				}
 			}
 		}
 		
 		ksort($friendsIds);
 		//die(json_encode($friendsIds));
-		return $friendsIds;
+		return array ( 'friends' => $friendsIds );
 	}
 }

@@ -11,9 +11,8 @@ window.requestAnimFrame = (function() {
 
 if (!Object.keys) {
     Object.keys = function (obj) {
-        var keys = [],
-            k;
-        for (k in obj) {
+        var keys = [];
+        for (var k in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, k)) {
                 keys.push(k);
             }
@@ -235,7 +234,12 @@ $.showEase = function(g,rect,ease)
 
 $.objectToString = function(objectToShow)
 {
-	return JSON.stringify(objectToShow, null, 4);
+	return JSON.stringify(objectToShow, null, 3);
+};
+
+$.timestampToLocaleDate = function(timestamp)
+{
+	return new Date(parseInt(timestamp) * 1000).toLocaleDateString(LOCALE.replace('_','-'));
 };
 
 // UNIT TESTS
