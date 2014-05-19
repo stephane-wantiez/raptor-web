@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Dim 18 Mai 2014 à 23:10
+-- Généré le: Lun 19 Mai 2014 à 18:10
 -- Version du serveur: 5.6.12-log
--- Version de PHP: 5.4.12
+-- Version de PHP: 5.4.16
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `config` (
   `value` varchar(32) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `type` (`type`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
 
 --
 -- Contenu de la table `config`
@@ -55,7 +55,9 @@ INSERT INTO `config` (`id`, `name`, `identifier`, `type`, `value`) VALUES
 (9, 'Explosion flash period (in msec)', 'EXPLOSION_FLASH_PERIOD_MSEC', 2, '100'),
 (10, 'Explosion flash color (RGB)', 'EXPLOSION_FLASH_COLOR', 2, '#FFFFB0'),
 (11, 'Max nb of score tuples per user', 'MAX_NB_SCORES_PER_USER', 3, '5'),
-(12, 'Max nb of friends per page', 'MAX_NB_FRIENDS_PER_PAGE', 3, '5');
+(12, 'Max nb of friends per page', 'MAX_NB_FRIENDS_PER_PAGE', 3, '5'),
+(13, 'Max nb of gift bombs per user', 'MAX_NB_GIFT_BOMBS_PER_USER', 3, '3'),
+(14, 'Period between each gift bomb (in sec)', 'PERIOD_GIFT_BOMBS_SEC', 3, '86400');
 
 -- --------------------------------------------------------
 
@@ -228,7 +230,7 @@ CREATE TABLE IF NOT EXISTS `score` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `game_done` (`game_done`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=80 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=81 ;
 
 --
 -- Contenu de la table `score`
@@ -242,7 +244,8 @@ INSERT INTO `score` (`id`, `user_id`, `game_dt`, `value`, `game_done`) VALUES
 (76, 10, 1400360897, 169, 1),
 (77, 10, 1400361000, 310, 1),
 (78, 14, 1400369233, 124, 1),
-(79, 21, 1400427269, 124, 1);
+(79, 21, 1400427269, 124, 1),
+(80, 14, 1400522403, 45, 0);
 
 -- --------------------------------------------------------
 
@@ -261,19 +264,22 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` varchar(100) DEFAULT NULL,
   `last_cnx_dt` int(10) unsigned NOT NULL,
   `nb_bombs` smallint(5) unsigned NOT NULL,
+  `nb_gift_bombs` int(10) unsigned NOT NULL,
+  `next_gift_bomb_dt` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `fb_id` (`fb_id`,`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=22 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=23 ;
 
 --
 -- Contenu de la table `user`
 --
 
-INSERT INTO `user` (`id`, `fb_id`, `username`, `password`, `firstname`, `lastname`, `email`, `last_cnx_dt`, `nb_bombs`) VALUES
-(10, '0', 'Lord W', 'sha256:1000:jHfBjE7+N8xGBS4yvmq24+N4yWehlMrc:e4i5++F0J4VryT3AcH7+gp3sSX55oyVu', 'Stéphane', 'Wantiez', 'stephane.wantiez@gmail.com', 0, 0),
-(13, '42', 'robert_mitchum', '42', 'Robert', 'Mitchum', 'robert.mitchum@mymail.com', 0, 0),
-(14, '698421819', 'Stéphane_Wantiez_698421819', '', 'Stéphane', 'Wantiez', 'stephane.wantiez@gmail.com', 1400454480, 0),
-(21, '100008364579710', 'Test-Stéphane_Wantiez_100008364579710', '', 'Test-Stéphane', 'Wantiez', 's.wantiez@rubika-edu.com', 1400432180, 0);
+INSERT INTO `user` (`id`, `fb_id`, `username`, `password`, `firstname`, `lastname`, `email`, `last_cnx_dt`, `nb_bombs`, `nb_gift_bombs`, `next_gift_bomb_dt`) VALUES
+(10, '0', 'Lord W', 'sha256:1000:jHfBjE7+N8xGBS4yvmq24+N4yWehlMrc:e4i5++F0J4VryT3AcH7+gp3sSX55oyVu', 'Stéphane', 'Wantiez', 'stephane.wantiez@gmail.com', 0, 0, 0, 0),
+(13, '42', 'robert_mitchum', '42', 'Robert', 'Mitchum', 'robert.mitchum@mymail.com', 0, 0, 0, 0),
+(14, '698421819', 'Stéphane_Wantiez_698421819', '', 'Stéphane', 'Wantiez', 'stephane.wantiez@gmail.com', 1400522662, 1, 1, 1400597599),
+(21, '100008364579710', 'Test-Stéphane_Wantiez_100008364579710', '', 'Test-Stéphane', 'Wantiez', 's.wantiez@rubika-edu.com', 1400522176, 3, 3, 1400604389),
+(22, '100008386745013', 'Aatest-Stéphane_Wantiez_100008386745013', '', 'Aatest-Stéphane', 'Wantiez', 'admin@wolf.swantiez.org', 1400509291, 0, 0, 0);
 
 -- --------------------------------------------------------
 
