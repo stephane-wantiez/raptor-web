@@ -54,3 +54,14 @@ FacebookManager.prototype.sendGiftBombToFriend = function(friendId,successCallba
 {
 	this.sendData( friendId, 'Gift bomb received for ' + Game.TITLE, 'Gift bomb received!', 'gift-bomb', successCallback, errorCallback );
 };
+
+FacebookManager.prototype.postOnWall = function(message)
+{
+	console.log("Sharing on facebook '" + message + "'");
+	FB.ui({
+		  method: 'feed',
+		  link: 'http://www.swantiez.org',
+		  name: Game.TITLE,
+		  caption: message,
+		}, function(response){});
+};

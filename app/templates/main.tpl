@@ -2,12 +2,22 @@
 <script>
     var config = <?php echo json_encode($_SESSION['config']); ?>;
 	var user = <?php echo $_SESSION['user']->toJSON(); ?>;
-	var nofblogin = <?php echo ( isset($_SESSION['nofb']) && $_SESSION['nofb'] ? 'true' : 'false' ); ?>;
+	var nofblogin = <?php echo ( defined('FB_APP_ID') ? 'false' : 'true' ); ?>;
 	var ENCRYPT_ENABLED = <?php echo (ENCRYPT_ENABLED ? 'true' : 'false'); ?>;
 	var FB_APP_ID = "<?php if (defined('FB_APP_ID')) { echo FB_APP_ID; } ?>";
 	var LOCALE = "<?php echo $_SESSION['locale']; ?>";
 	var webStaticUri = '<?php echo WEB_STATIC_URI; ?>';
-	var friendsRequests = <?php echo json_encode($_SESSION['friendsRequests']); $_SESSION['friendsRequests'] = array(); ?>;
+	var friendsRequests = <?php
+	   if (isset($_SESSION['friendsRequests']))
+	   {
+	       echo json_encode($_SESSION['friendsRequests']);
+	       $_SESSION['friendsRequests'] = array();
+	   }
+	   else
+	   {
+	       echo 'null';
+	   }
+	?>;
 </script>
 <script type="text/javascript" src="<?php echo WEB_STATIC_URI; ?>js/script.js"></script>
 
@@ -40,8 +50,8 @@
                     </div>
                 </div>
             </div>
-            <div class="menu">
-            </div>
+            <div class="menu"></div>
+            <div id="sound_volume"></div>
         </div>
     </div>
 </body>

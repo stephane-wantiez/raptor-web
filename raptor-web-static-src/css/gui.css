@@ -1,3 +1,11 @@
+#sound_volume{
+    z-index: 20;
+	position:absolute;
+	top:10px;
+	left:100%;
+	margin-left: -60px;
+	cursor:pointer;
+}
 .menu{
     z-index: 10;
 	position: absolute;
@@ -288,7 +296,7 @@
 }
 
 .endgame-menu{
-    height:160px;
+    height:190px;
 }
 .endgame-menu-score1{
     top:40px;
@@ -296,11 +304,14 @@
 .endgame-menu-score2{
     top:60px;
 }
-.endgame-menu-restart{
+.endgame-menu-share{
     top:95px;
 }
-.endgame-menu-exit{
+.endgame-menu-restart{
     top:125px;
+}
+.endgame-menu-exit{
+    top:155px;
 }
 
 #victory-menu{

@@ -49,13 +49,13 @@ MainMenu.prototype.updateState = function(showMenu)
 	
     if(showMenu)
     {
-    	//this.music.playLoop();
+    	this.music.playLoop();
     	this.$menuTitleScreen.addClass("visible");
     	this.$screen.addClass("paused");
     }
     else
     {
-    	//this.music.stop();
+    	this.music.stop();
     	this.$menuTitleScreen.removeClass("visible");
     	this.$screen.removeClass("paused");
     }

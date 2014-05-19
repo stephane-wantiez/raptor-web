@@ -170,7 +170,7 @@ Scene.prototype.checkActorsPosition = function()
 	}
 };
 
-Scene.prototype.killActiveActors = function()
+Scene.prototype.damageActiveActors = function(damages)
 {
 	for (var actorId in this.actors.list)
 	{
@@ -178,7 +178,7 @@ Scene.prototype.killActiveActors = function()
 		
 		if (actor.state == Actor.State.ACTIVE)
 		{
-			actor.kill();
+			actor.damage(damages);
 		}
 	}
 };

@@ -12,6 +12,11 @@ var Game = function()
 	this.paused = false;
 	this.friendsRequestsMessagesDone = false;
 	
+	this.soundVolumeOnImg = null;
+	this.soundVolumeOffImg = null;
+	this.soundEnabled = false;
+	this.soundVolumeDiv = null;
+	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
     this.graphics = sceneView.getContext("2d");
@@ -50,21 +55,27 @@ Game.prototype.initAssets = function()
         "enemy3"      	   : imagesPath +   "sprites_enemy3.png",
         "explosion1"   	   : imagesPath +   	"explosion1.png",
         "explosion2"   	   : imagesPath +   	"explosion2.png",
-        "boss1"            : imagesPath +     "sprite_boss1.png"
+        "boss1"            : imagesPath +     "sprite_boss1.png",
+        "sound-on"         : imagesPath +         "sound-on.png",
+        "sound-off"        : imagesPath +        "sound-off.png"
     };
 
     var soundsPath = webStaticUri + "sounds/";
     var soundList = {
         "shoot_basic"   : soundsPath +   "shoot_basic.wav",
         "bullet_hit"    : soundsPath +    "bullet_hit.wav",
-        "explosion"     : soundsPath +     "explosion.wav",
+        "explosion"     : soundsPath +     "explosion.wav"
+    };
+
+    var musicPath = webStaticUri + "sounds/";
+    var musicList = {
         "music-menu"    : soundsPath +    "music-menu.mp3",
         "music-battle1" : soundsPath + "music-battle1.mp3",
         "music-boss1"   : soundsPath +   "music-boss1.mp3",
         "music-victory" : soundsPath + "music-victory.mp3"
     };
     
-    assetManager.startLoading(imageList,soundList);
+    assetManager.startLoading(imageList,soundList,musicList);
 };
 
 Game.prototype.onAssetsLoaded = function()
@@ -80,6 +91,21 @@ Game.prototype.onAssetsLoaded = function()
 	this.gameOverMenu = new GameOverMenu();
 	
 	this.launchMainMenu();
+    this.initSoundVolume();
+};
+
+Game.prototype.initSoundVolume = function()
+{
+	var self = this;
+	this.soundVolumeOnImg = assetManager.getImage('sound-on');
+	this.soundVolumeOffImg = assetManager.getImage('sound-off');
+	this.soundEnabled = true;
+	this.soundVolumeDiv = $('#sound_volume').append(this.soundVolumeOnImg).click(function(){
+		self.soundEnabled = !self.soundEnabled;
+		self.soundVolumeDiv.empty();
+		self.soundVolumeDiv.append(self.soundEnabled ? self.soundVolumeOnImg : self.soundVolumeOffImg);
+		assetManager.fireSoundVolumeChange(self.soundEnabled);
+	});
 };
 
 Game.prototype.launchMainMenu = function()
@@ -182,7 +208,7 @@ Game.prototype.logout = function()
 
 Game.prototype.checkFriendsRequests = function()
 {
-	if (!this.friendsRequestsMessagesDone && $.isDefined(friendsRequests) && (friendsRequests.length != null))
+	if (!this.friendsRequestsMessagesDone && $.isDefined(friendsRequests) && (friendsRequests != null) && (friendsRequests.length != null))
 	{
 		for(var friendRequestIndex in friendsRequests)
 		{

@@ -1,8 +1,8 @@
 /** 
-* Script file generated on Mon, 19 May 2014 20:08:53 +0200
+* Script file generated on Tue, 20 May 2014 00:39:42 +0200
 **/
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\0-utils\utils.js **/
 
 window.requestAnimFrame = (function() {
   return window.requestAnimationFrame ||
@@ -261,7 +261,7 @@ if (testValue != "00001234") console.error("$.expandValueDigits is WRONG: " + te
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\0-Sound.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-managers\0-Sound.js **/
 
 var Sound = function(url)
 {
@@ -318,9 +318,14 @@ Sound.prototype.stop = function()
 	this.audio.pause();
 };
 
+Sound.prototype.setMute = function(mute)
+{
+	this.audio.volume = mute ? 0 : 1;
+};
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\1-AssetManager.js **/
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-managers\1-AssetManager.js **/
 
 var AssetManager = function()
 {
@@ -333,6 +338,7 @@ var AssetManager = function()
 	this.imagesToLoad = {};
 	this.soundsToLoad = {};
 	this.loadingStarted = false;
+	this.soundVolumeChangeListeners = [];
     //this.renderAlpha = 1;
 };
 
@@ -396,7 +402,7 @@ AssetManager.prototype.loadImage = function(url, id)
 	return img;
 };
 
-AssetManager.prototype.loadSound = function(url, id, onload)
+AssetManager.prototype.loadSound = function(url, id, music, onload)
 {
 	var _this = this;	
 	if(!id) id = url;
@@ -425,6 +431,13 @@ AssetManager.prototype.loadSound = function(url, id, onload)
         		_this.assetLoaded();
         	}
 	    });
+	    
+	    if (music)
+	    {
+		    this.addSoundVolumeChangeListener(function(enabled){
+		    	sound.setMute(!enabled);
+		    });
+	    }
 	    
 		this.sounds[id] = sound;
 	}
@@ -482,7 +495,7 @@ AssetManager.prototype.isDoneLoading = function()
 	return this.totalAssetCount <= this.totalAssetLoaded;
 };
 
-AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
+AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList, musicLoadingList)
 {
 	this.loadingStartTime = Date.now();	
 	this.totalAssetLoaded = 0;
@@ -500,6 +513,10 @@ AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
 	{
 		this.totalAssetCount++;
 	}
+	for(var i in musicLoadingList)
+	{
+		this.totalAssetCount++;
+	}
 	
 	this.loadingStarted = true;
 
@@ -513,7 +530,11 @@ AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
 	}
 	for(var i in soundLoadingList)
 	{
-		this.loadSound(soundLoadingList[i], i);
+		this.loadSound(soundLoadingList[i], i, false);
+	}
+	for(var i in musicLoadingList)
+	{
+		this.loadSound(musicLoadingList[i], i, true);
 	}
 };
 
@@ -544,9 +565,22 @@ AssetManager.prototype.getSound = function(id)
 	return this.sounds[id];
 };
 
+AssetManager.prototype.addSoundVolumeChangeListener = function(listener)
+{
+	this.soundVolumeChangeListeners.push(listener);
+};
+
+AssetManager.prototype.fireSoundVolumeChange = function(enabled)
+{
+	for(var listenerIndex in this.soundVolumeChangeListeners)
+	{
+		this.soundVolumeChangeListeners[listenerIndex](enabled);
+	}
+};
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\2-ServerManager.js **/
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-managers\2-ServerManager.js **/
 
 var ServerManager = function()
 {};
@@ -633,7 +667,7 @@ ServerManager.prototype.requestFriendsToInvite = function(successCallback,errorC
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\1-managers\3-FacebookManager.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\1-managers\3-FacebookManager.js **/
 
 var FacebookManager = function()
 {
@@ -692,9 +726,20 @@ FacebookManager.prototype.sendGiftBombToFriend = function(friendId,successCallba
 	this.sendData( friendId, 'Gift bomb received for ' + Game.TITLE, 'Gift bomb received!', 'gift-bomb', successCallback, errorCallback );
 };
 
+FacebookManager.prototype.postOnWall = function(message)
+{
+	console.log("Sharing on facebook '" + message + "'");
+	FB.ui({
+		  method: 'feed',
+		  link: 'http://www.swantiez.org',
+		  name: Game.TITLE,
+		  caption: message,
+		}, function(response){});
+};
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\2-inputs\InputManager.js **/
+
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\2-inputs\InputManager.js **/
 
 var InputManager = function()
 {
@@ -797,7 +842,7 @@ InputManager.P_KEY_CODE = 80;
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\3-graphics\Sprite.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\3-graphics\Sprite.js **/
 
 var Sprite = function(id, img, width, height, colCount, rowCount, frameRate, loop)
 {
@@ -949,7 +994,7 @@ Sprite.prototype.render = function(g)
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\0-PositionChanger.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\0-PositionChanger.js **/
 
 var PositionChanger = function()
 {	
@@ -984,7 +1029,7 @@ PositionChanger.prototype.setPosition = function(x, y)
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\1-Actor.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\1-Actor.js **/
 
 var Actor = function(id,width,height)
 {
@@ -1316,7 +1361,7 @@ Actor.prototype.remove = function()
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\2-ActorsContainer.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\2-ActorsContainer.js **/
 
 var ActorsContainer = function()
 {
@@ -1388,7 +1433,7 @@ ActorsContainer.prototype.removeAll = function()
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\4-base-actors\3-MovingActor.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\4-base-actors\3-MovingActor.js **/
 
 var MovingActor = function(id,width,height)
 {
@@ -1439,7 +1484,7 @@ MovingActor.prototype.doUpdate = function(deltaTimeSec)
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\0-Projectile.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\0-Projectile.js **/
 
 var Projectile = function(id,speedX,speedY,width,height,radius)
 {
@@ -1458,7 +1503,7 @@ Projectile.prototype = new MovingActor();
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\1-Bullet.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\1-Bullet.js **/
 
 var Bullet = function(speedY,speedX)
 {
@@ -1483,7 +1528,7 @@ Bullet.DAMAGE = 5;
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\2-FlyingEnemy.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\2-FlyingEnemy.js **/
 
 var FlyingEnemy = function(id,width,height,x,y)
 {
@@ -1574,7 +1619,7 @@ FlyingEnemy.prototype.doShoot = function()
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingBoss1.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingBoss1.js **/
 
 var FlyingBoss1 = function(id,x,y)
 {
@@ -1635,19 +1680,19 @@ FlyingBoss1.KILL_SPRITE_WIDTH  = 65;
 FlyingBoss1.KILL_SPRITE_HEIGHT = 65;
 FlyingBoss1.KILL_SPRITE_FPS = 10;
 FlyingBoss1.COLLISION_DAMAGE = 1000;
-FlyingBoss1.SHOOT_PROB = 0.25;
+FlyingBoss1.SHOOT_PROB = 0.7;
 FlyingBoss1.KILL_SCORE = 250;
 FlyingBoss1.SHOOT_NB_POS = 5;
 FlyingBoss1.SHOOT_REL_POS_X = [  -20,  -20,  20,  20,   0 ];
 FlyingBoss1.SHOOT_REL_POS_Y = [  -20,   20,  20, -20,  30 ];
 FlyingBoss1.SHOOT_PROJ_SP_X = [ -400, -200, 200, 400,   0 ];
 FlyingBoss1.SHOOT_PROJ_SP_Y = [  200,  400, 400, 200, 500 ];
-FlyingBoss1.SHOOT_MAX_VAR_X = 10;
-FlyingBoss1.SHOOT_MAX_VAR_Y = 10;
+FlyingBoss1.SHOOT_MAX_VAR_X = 20;
+FlyingBoss1.SHOOT_MAX_VAR_Y = 20;
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy1.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy1.js **/
 
 var FlyingEnemy1 = function(id,x,y)
 {
@@ -1680,7 +1725,7 @@ FlyingEnemy1.KILL_SCORE = 14;
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy2.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy2.js **/
 
 var FlyingEnemy2 = function(id,x,y)
 {
@@ -1701,7 +1746,7 @@ FlyingEnemy2.SPRITE_FPS = 20;
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy3.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\FlyingEnemy3.js **/
 
 var FlyingEnemy3 = function(id,x,y)
 {
@@ -1741,7 +1786,7 @@ FlyingEnemy3.SHOOT_SPEED = 1200;
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\5-game-actors\ScoreFeedback.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\5-game-actors\ScoreFeedback.js **/
 
 var ScoreFeedback = function(sourceActor,scoreText)
 {
@@ -1787,7 +1832,7 @@ ScoreFeedback.prototype.doRender = function(g)
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\0-LevelLoader.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\0-LevelLoader.js **/
 
 var LevelLoader = function()
 {
@@ -1911,7 +1956,7 @@ LevelLoader.prototype.getLevelLoadingError = function()
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\1-LevelBuilder.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\1-LevelBuilder.js **/
 
 var LevelBuilder =
 {
@@ -1964,7 +2009,7 @@ var LevelBuilder =
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\6-levels\Scene.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\6-levels\Scene.js **/
 
 var Scene = function(sceneConfig)
 {
@@ -2138,7 +2183,7 @@ Scene.prototype.checkActorsPosition = function()
 	}
 };
 
-Scene.prototype.killActiveActors = function()
+Scene.prototype.damageActiveActors = function(damages)
 {
 	for (var actorId in this.actors.list)
 	{
@@ -2146,7 +2191,7 @@ Scene.prototype.killActiveActors = function()
 		
 		if (actor.state == Actor.State.ACTIVE)
 		{
-			actor.kill();
+			actor.damage(damages);
 		}
 	}
 };
@@ -2310,7 +2355,7 @@ Scene.WAIT_BEFORE_RESTART_MS = 4000;
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\0-MenuFrame.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\0-MenuFrame.js **/
 
 var MenuFrame = function(menuId,title,items,menuExtraClass,menuTitleExtraClass)
 {	
@@ -2414,9 +2459,9 @@ MenuFrame.prototype.updateState = function(openMenu)
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\1-EndGameMenu.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\1-EndGameMenu.js **/
 
-var EndGameMenu = function(menuId,title)
+var EndGameMenu = function(menuId,title,victory)
 {
 	if (!$.isDefined(menuId)) return;
 	
@@ -2430,6 +2475,16 @@ var EndGameMenu = function(menuId,title)
 			type : "text",
 			captionCallback : function(){ return game.getPlayerScore() + " points"; },
 			extraClass : "endgame-menu-score2"
+		},
+		share : {
+			type : "option",
+			caption : "Share",
+			clickCallback : function(){
+				var message = victory ? 'Victory' : 'Defeated';
+				message = message + ' with a score of ' + game.getPlayerScore() + ' points';
+				fbManager.postOnWall(message);
+			},
+			extraClass : "endgame-menu-share"
 		},
 		restart : {
 			type : "option",
@@ -2466,7 +2521,7 @@ EndGameMenu.prototype.updateState = function(gameEnd)
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\FriendsMenu.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\FriendsMenu.js **/
 
 var FriendsMenu = function()
 {
@@ -2698,7 +2753,7 @@ FriendsMenu.prototype.updateState = function(showMenu)
     		self.nbPagesForFriendsToInvite = self.computeNbPages(self.nbFriendsToInvite);
     		self.listOfFriendsToInvite = self.getFriendsList(true,0);
     		MenuFrame.prototype.updateState.call(self,showMenu);
-    		//self.music.playLoop();
+    		self.music.playLoop();
     		self.$screen.addClass("paused");
     	}
     	,function(err)
@@ -2710,23 +2765,23 @@ FriendsMenu.prototype.updateState = function(showMenu)
     else
     {
 		MenuFrame.prototype.updateState.call(self,false);
-    	//this.music.stop();
+    	this.music.stop();
     	this.$screen.removeClass("paused");
     }
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\GameOverMenu.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\GameOverMenu.js **/
 
 var GameOverMenu = function()
 {
-	EndGameMenu.call(this,"game-over-menu","Game Over!");
+	EndGameMenu.call(this,"game-over-menu","Game Over!",false);
 };
 
 GameOverMenu.prototype = new EndGameMenu();
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\MainMenu.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\MainMenu.js **/
 
 var MainMenu = function()
 {
@@ -2779,20 +2834,20 @@ MainMenu.prototype.updateState = function(showMenu)
 	
     if(showMenu)
     {
-    	//this.music.playLoop();
+    	this.music.playLoop();
     	this.$menuTitleScreen.addClass("visible");
     	this.$screen.addClass("paused");
     }
     else
     {
-    	//this.music.stop();
+    	this.music.stop();
     	this.$menuTitleScreen.removeClass("visible");
     	this.$screen.removeClass("paused");
     }
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\PauseMenu.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\PauseMenu.js **/
 
 var PauseMenu = function()
 {
@@ -2835,7 +2890,7 @@ PauseMenu.prototype.updateState = function(paused)
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\TopScoresMenu.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\TopScoresMenu.js **/
 
 var TopScoresMenu = function()
 {
@@ -2955,7 +3010,7 @@ TopScoresMenu.prototype.updateState = function(showMenu)
     		self.friendsScores = data['friends'];
     		self.allScores = data['all'];
     		MenuFrame.prototype.updateState.call(self,showMenu);
-    		//self.music.playLoop();
+    		self.music.playLoop();
     		self.$screen.addClass("paused");
     	}
     	,function(err)
@@ -2967,23 +3022,23 @@ TopScoresMenu.prototype.updateState = function(showMenu)
     else
     {
 		MenuFrame.prototype.updateState.call(self,false);
-    	//this.music.stop();
+    	this.music.stop();
     	this.$screen.removeClass("paused");
     }
 };
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\7-menus\VictoryMenu.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\7-menus\VictoryMenu.js **/
 
 var VictoryMenu = function()
 {
-	EndGameMenu.call(this,"victory-menu","Congratulations!");
+	EndGameMenu.call(this,"victory-menu","Congratulations!",true);
 };
 
 VictoryMenu.prototype = new EndGameMenu();
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\8-player\Player.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\8-player\Player.js **/
 
 var Player = function(playerConfig)
 {
@@ -3009,6 +3064,7 @@ var Player = function(playerConfig)
 	this.useAttackPosition1 = true;
 	
 	this.collisionDamage = parseInt(playerConfig.COLLISION_DAMAGE_ENEMY);
+	this.bombDamage = parseInt(playerConfig.BOMB_DAMAGE);
 	
 	this.healthChanged = true;
 	this.armorChanged = true;
@@ -3126,7 +3182,7 @@ Player.prototype.setArmor = function(value)
 
 Player.prototype.setNbShields = function(value)
 {	
-	value = $.clampValue(value,0,this.maxNbShields);
+	value = Math.max(0,value);
 	
 	if (this.nbShields != value)
 	{
@@ -3169,7 +3225,7 @@ Player.prototype.setSecWeapon = function(value)
 
 Player.prototype.setNbBombs = function(value)
 {	
-	value = $.clampValue(value,0,this.maxNbBombs);
+	value = Math.max(0,value);
 	
 	if (this.nbBombs != value)
 	{
@@ -3312,7 +3368,7 @@ Player.prototype.doDropBomb = function(nbRemainingBombs)
 	//console.log("Drop bomb");
 	this.setNbBombs(nbRemainingBombs);
 	scene.flash();
-	scene.killActiveActors();
+	scene.damageActiveActors(this.bombDamage);
 };
 
 Player.prototype.dropBomb = function()
@@ -3388,7 +3444,7 @@ Player.prototype.doUpdate = function(deltaTimeSec)
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\js\9-game\Game.js **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\js\9-game\Game.js **/
 
 var Game = function()
 {
@@ -3403,6 +3459,11 @@ var Game = function()
 	this.started = false;
 	this.paused = false;
 	this.friendsRequestsMessagesDone = false;
+	
+	this.soundVolumeOnImg = null;
+	this.soundVolumeOffImg = null;
+	this.soundEnabled = false;
+	this.soundVolumeDiv = null;
 	
     var $sceneView = $("#scene-view");
     var sceneView = $sceneView.get(0);
@@ -3442,21 +3503,27 @@ Game.prototype.initAssets = function()
         "enemy3"      	   : imagesPath +   "sprites_enemy3.png",
         "explosion1"   	   : imagesPath +   	"explosion1.png",
         "explosion2"   	   : imagesPath +   	"explosion2.png",
-        "boss1"            : imagesPath +     "sprite_boss1.png"
+        "boss1"            : imagesPath +     "sprite_boss1.png",
+        "sound-on"         : imagesPath +         "sound-on.png",
+        "sound-off"        : imagesPath +        "sound-off.png"
     };
 
     var soundsPath = webStaticUri + "sounds/";
     var soundList = {
         "shoot_basic"   : soundsPath +   "shoot_basic.wav",
         "bullet_hit"    : soundsPath +    "bullet_hit.wav",
-        "explosion"     : soundsPath +     "explosion.wav",
+        "explosion"     : soundsPath +     "explosion.wav"
+    };
+
+    var musicPath = webStaticUri + "sounds/";
+    var musicList = {
         "music-menu"    : soundsPath +    "music-menu.mp3",
         "music-battle1" : soundsPath + "music-battle1.mp3",
         "music-boss1"   : soundsPath +   "music-boss1.mp3",
         "music-victory" : soundsPath + "music-victory.mp3"
     };
     
-    assetManager.startLoading(imageList,soundList);
+    assetManager.startLoading(imageList,soundList,musicList);
 };
 
 Game.prototype.onAssetsLoaded = function()
@@ -3472,6 +3539,21 @@ Game.prototype.onAssetsLoaded = function()
 	this.gameOverMenu = new GameOverMenu();
 	
 	this.launchMainMenu();
+    this.initSoundVolume();
+};
+
+Game.prototype.initSoundVolume = function()
+{
+	var self = this;
+	this.soundVolumeOnImg = assetManager.getImage('sound-on');
+	this.soundVolumeOffImg = assetManager.getImage('sound-off');
+	this.soundEnabled = true;
+	this.soundVolumeDiv = $('#sound_volume').append(this.soundVolumeOnImg).click(function(){
+		self.soundEnabled = !self.soundEnabled;
+		self.soundVolumeDiv.empty();
+		self.soundVolumeDiv.append(self.soundEnabled ? self.soundVolumeOnImg : self.soundVolumeOffImg);
+		assetManager.fireSoundVolumeChange(self.soundEnabled);
+	});
 };
 
 Game.prototype.launchMainMenu = function()
@@ -3574,7 +3656,7 @@ Game.prototype.logout = function()
 
 Game.prototype.checkFriendsRequests = function()
 {
-	if (!this.friendsRequestsMessagesDone && $.isDefined(friendsRequests) && (friendsRequests.length != null))
+	if (!this.friendsRequestsMessagesDone && $.isDefined(friendsRequests) && (friendsRequests != null) && (friendsRequests.length != null))
 	{
 		for(var friendRequestIndex in friendsRequests)
 		{

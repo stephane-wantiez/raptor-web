@@ -22,6 +22,7 @@ var Player = function(playerConfig)
 	this.useAttackPosition1 = true;
 	
 	this.collisionDamage = parseInt(playerConfig.COLLISION_DAMAGE_ENEMY);
+	this.bombDamage = parseInt(playerConfig.BOMB_DAMAGE);
 	
 	this.healthChanged = true;
 	this.armorChanged = true;
@@ -139,7 +140,7 @@ Player.prototype.setArmor = function(value)
 
 Player.prototype.setNbShields = function(value)
 {	
-	value = $.clampValue(value,0,this.maxNbShields);
+	value = Math.max(0,value);
 	
 	if (this.nbShields != value)
 	{
@@ -182,7 +183,7 @@ Player.prototype.setSecWeapon = function(value)
 
 Player.prototype.setNbBombs = function(value)
 {	
-	value = $.clampValue(value,0,this.maxNbBombs);
+	value = Math.max(0,value);
 	
 	if (this.nbBombs != value)
 	{
@@ -325,7 +326,7 @@ Player.prototype.doDropBomb = function(nbRemainingBombs)
 	//console.log("Drop bomb");
 	this.setNbBombs(nbRemainingBombs);
 	scene.flash();
-	scene.killActiveActors();
+	scene.damageActiveActors(this.bombDamage);
 };
 
 Player.prototype.dropBomb = function()

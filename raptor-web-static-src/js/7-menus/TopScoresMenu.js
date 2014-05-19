@@ -116,7 +116,7 @@ TopScoresMenu.prototype.updateState = function(showMenu)
     		self.friendsScores = data['friends'];
     		self.allScores = data['all'];
     		MenuFrame.prototype.updateState.call(self,showMenu);
-    		//self.music.playLoop();
+    		self.music.playLoop();
     		self.$screen.addClass("paused");
     	}
     	,function(err)
@@ -128,7 +128,7 @@ TopScoresMenu.prototype.updateState = function(showMenu)
     else
     {
 		MenuFrame.prototype.updateState.call(self,false);
-    	//this.music.stop();
+    	this.music.stop();
     	this.$screen.removeClass("paused");
     }
 };

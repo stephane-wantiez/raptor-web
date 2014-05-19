@@ -9,6 +9,7 @@ var AssetManager = function()
 	this.imagesToLoad = {};
 	this.soundsToLoad = {};
 	this.loadingStarted = false;
+	this.soundVolumeChangeListeners = [];
     //this.renderAlpha = 1;
 };
 
@@ -72,7 +73,7 @@ AssetManager.prototype.loadImage = function(url, id)
 	return img;
 };
 
-AssetManager.prototype.loadSound = function(url, id, onload)
+AssetManager.prototype.loadSound = function(url, id, music, onload)
 {
 	var _this = this;	
 	if(!id) id = url;
@@ -101,6 +102,13 @@ AssetManager.prototype.loadSound = function(url, id, onload)
         		_this.assetLoaded();
         	}
 	    });
+	    
+	    if (music)
+	    {
+		    this.addSoundVolumeChangeListener(function(enabled){
+		    	sound.setMute(!enabled);
+		    });
+	    }
 	    
 		this.sounds[id] = sound;
 	}
@@ -158,7 +166,7 @@ AssetManager.prototype.isDoneLoading = function()
 	return this.totalAssetCount <= this.totalAssetLoaded;
 };
 
-AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
+AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList, musicLoadingList)
 {
 	this.loadingStartTime = Date.now();	
 	this.totalAssetLoaded = 0;
@@ -176,6 +184,10 @@ AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
 	{
 		this.totalAssetCount++;
 	}
+	for(var i in musicLoadingList)
+	{
+		this.totalAssetCount++;
+	}
 	
 	this.loadingStarted = true;
 
@@ -189,7 +201,11 @@ AssetManager.prototype.startLoading = function(imgLoadingList, soundLoadingList)
 	}
 	for(var i in soundLoadingList)
 	{
-		this.loadSound(soundLoadingList[i], i);
+		this.loadSound(soundLoadingList[i], i, false);
+	}
+	for(var i in musicLoadingList)
+	{
+		this.loadSound(musicLoadingList[i], i, true);
 	}
 };
 
@@ -218,4 +234,17 @@ AssetManager.prototype.getImage = function(id)
 AssetManager.prototype.getSound = function(id)
 {
 	return this.sounds[id];
+};
+
+AssetManager.prototype.addSoundVolumeChangeListener = function(listener)
+{
+	this.soundVolumeChangeListeners.push(listener);
+};
+
+AssetManager.prototype.fireSoundVolumeChange = function(enabled)
+{
+	for(var listenerIndex in this.soundVolumeChangeListeners)
+	{
+		this.soundVolumeChangeListeners[listenerIndex](enabled);
+	}
 };

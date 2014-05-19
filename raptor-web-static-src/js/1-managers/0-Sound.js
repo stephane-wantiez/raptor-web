@@ -52,3 +52,8 @@ Sound.prototype.stop = function()
 {
 	this.audio.pause();
 };
+
+Sound.prototype.setMute = function(mute)
+{
+	this.audio.volume = mute ? 0 : 1;
+};

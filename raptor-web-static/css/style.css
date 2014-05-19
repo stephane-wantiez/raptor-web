@@ -1,8 +1,8 @@
 /** 
-* CSS style file generated on Mon, 19 May 2014 20:08:53 +0200
+* CSS style file generated on Tue, 20 May 2014 00:39:42 +0200
 **/
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\css\0-base.css **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\0-base.css **/
 
 @font-face{
     font-family: 5metrik_bold;
@@ -49,7 +49,7 @@ div{
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\css\1-scene.css **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\1-scene.css **/
 
 #scene-view{
     position: absolute;
@@ -61,8 +61,16 @@ div{
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\css\gui.css **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\gui.css **/
 
+#sound_volume{
+    z-index: 20;
+	position:absolute;
+	top:10px;
+	left:100%;
+	margin-left: -60px;
+	cursor:pointer;
+}
 .menu{
     z-index: 10;
 	position: absolute;
@@ -353,7 +361,7 @@ div{
 }
 
 .endgame-menu{
-    height:160px;
+    height:190px;
 }
 .endgame-menu-score1{
     top:40px;
@@ -361,11 +369,14 @@ div{
 .endgame-menu-score2{
     top:60px;
 }
-.endgame-menu-restart{
+.endgame-menu-share{
     top:95px;
 }
-.endgame-menu-exit{
+.endgame-menu-restart{
     top:125px;
+}
+.endgame-menu-exit{
+    top:155px;
 }
 
 #victory-menu{
@@ -377,7 +388,7 @@ div{
 
 
 
-/** From file C:\workspace\raptor-web\raptor-web-static-src\css\hud.css **/
+/** From file D:\GitHub\raptor-web\raptor-web-static-src\css\hud.css **/
 
 #hud div {
 	z-index: 5;
